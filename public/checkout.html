@@ -88,7 +88,7 @@
 
     <!-- Script Logic -->
     <script>
-        let currentTopupId = null; // Menyimpan ID Transaksi untuk divalidasi nanti
+        let currentTopupId = null;
 
         function showNotification(message, type = 'error') {
             const alertBox = document.getElementById('uiAlert');
@@ -132,8 +132,6 @@
                     document.getElementById('qrisLoading').style.display = 'none';
                     qrisImg.src = data.qr_url;
                     qrisImg.classList.remove('hidden');
-                    
-                    // Simpan ID Transaksi dari backend
                     currentTopupId = data.topup_id; 
                 } else {
                     document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gagal Dimuat</span>';
@@ -144,7 +142,7 @@
                 showNotification("Tidak dapat terhubung ke server pembayaran.", "error");
             }
 
-            // Tombol Aksi
+            // Tombol Aksi Bertahap
             document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
                 const email = document.getElementById('emailInput').value.trim();
                 const username = document.getElementById('usernameInput').value.trim();
@@ -160,12 +158,11 @@
                     return;
                 }
 
-                // Loading State
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Mengecek Pembayaran...`;
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Memeriksa Pembayaran...`;
                 btn.disabled = true;
                 btn.classList.add('opacity-70', 'cursor-not-allowed');
                 
-                showNotification("Sedang memverifikasi mutasi pembayaran ke server...", "info");
+                showNotification("🔍 Memeriksa status mutasi pembayaran...", "info");
 
                 try {
                     const webhookRes = await fetch('/api/webhook', {
@@ -175,21 +172,32 @@
                             plan_key: planKey,
                             email_pembeli: email,
                             username: username,
-                            topup_id: currentTopupId // Kirim ID transaksi buat divalidasi di backend
+                            topup_id: currentTopupId
                         })
                     });
                     
                     const webhookData = await webhookRes.json();
 
-                    if (webhookData.success) {
-                        document.getElementById('mainContent').style.display = 'none';
-                        showNotification("✨ Pembayaran Lunas! Server Pterodactyl Anda berhasil dibuat. Silakan cek inbox/spam email Anda untuk detail login.", "success");
-                    } else {
+                    // Jika belum bayar, berhenti di sini
+                    if (!webhookRes.ok || !webhookData.success) {
                         showNotification(webhookData.error || "Pembayaran belum terdeteksi.", "error");
                         btn.innerHTML = "Cek Ulang Pembayaran";
                         btn.disabled = false;
                         btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                        return;
                     }
+
+                    // Jika LUNAS: Beri tahu sukses bayar dulu, lalu jeda 2 detik sebelum nembak ke Pterodactyl
+                    showNotification("🎉 Pembayaran Sukses! Menyiapkan server Pterodactyl...", "info");
+                    btn.innerHTML = `Menghubungkan ke Panel...`;
+
+                    await new Promise(resolve => setTimeout(resolve, 2000)); // Jeda 2 detik
+
+                    if (webhookData.success) {
+                        document.getElementById('mainContent').style.display = 'none';
+                        showNotification("✨ Pembayaran Sukses & Server Pterodactyl Berhasil Dibuat! Cek inbox/spam email Anda untuk detail login.", "success");
+                    }
+
                 } catch (err) {
                     showNotification("Terjadi kendala jaringan saat memproses sistem.", "error");
                     btn.innerHTML = "Cek Ulang Pembayaran";
