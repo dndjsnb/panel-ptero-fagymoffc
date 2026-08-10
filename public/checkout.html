@@ -7,7 +7,6 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Tambahan sedikit sentuhan smooth & custom scrollbar */
         body {
             background: radial-gradient(circle at top, #111827, #030712);
             font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -23,7 +22,7 @@
 
     <div class="glass-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-gray-800 relative overflow-hidden">
         
-        <!-- Efek Glow Dekoratif di Background -->
+        <!-- Efek Glow Dekoratif -->
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -33,7 +32,7 @@
             <p class="text-xs text-center text-gray-400 mb-6">Selesaikan transaksi untuk otomatis mengaktifkan server Anda.</p>
         </div>
 
-        <!-- Kotak Notifikasi UI (Modern & Clean) -->
+        <!-- Kotak Notifikasi UI -->
         <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
         </div>
 
@@ -64,11 +63,11 @@
                 </div>
             </div>
 
-            <!-- Area QRIS (Fresh & Minimalis) -->
+            <!-- Area QRIS -->
             <div class="text-center bg-gray-900/40 p-4 rounded-xl border border-gray-800/50">
                 <p class="text-xs text-gray-400 mb-3 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
                 <div class="bg-white p-3 rounded-xl inline-block w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center mx-auto shadow-md relative overflow-hidden">
-                    <!-- Skeleton / Loading Pulse -->
+                    <!-- Loading Spinner -->
                     <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
                         <svg class="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -80,7 +79,7 @@
                 </div>
             </div>
 
-            <!-- Tombol Konfirmasi (Smooth Gradient & Interactive) -->
+            <!-- Tombol Konfirmasi -->
             <button id="btnKonfirmasi" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-all duration-200">
                 Saya Sudah Bayar
             </button>
@@ -89,6 +88,8 @@
 
     <!-- Script Logic -->
     <script>
+        let currentTopupId = null; // Menyimpan ID Transaksi untuk divalidasi nanti
+
         function showNotification(message, type = 'error') {
             const alertBox = document.getElementById('uiAlert');
             alertBox.className = "relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg";
@@ -121,7 +122,7 @@
             document.getElementById('invoicePlan').innerText = planName;
             document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
 
-            // Request QRIS dengan penanganan error yang rapi
+            // Request QRIS
             try {
                 const res = await fetch(`/api/generate-qris?amount=${price}`);
                 const data = await res.json();
@@ -131,6 +132,9 @@
                     document.getElementById('qrisLoading').style.display = 'none';
                     qrisImg.src = data.qr_url;
                     qrisImg.classList.remove('hidden');
+                    
+                    // Simpan ID Transaksi dari backend
+                    currentTopupId = data.topup_id; 
                 } else {
                     document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gagal Dimuat</span>';
                     showNotification("Gagal memuat QRIS dari server pembayaran.", "error");
@@ -151,12 +155,17 @@
                     return;
                 }
 
-                // Smooth Loading State
-                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Memproses Server...`;
+                if (!currentTopupId) {
+                    showNotification("Sesi pembayaran belum siap. Silakan refresh halaman.", "error");
+                    return;
+                }
+
+                // Loading State
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Mengecek Pembayaran...`;
                 btn.disabled = true;
                 btn.classList.add('opacity-70', 'cursor-not-allowed');
                 
-                showNotification("Sedang memverifikasi pembayaran dan membuat server...", "info");
+                showNotification("Sedang memverifikasi mutasi pembayaran ke server...", "info");
 
                 try {
                     const webhookRes = await fetch('/api/webhook', {
@@ -165,7 +174,8 @@
                         body: JSON.stringify({
                             plan_key: planKey,
                             email_pembeli: email,
-                            username: username
+                            username: username,
+                            topup_id: currentTopupId // Kirim ID transaksi buat divalidasi di backend
                         })
                     });
                     
@@ -173,15 +183,15 @@
 
                     if (webhookData.success) {
                         document.getElementById('mainContent').style.display = 'none';
-                        showNotification("✨ Pembayaran Berhasil! Server Pterodactyl Anda sudah aktif. Silakan cek inbox/spam email Anda untuk detail akun.", "success");
+                        showNotification("✨ Pembayaran Lunas! Server Pterodactyl Anda berhasil dibuat. Silakan cek inbox/spam email Anda untuk detail login.", "success");
                     } else {
-                        showNotification(`Gagal: ${webhookData.error || "Pembayaran belum terdeteksi."}`, "error");
+                        showNotification(webhookData.error || "Pembayaran belum terdeteksi.", "error");
                         btn.innerHTML = "Cek Ulang Pembayaran";
                         btn.disabled = false;
                         btn.classList.remove('opacity-70', 'cursor-not-allowed');
                     }
                 } catch (err) {
-                    showNotification("Terjadi kendala jaringan saat menghubungi server.", "error");
+                    showNotification("Terjadi kendala jaringan saat memproses sistem.", "error");
                     btn.innerHTML = "Cek Ulang Pembayaran";
                     btn.disabled = false;
                     btn.classList.remove('opacity-70', 'cursor-not-allowed');
