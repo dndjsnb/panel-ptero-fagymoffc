@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <!-- SATPAM PENJAGA DASHBOARD -->
+    <script>
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.replace('reseller-login.html');
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reseller Dashboard - Fahmi Hosting</title>
@@ -57,7 +63,26 @@
         <header class="h-16 glass-panel border-b border-gray-800 flex items-center justify-between px-6 z-10">
             <h2 class="text-lg font-semibold text-white" id="header-title">Overview Sistem</h2>
             <div class="flex items-center space-x-4 ml-auto">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm text-white shadow-lg">R</div>
+                <!-- DROPDOWN PROFIL BARU -->
+                <div class="relative">
+                    <button onclick="toggleProfileMenu()" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm text-white shadow-lg hover:scale-105 transition-transform">
+                        R
+                    </button>
+                    
+                    <!-- Dropdown Menu Profil -->
+                    <div id="profile-menu" class="hidden absolute right-0 mt-3 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl py-2 z-50">
+                        <div class="px-4 py-2 border-b border-gray-800 mb-1">
+                            <p class="text-xs text-gray-400">Login sebagai</p>
+                            <p class="text-sm font-bold text-white truncate">Reseller VIP</p>
+                        </div>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                            <i class="fa-solid fa-user-gear w-5 text-gray-400"></i> Setting Akun
+                        </a>
+                        <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1 border-t border-gray-800 pt-2">
+                            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Keluar
+                        </button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -164,23 +189,37 @@
     </main>
 
     <script>
+        // FUNGSI BUKA TUTUP MENU PROFIL
+        function toggleProfileMenu() {
+            const menu = document.getElementById('profile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Biar menu profil otomatis nutup kalau lu ngeklik sembarang tempat
+        window.addEventListener('click', function(e) {
+            const btnProfil = document.querySelector('button[onclick="toggleProfileMenu()"]');
+            const menuProfil = document.getElementById('profile-menu');
+            
+            if (btnProfil && menuProfil && e.target !== btnProfil && !btnProfil.contains(e.target) && !menuProfil.contains(e.target)) {
+                menuProfil.classList.add('hidden');
+            }
+        });
+
         // 1. FUNGSI GANTI MENU (TABS SPA)
         function switchTab(tabId) {
-            // Sembunyiin semua konten
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Tunjukin konten yang diklik
             document.getElementById('tab-' + tabId).classList.add('active');
 
-            // Ganti warna menu di sidebar
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-blue-600/10', 'text-blue-400');
                 btn.classList.add('text-gray-400');
             });
             const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
-            activeBtn.classList.remove('text-gray-400');
-            activeBtn.classList.add('bg-blue-600/10', 'text-blue-400');
+            if(activeBtn) {
+                activeBtn.classList.remove('text-gray-400');
+                activeBtn.classList.add('bg-blue-600/10', 'text-blue-400');
+            }
 
-            // Ganti Title Header
             const titles = {
                 'dashboard': 'Overview Sistem',
                 'server': 'Kelola Server Pelanggan',
@@ -255,7 +294,7 @@
                 if(result.success && result.qr_url) {
                     qrisEmpty.classList.add('hidden');
                     qrisResult.classList.remove('hidden');
-                    qrisImage.src = result.qr_url; // Nampilin gambar dari backend
+                    qrisImage.src = result.qr_url; 
                 } else {
                     alertBox.classList.remove('hidden');
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
@@ -271,9 +310,17 @@
             }
         });
 
-        // 4. FUNGSI LOGOUT
+        // 4. FUNGSI LOGOUT (MENGHAPUS TIKET/SATPAM)
         function logout() {
-            window.location.href = 'reseller-login.html';
+            const btn = document.querySelector('button[onclick="logout()"]');
+            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Keluar...';
+            
+            // HAPUS TIKET MASUK BIAR DI-LOCK LAGI
+            localStorage.removeItem('isLoggedIn');
+            
+            setTimeout(() => {
+                window.location.href = 'reseller-login.html';
+            }, 800);
         }
     </script>
 </body>

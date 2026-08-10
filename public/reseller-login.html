@@ -60,16 +60,16 @@
                 alertBox.classList.remove('hidden', 'bg-blue-500/20', 'text-blue-400', 'bg-red-500/20', 'text-red-400');
 
                 if (response.ok) {
-                    // Kalau login bener
                     alertBox.classList.add('bg-blue-500/20', 'text-blue-400');
                     alertBox.innerText = result.message; 
                     
-                    // Delay dikit terus pindah ke dashboard
+                    // KASIH TIKET MASUK (SATPAM)
+                    localStorage.setItem('isLoggedIn', 'true'); 
+                    
                     setTimeout(() => {
-                        window.location.href = 'reseller-dashboard.html'; // PENTING: Ganti nama file ini kalau beda!
+                        window.location.href = 'reseller-dashboard.html'; 
                     }, 1500);
                 } else {
-                    // Kalau password/email salah
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
                     alertBox.innerText = result.message; 
                 }
