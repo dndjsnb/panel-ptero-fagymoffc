@@ -16,34 +16,28 @@ module.exports = async (req, res) => {
 
         if (!plan || !topup_id) return res.status(400).json({ success: false, error: 'Data tidak lengkap' });
 
-        // 1. CEK TRANSAKSI DI DAFTAR PENDING (API BARU)
-        const checkRes = await axios.get('https://qris.zakki.store/api/check-status', {
-            params: { token: process.env.ZAKKI_TOKEN, iduser: process.env.ZAKKI_IDUSER }
+        // CEK STATUS KE ENDPOINT YANG BENER: https://qris.zakki.store/cektopup
+        const checkRes = await axios.get(`https://qris.zakki.store/cektopup`, {
+            params: { idtopup: topup_id }
         });
 
-        // Cari transaksi lu di dalam 'pending_list'
-        const transaksi = checkRes.data.pending_list.find(item => item.id_transaksi === topup_id);
-
-        if (transaksi) {
-            // Kalau masih ada di pending_list, artinya BELUM DIBAYAR
+        // Cek apakah statusnya "SUCCESS" (sesuai dokumentasi terbaru)
+        if (!checkRes.data || checkRes.data.status !== 'found' || checkRes.data.data.status !== 'SUCCESS') {
             return res.status(400).json({ 
                 success: false, 
-                error: '❌ Pembayaran belum terdeteksi. Silakan bayar dulu di QRIS yang sudah dibuat!' 
+                error: '❌ Pembayaran belum lunas! Status transaksi: ' + (checkRes.data.status || 'Belum dibayar') 
             });
         }
 
-        // --- BARU LANJUT BIKIN SERVER KALAU TRANSAKSI TIDAK ADA DI PENDING (ARTINYA SUDAH LUNAS) ---
-
-        // 2. BUAT AKUN DI PTERODACTYL
+        // --- LANJUT BIKIN SERVER PTERODACTYL ---
         const userRes = await axios.post(`${process.env.PTERO_URL}/api/application/users`, {
             email: email_pembeli, username, first_name: username, last_name: "Customer", language: "en"
         }, { headers: { 'Authorization': `Bearer ${process.env.PTERO_APP_KEY}`, 'Content-Type': 'application/json' } });
 
-        // 3. BUAT SERVER BOT WA
         await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
             name: `Bot-WA-${username}`,
             user: userRes.data.attributes.id,
-            egg: 15, // SESUAIKAN ID EGG LU
+            egg: 15, // SESUAIKAN ID EGG
             docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
             startup: "/usr/local/bin/node /home/container/index.js",
             environment: { MAIN_FILE: "index.js", AUTO_UPDATE: "0", USER_UPLOAD: "0" },
@@ -55,6 +49,6 @@ module.exports = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Server berhasil dibuat!' });
 
     } catch (error) {
-        return res.status(500).json({ success: false, error: 'Gagal sistem: ' + error.message });
+        return res.status(500).json({ success: false, error: 'Gagal sistem: ' + (error.response?.data?.message || error.message) });
     }
 };
