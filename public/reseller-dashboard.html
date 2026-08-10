@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,36 +7,25 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts: Inter -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        dark: {
-                            900: '#0a0a0f',
-                            800: '#12121a',
-                            700: '#1c1c28',
-                            600: '#2a2a3c',
+                        dark: { 
+                            900: '#09090b', 
+                            800: '#121217', 
+                            700: '#1c1c24',
+                            600: '#272735'
                         },
-                        accent: {
-                            primary: '#6366f1', // Indigo
-                            secondary: '#ec4899', // Pink
-                            success: '#10b981', // Emerald
-                        }
-                    },
-                    boxShadow: {
-                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-                        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
+                        brand: { primary: '#6366f1' }
                     }
                 }
             }
@@ -44,238 +33,220 @@
     </script>
 
     <style>
-        body {
-            background-color: #0a0a0f;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
-            background-attachment: fixed;
-        }
-        
-        .glass-panel {
-            background: rgba(28, 28, 40, 0.6);
+        body { background-color: #09090b; color: #e4e4e7; }
+        .glass {
+            background: rgba(28, 28, 36, 0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .stat-card:hover {
-            transform: translateY(-2px);
-            border-color: rgba(99, 102, 241, 0.4);
-            box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
-        }
-
+        /* Smooth transition for page switching */
+        .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0f; }
-        ::-webkit-scrollbar-thumb { background: #2a2a3c; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
-
-        /* Avatar Glow Animation */
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-            50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
-        }
-        .avatar-glow { animation: pulse-glow 3s infinite; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
     </style>
 </head>
-<body class="text-gray-300 antialiased min-h-screen flex flex-col md:flex-row">
+<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- SIDEBAR (Desktop Only) -->
-    <aside class="hidden md:flex w-64 flex-col glass-panel border-r border-white/5 h-screen sticky top-0 z-50">
-        <div class="p-6 flex items-center gap-3">
-            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-white font-bold">F</div>
-            <h1 class="text-xl font-bold text-white tracking-tight">Fahmi<span class="text-accent-primary">Host</span></h1>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
+        <div class="p-6 flex items-center gap-3 border-b border-white/5">
+            <div class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(99,102,241,0.5)]">F</div>
+            <h1 class="text-xl font-bold text-white tracking-tight">Fahmi<span class="text-brand-primary">Host</span></h1>
         </div>
 
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent-primary/10 text-accent-primary border border-accent-primary/20 transition-all">
-                <i class="fa-solid fa-chart-pie w-5"></i>
-                <span class="font-medium">Dashboard</span>
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all group">
-                <i class="fa-solid fa-server w-5 group-hover:text-accent-primary transition-colors"></i>
-                <span class="font-medium">Kelola Server</span>
-            </a>
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all group">
-                <i class="fa-solid fa-wallet w-5 group-hover:text-accent-success transition-colors"></i>
-                <span class="font-medium">Saldo & Topup</span>
-            </a>
+        <nav class="flex-1 px-4 py-6 space-y-2">
+            <!-- Nav Items with onclick handlers -->
+            <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
+                <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+            </button>
+            
+            <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-server w-5"></i> Kelola Server
+            </button>
+            
+            <button onclick="switchPage('topup')" id="nav-topup" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-wallet w-5"></i> Saldo & Topup
+            </button>
         </nav>
 
         <div class="p-4 border-t border-white/5">
-            <div class="glass-panel rounded-xl p-4">
-                <p class="text-xs text-gray-500 mb-1">Status Sistem</p>
-                <div class="flex items-center gap-2 text-accent-success text-sm font-medium">
-                    <span class="relative flex h-2 w-2">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    Online & Stabil
-                </div>
+            <div class="glass rounded-xl p-4 flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-xs font-medium text-emerald-400">Sistem Online</span>
             </div>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 flex flex-col min-h-screen relative overflow-x-hidden">
+    <!-- MAIN CONTENT WRAPPER -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64">
         
-        <!-- TOP HEADER (Fixed Issue Here!) -->
-        <header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-6 py-4 flex items-center justify-between">
-            <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-gray-400 hover:text-white">
+        <!-- TOP HEADER -->
+        <header class="sticky top-0 z-40 glass border-b border-white/5 px-6 py-4 flex items-center justify-between shrink-0">
+            <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2">
                 <i class="fa-solid fa-bars text-xl"></i>
             </button>
+            
+            <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard Overview</h2>
 
-            <!-- Page Title -->
-            <h2 class="text-lg font-semibold text-white hidden md:block">Manajemen Saldo QRIS</h2>
-            <h2 class="text-lg font-semibold text-white md:hidden">Dashboard</h2>
-
-            <!-- FIXED AVATAR SECTION -->
+            <!-- Profile Dropdown -->
             <div class="relative group">
-                <button class="flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-full glass-panel hover:bg-white/10 transition-all border border-white/10 avatar-glow">
+                <button class="flex items-center gap-3 pl-3 pr-1 py-1.5 rounded-full glass hover:bg-white/10 transition-all border border-white/10">
                     <div class="text-right hidden sm:block">
-                        <p class="text-sm font-medium text-white leading-none">Reseller Admin</p>
-                        <p class="text-[10px] text-gray-400 mt-0.5">ID: #FH-8821</p>
+                        <p class="text-xs font-bold text-white leading-none">Reseller Admin</p>
+                        <p class="text-[10px] text-gray-500 mt-0.5">#FH-8821</p>
                     </div>
-                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-dark-900">
-                        R
-                    </div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-dark-900">R</div>
                 </button>
-
-                <!-- Dropdown Menu (Smooth Reveal) -->
-                <div class="absolute right-0 top-full mt-3 w-48 glass-panel rounded-xl border border-white/10 shadow-glass opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 origin-top-right">
-                    <div class="py-1">
-                        <a href="#" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-                            <i class="fa-regular fa-user mr-2"></i> Profil Saya
-                        </a>
-                        <a href="#" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
-                            <i class="fa-solid fa-gear mr-2"></i> Pengaturan
-                        </a>
-                        <div class="my-1 border-t border-white/5"></div>
-                        <a href="#" class="block px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
-                            <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout
-                        </a>
-                    </div>
+                
+                <!-- Dropdown Menu -->
+                <div class="absolute right-0 top-full mt-2 w-48 glass rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 origin-top-right overflow-hidden">
+                    <a href="#" class="block px-4 py-3 text-xs text-gray-300 hover:bg-white/5 hover:text-white"><i class="fa-regular fa-user mr-2"></i> Profil Saya</a>
+                    <a href="#" class="block px-4 py-3 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout</a>
                 </div>
             </div>
         </header>
 
-        <!-- CONTENT AREA -->
-        <div class="p-6 max-w-7xl mx-auto w-full space-y-8">
+        <!-- SCROLLABLE CONTENT AREA -->
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
             
-            <!-- STATS GRID (Rebuilt Layout) -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                <!-- Card 1 -->
-                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-primary/10 rounded-full blur-2xl group-hover:bg-accent-primary/20 transition-all"></div>
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-2.5 rounded-xl bg-accent-primary/10 text-accent-primary">
-                            <i class="fa-solid fa-server text-lg"></i>
-                        </div>
-                        <span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">+12%</span>
+            <!-- PAGE: DASHBOARD -->
+            <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="glass rounded-2xl p-5 border-l-4 border-brand-primary">
+                        <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Server Aktif</p>
+                        <h3 class="text-2xl font-bold text-white">24 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
                     </div>
-                    <p class="text-gray-400 text-sm font-medium">Total Server Aktif</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">24 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
+                    <div class="glass rounded-2xl p-5 border-l-4 border-emerald-500">
+                        <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Saldo QRIS</p>
+                        <h3 class="text-2xl font-bold text-white">Rp 0 <span class="text-sm font-normal text-gray-500">,-</span></h3>
+                    </div>
+                    <div class="glass rounded-2xl p-5 border-l-4 border-pink-500">
+                        <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Pelanggan</p>
+                        <h3 class="text-2xl font-bold text-white">0 <span class="text-sm font-normal text-gray-500">User</span></h3>
+                    </div>
                 </div>
 
-                <!-- Card 2 -->
-                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-success/10 rounded-full blur-2xl group-hover:bg-accent-success/20 transition-all"></div>
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-2.5 rounded-xl bg-accent-success/10 text-accent-success">
-                            <i class="fa-solid fa-qrcode text-lg"></i>
+                <!-- Deploy Form -->
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">Deploy Server Baru</h3>
+                            <p class="text-xs text-gray-400 mt-1">Instance baru via Pterodactyl API</p>
                         </div>
+                        <span class="px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wide">API Connected</span>
                     </div>
-                    <p class="text-gray-400 text-sm font-medium">Saldo QRIS Aktif</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">Rp 0 <span class="text-sm font-normal text-gray-500">,-</span></h3>
-                </div>
 
-                <!-- Card 3 -->
-                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-secondary/10 rounded-full blur-2xl group-hover:bg-accent-secondary/20 transition-all"></div>
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-2.5 rounded-xl bg-accent-secondary/10 text-accent-secondary">
-                            <i class="fa-solid fa-users text-lg"></i>
+                    <form class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-400 ml-1">Email Pelanggan</label>
+                                <input type="email" placeholder="client@example.com" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-400 ml-1">Username Panel</label>
+                                <input type="text" placeholder="username_client" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                            </div>
                         </div>
-                    </div>
-                    <p class="text-gray-400 text-sm font-medium">Total Pelanggan</p>
-                    <h3 class="text-2xl font-bold text-white mt-1">0 <span class="text-sm font-normal text-gray-500">User</span></h3>
+                        
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Pilih Paket Hosting</label>
+                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all appearance-none cursor-pointer">
+                                <option>Pilih spesifikasi server...</option>
+                                <option>Starter - Rp 5.000/bulan</option>
+                                <option>Pro - Rp 15.000/bulan</option>
+                            </select>
+                        </div>
+
+                        <button type="button" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all mt-2 text-sm">
+                            <i class="fa-solid fa-rocket mr-2"></i> Deploy Server Sekarang
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <!-- DEPLOY SERVER FORM (Rebuilt) -->
-            <div class="glass-panel rounded-2xl p-6 md:p-8 border border-white/5">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-white">Deploy Server Baru</h3>
-                        <p class="text-sm text-gray-400 mt-1">Buat instance server baru untuk pelanggan Anda.</p>
+            <!-- PAGE: SALDO & TOPUP -->
+            <div id="page-topup" class="page-section max-w-4xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8 text-center py-12">
+                    <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
+                        <i class="fa-solid fa-qrcode"></i>
                     </div>
-                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium w-fit">
-                        <i class="fa-solid fa-bolt"></i> Pterodactyl API
+                    <h3 class="text-xl font-bold text-white mb-2">Manajemen Saldo QRIS</h3>
+                    <p class="text-sm text-gray-400 max-w-md mx-auto mb-8">Fitur topup saldo otomatis sedang dalam pengembangan. Silakan hubungi admin untuk pengisian manual sementara waktu.</p>
+                    
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-800 border border-white/10 text-xs text-gray-300">
+                        <i class="fa-solid fa-circle-info text-brand-primary"></i> Status: Maintenance
                     </div>
                 </div>
+            </div>
 
-                <form class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Input Email -->
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-300 ml-1">Email Pelanggan</label>
-                            <div class="relative">
-                                <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                                <input type="email" placeholder="email@client.com" 
-                                    class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all">
-                            </div>
-                        </div>
-
-                        <!-- Input Username (Added for completeness) -->
-                        <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-300 ml-1">Username Panel</label>
-                            <div class="relative">
-                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                                <input type="text" placeholder="username_client" 
-                                    class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all">
-                            </div>
-                        </div>
+            <!-- PAGE: KELOLA SERVER -->
+            <div id="page-servers" class="page-section max-w-6xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8 text-center py-12">
+                    <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500 text-2xl">
+                        <i class="fa-solid fa-server"></i>
                     </div>
-
-                    <!-- Package Select -->
-                    <div class="space-y-2">
-                        <label class="text-sm font-medium text-gray-300 ml-1">Pilih Paket Hosting</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-box-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
-                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white appearance-none focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all cursor-pointer">
-                                <option value="" disabled selected>Pilih spesifikasi server...</option>
-                                <option value="1">Starter - Rp 5.000/bulan (1GB RAM)</option>
-                                <option value="2">Pro - Rp 15.000/bulan (2GB RAM)</option>
-                                <option value="3">Ultimate - Rp 30.000/bulan (4GB RAM)</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
-                        </div>
-                    </div>
-
-                    <!-- Action Button -->
-                    <button type="button" class="w-full bg-gradient-to-r from-accent-primary to-indigo-600 hover:from-indigo-500 hover:to-accent-primary text-white font-semibold py-4 rounded-xl shadow-glow hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all duration-300 transform active:scale-[0.99] flex items-center justify-center gap-2 mt-4">
-                        <i class="fa-solid fa-rocket"></i> Deploy Server Sekarang
-                    </button>
-                </form>
+                    <h3 class="text-xl font-bold text-white mb-2">Daftar Server Pelanggan</h3>
+                    <p class="text-sm text-gray-400">Belum ada server yang aktif saat ini.</p>
+                </div>
             </div>
 
         </div>
     </main>
 
-    <!-- Simple Script for Mobile Menu Toggle (Optional) -->
+    <!-- Overlay for Mobile Sidebar -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
+
     <script>
-        const menuBtn = document.querySelector('button.md\\:hidden');
-        const sidebar = document.querySelector('aside');
-        
-        if(menuBtn && sidebar) {
-            menuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                sidebar.classList.toggle('fixed');
-                sidebar.classList.toggle('inset-0');
-                sidebar.classList.toggle('w-full');
+        // SPA Navigation Logic
+        function switchPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            // Show selected page
+            const target = document.getElementById('page-' + pageId);
+            if(target) target.classList.add('active');
+
+            // Update Title
+            const titles = {
+                'dashboard': 'Dashboard Overview',
+                'topup': 'Manajemen Saldo QRIS',
+                'servers': 'Kelola Server'
+            };
+            document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
+
+            // Update Active Nav State
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200';
             });
+            
+            const activeBtn = document.getElementById('nav-' + pageId);
+            if(activeBtn) {
+                activeBtn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
+            }
+
+            // Close sidebar on mobile after click
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            const isHidden = sidebar.classList.contains('-translate-x-full');
+            
+            if(isHidden) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
     </script>
 </body>
