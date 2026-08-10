@@ -1,9 +1,26 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 const ZakkiStore = require('zakkistore-sdk');
 const axios = require('axios');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
+
+// --- BAGIAN DATABASE MONGODB (Silent Mode) ---
+const mongoURI = 'mongodb+srv://faaahhmmii_db_user:NwGmRthZCDYqwafy@clusterfagym.qzt0o1a.mongodb.net/?appName=ClusterFagym';
+
+mongoose.connect(mongoURI).catch(() => {});
+
+const resellerSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true } 
+});
+
+const Reseller = mongoose.model('Reseller', resellerSchema);
+// ---------------------------------
 
 // 1. DATA PLANS / PAKET HOSTING
 const plans = {
@@ -45,7 +62,7 @@ async function createPteroServer(userId, plan) {
     const res = await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
         name: `Server-${plan.name}`,
         user: userId,
-        egg: 15, // Disesuaikan dengan Egg ID default di panel lu
+        egg: 15,
         docker_image: "ghcr.io/pterodactyl/yolks:java_17",
         startup: "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}}",
         environment: {
@@ -77,6 +94,20 @@ async function createPteroServer(userId, plan) {
     return res.data.attributes;
 }
 
+// --- ENDPOINT API REGISTER RESELLER ---
+app.post('/api/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        
+        const newReseller = new Reseller({ name, email, password });
+        await newReseller.save();
+        
+        res.status(201).json({ message: 'Mantap Cok! Akun reseller berhasil didaftarkan.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Gagal daftar! Email mungkin udah kepakai.' });
+    }
+});
+
 // 4. ENDPOINT GENERATE QRIS
 app.post('/api/generate-qris', async (req, res) => {
     try {
@@ -95,7 +126,6 @@ app.post('/api/generate-qris', async (req, res) => {
         
         throw new Error("Respon dari ZakkiStore tidak valid");
     } catch (err) {
-        console.error("QRIS Error:", err.message);
         res.status(500).json({ success: false, error: err.message });
     }
 });
@@ -108,7 +138,6 @@ app.post('/api/webhook', async (req, res) => {
         const plan = plans[plan_key];
         if (!plan) return res.status(400).json({ success: false, error: 'Paket tidak ditemukan' });
 
-        // Buat User & Server di Pterodactyl
         const userId = await createPteroUser(email_pembeli, username);
         const server = await createPteroServer(userId, plan);
 
@@ -118,7 +147,6 @@ app.post('/api/webhook', async (req, res) => {
             server_id: server.identifier 
         });
     } catch (err) {
-        console.error("Webhook Error:", err.response ? err.response.data : err.message);
         return res.status(500).json({ 
             success: false, 
             error: 'Gagal membuat server Pterodactyl. Cek data API Key / Panel.' 
