@@ -71,6 +71,10 @@
             <button onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
                 <i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana
             </button>
+
+            <button onclick="switchPage('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening
+            </button>
             
             <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
                 <i class="fa-solid fa-server w-5"></i> Kelola Server
@@ -204,15 +208,80 @@
                 </div>
             </div>
 
-            <!-- PAGE: WITHDRAW DANA (FITUR BARU) -->
+            <!-- PAGE: PENGATURAN REKENING DEFAULT (WAJIB DIISI DULU) -->
+            <div id="page-settings" class="page-section max-w-4xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
+                            <i class="fa-solid fa-gear"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Pengaturan Metode Pencairan</h3>
+                        <p class="text-sm text-gray-400">Atur rekening bank atau e-wallet tujuan withdraw Anda.</p>
+                    </div>
+
+                    <form id="withdrawSettingsForm" class="max-w-md mx-auto space-y-5">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Jenis Metode</label>
+                            <select id="settingMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all appearance-none cursor-pointer">
+                                <option value="">Pilih jenis metode...</option>
+                                <option value="BCA">Transfer Bank BCA</option>
+                                <option value="BRI">Transfer Bank BRI</option>
+                                <option value="MANDIRI">Transfer Bank Mandiri</option>
+                                <option value="BNI">Transfer Bank BNI</option>
+                                <option value="GOPAY">GoPay</option>
+                                <option value="DANA">DANA</option>
+                                <option value="OVO">OVO</option>
+                                <option value="SHOPEEPAY">ShopeePay</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nama Pemilik Rekening/E-Wallet</label>
+                            <input type="text" id="settingHolderName" placeholder="Sesuai KTP / Nama Akun" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nomor Rekening / Nomor HP E-Wallet</label>
+                            <input type="text" id="settingAccountNumber" placeholder="Contoh: 1234567890" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                        </div>
+
+                        <!-- DISCLAIMER TANGGUNG JAWAB -->
+                        <div class="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-[10px] text-yellow-400 leading-relaxed">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                            <strong>Perhatian:</strong> Pastikan data rekening/e-wallet sudah benar. Kami tidak bertanggung jawab atas kesalahan pengiriman dana akibat data yang tidak valid atau salah input oleh pengguna.
+                        </div>
+
+                        <button type="submit" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-brand-primary/20 active:scale-[0.98] transition-all duration-200">
+                            Simpan Pengaturan
+                        </button>
+
+                        <div id="settingsNotification" class="hidden p-3 rounded-xl text-xs font-medium text-center"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- PAGE: WITHDRAW DANA (AUTO SEND TO DEFAULT ACCOUNT) -->
             <div id="page-withdraw" class="page-section max-w-4xl mx-auto space-y-6">
                 <div class="glass rounded-2xl p-6 md:p-8">
                     <div class="text-center mb-8">
                         <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
                             <i class="fa-solid fa-money-bill-transfer"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Pencairan Dana (Withdraw)</h3>
-                        <p class="text-sm text-gray-400">Tarik keuntungan Anda ke rekening bank atau e-wallet.</p>
+                        <h3 class="text-xl font-bold text-white mb-2">Pencairan Dana Otomatis</h3>
+                        <p class="text-sm text-gray-400">Dana akan dikirim ke rekening/e-wallet yang sudah Anda atur.</p>
+                    </div>
+
+                    <!-- TAMPILAN REKENING DEFAULT ATAU PERINGATAN -->
+                    <div id="defaultAccountCard" class="max-w-md mx-auto mb-6 p-4 rounded-xl bg-dark-800 border border-white/10 flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-brand-primary/20 flex items-center justify-center text-brand-primary">
+                            <i class="fa-solid fa-building-columns"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-xs text-gray-400 mb-0.5">Tujuan Pencairan</p>
+                            <p class="text-sm font-bold text-white" id="displayBankName">Belum Diatur</p>
+                            <p class="text-xs text-gray-500" id="displayAccountNumber">Silakan atur di menu Pengaturan</p>
+                        </div>
+                        <button onclick="switchPage('settings')" class="text-xs text-brand-primary hover:text-indigo-400 font-medium">Ubah</button>
                     </div>
 
                     <div class="max-w-md mx-auto space-y-5">
@@ -223,20 +292,6 @@
                                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Rp</span>
                                 <input type="number" id="withdrawAmount" min="20000" placeholder="Masukkan jumlah withdraw" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
                             </div>
-                        </div>
-
-                        <!-- Metode Transfer -->
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-medium text-gray-400 ml-1">Metode Penerimaan</label>
-                            <select id="withdrawMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all appearance-none cursor-pointer">
-                                <option value="">Pilih metode transfer...</option>
-                                <option value="BCA">Transfer Bank BCA</option>
-                                <option value="BRI">Transfer Bank BRI</option>
-                                <option value="MANDIRI">Transfer Bank Mandiri</option>
-                                <option value="GOPAY">GoPay</option>
-                                <option value="DANA">DANA</option>
-                                <option value="OVO">OVO</option>
-                            </select>
                         </div>
 
                         <!-- KALKULATOR KOMISI REAL-TIME -->
@@ -287,6 +342,39 @@
         // --- STATE MANAGEMENT ---
         let currentBalance = 500000; // Simulasi saldo awal reseller
         
+        // State untuk pengaturan rekening default
+        let defaultWithdrawSettings = {
+            method: '',
+            holderName: '',
+            accountNumber: ''
+        };
+
+        // Load settings dari localStorage saat pertama kali buka
+        function loadWithdrawSettings() {
+            const saved = localStorage.getItem('reseller_withdraw_settings');
+            if (saved) {
+                defaultWithdrawSettings = JSON.parse(saved);
+            }
+            updateDefaultAccountDisplay();
+        }
+
+        // Update tampilan kartu rekening default di halaman withdraw
+        function updateDefaultAccountDisplay() {
+            const bankNameEl = document.getElementById('displayBankName');
+            const accNumEl = document.getElementById('displayAccountNumber');
+            const btnWithdraw = document.getElementById('btnProcessWithdraw');
+            
+            if (defaultWithdrawSettings.method && defaultWithdrawSettings.accountNumber) {
+                bankNameEl.innerText = `${defaultWithdrawSettings.method} - ${defaultWithdrawSettings.holderName}`;
+                accNumEl.innerText = defaultWithdrawSettings.accountNumber;
+                btnWithdraw.disabled = false;
+            } else {
+                bankNameEl.innerText = 'Belum Diatur';
+                accNumEl.innerText = 'Silakan atur di menu Pengaturan';
+                btnWithdraw.disabled = true; // Kunci tombol withdraw kalau belum setting
+            }
+        }
+
         // --- NAVIGASI SPA ---
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
@@ -296,6 +384,7 @@
                 'dashboard': 'Dashboard Overview',
                 'topup': 'Deposit Saldo',
                 'withdraw': 'Pencairan Dana',
+                'settings': 'Pengaturan Rekening',
                 'servers': 'Kelola Server'
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
@@ -307,7 +396,12 @@
             const activeBtn = document.getElementById('nav-' + pageId);
             if(activeBtn) {
                 activeBtn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
-                     }
+            }
+            
+            // Refresh display setiap kali pindah ke halaman withdraw
+            if (pageId === 'withdraw') {
+                updateDefaultAccountDisplay();
+            }
             
             if(window.innerWidth < 768) toggleSidebar();
         }
@@ -343,6 +437,35 @@
             img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEPOSIT_${amount}_${Date.now()}`;
         });
 
+        // --- LOGIKA SIMPAN PENGATURAN REKENING ---
+        document.getElementById('withdrawSettingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const method = document.getElementById('settingMethod').value;
+            const holderName = document.getElementById('settingHolderName').value.trim();
+            const accountNumber = document.getElementById('settingAccountNumber').value.trim();
+            const notif = document.getElementById('settingsNotification');
+
+            if (!method || !holderName || !accountNumber) {
+                showSettingsNotif(' Semua kolom wajib diisi!', 'error');
+                return;
+            }
+
+            // Simpan ke state & localStorage
+            defaultWithdrawSettings = { method, holderName, accountNumber };
+            localStorage.setItem('reseller_withdraw_settings', JSON.stringify(defaultWithdrawSettings));
+            
+            showSettingsNotif('✅ Pengaturan berhasil disimpan! Anda sekarang bisa melakukan withdraw.', 'success');
+            updateDefaultAccountDisplay();
+        });
+
+        function showSettingsNotif(message, type) {
+            const notif = document.getElementById('settingsNotification');
+            notif.innerText = message;
+            notif.className = `mt-4 p-3 rounded-xl text-xs font-medium text-center ${type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`;
+            notif.classList.remove('hidden');
+        }
+
         // --- LOGIKA WITHDRAW + KALKULATOR KOMISI 10% ---
         const COMMISSION_RATE = 0.10;
         const MIN_WITHDRAW = 20000;
@@ -362,7 +485,6 @@
         document.getElementById('btnProcessWithdraw').addEventListener('click', async function() {
             const btn = this;
             const amountInput = document.getElementById('withdrawAmount');
-            const methodInput = document.getElementById('withdrawMethod');
             const notification = document.getElementById('withdrawNotification');
             
             const requestedAmount = parseInt(amountInput.value);
@@ -372,13 +494,13 @@
             // Reset notif
             notification.classList.add('hidden');
 
-            // Validasi
+            // Validasi Ganda (Saldo + Setting Default)
             if (!requestedAmount || requestedAmount < MIN_WITHDRAW) {
                 showNotif(`❌ Minimal penarikan adalah Rp ${MIN_WITHDRAW.toLocaleString('id-ID')}`, 'error');
                 return;
             }
-            if (!methodInput.value) {
-                showNotif('❌ Silakan pilih metode penerimaan dana.', 'error');
+            if (!defaultWithdrawSettings.method || !defaultWithdrawSettings.accountNumber) {
+                showNotif('❌ Silakan atur rekening tujuan terlebih dahulu di menu Pengaturan.', 'error');
                 return;
             }
             if (currentBalance < requestedAmount) {
@@ -399,11 +521,10 @@
                 currentBalance -= requestedAmount;
                 document.getElementById('currentBalanceDisplay').innerHTML = `Rp ${currentBalance.toLocaleString('id-ID')} <span class="text-sm font-normal text-gray-500">,-</span>`;
 
-                showNotif(`✅ Berhasil! Dana bersih Rp ${netAmount.toLocaleString('id-ID')} sedang dikirim ke ${methodInput.options[methodInput.selectedIndex].text}.`, 'success');
+                showNotif(`✅ Berhasil! Dana bersih Rp ${netAmount.toLocaleString('id-ID')} sedang dikirim ke ${defaultWithdrawSettings.method} (${defaultWithdrawSettings.accountNumber}).`, 'success');
                 
                 // Reset form
                 amountInput.value = '';
-                methodInput.value = '';
                 document.getElementById('previewRequest').innerText = 'Rp 0';
                 document.getElementById('previewCommission').innerText = '- Rp 0';
                 document.getElementById('previewNet').innerText = 'Rp 0';
@@ -422,7 +543,12 @@
             notif.className = `mt-4 p-3 rounded-xl text-xs font-medium text-center ${type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`;
             notif.classList.remove('hidden');
         }
+
+        // Inisialisasi saat halaman dimuat
+        window.addEventListener('DOMContentLoaded', () => {
+            loadWithdrawSettings();
+            updateDefaultAccountDisplay();
+        });
     </script>
 </body>
 </html>
-     
