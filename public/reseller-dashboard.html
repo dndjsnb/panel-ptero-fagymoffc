@@ -136,7 +136,7 @@
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-lg font-bold text-white"> Link Order Customer</h3>
+                            <h3 class="text-lg font-bold text-white">🔗 Link Order Customer</h3>
                             <p class="text-xs text-gray-400 mt-1">Share link ini ke customer kamu. Saldo otomatis masuk saat mereka bayar.</p>
                         </div>
                     </div>
@@ -186,27 +186,86 @@
 
             <!-- PAGE: TOPUP -->
             <div id="page-topup" class="page-section max-w-6xl mx-auto space-y-6">
-                <div class="glass rounded-2xl p-6 md:p-8">
-                    <h3 class="text-lg font-bold text-white mb-6">Deposit Saldo Reseller</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 25.000</button>
-                        <button class="bg-brand-primary/20 border border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 50.000</button>
-                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 100.000</button>
-                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 500.000</button>
+                <div class="glass rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                    
+                    <h3 class="text-lg font-bold text-white mb-6 relative z-10">Deposit Saldo Reseller</h3>
+                    
+                    <!-- Kotak Notifikasi UI (Adaptasi dari Checkout) -->
+                    <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
                     </div>
-                    <div class="space-y-4">
-                        <div class="space-y-1.5">
-                            <label class="text-xs font-medium text-gray-400 ml-1">Metode Pembayaran</label>
-                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
-                                <option>QRIS (Otomatis)</option>
-                                <option>Transfer Bank (BCA/Mandiri)</option>
-                                <option>E-Wallet (Dana/OVO/GoPay)</option>
-                            </select>
+
+                    <!-- WRAPPER FORM DEPOSIT -->
+                    <div id="depositFormWrapper" class="relative z-10 transition-all duration-300">
+                        <!-- Input Custom Nominal -->
+                        <div class="space-y-1.5 mb-6">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nominal Deposit (Min. Rp 1.000)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-3.5 text-gray-400 font-medium">Rp</span>
+                                <input type="number" id="customAmount" placeholder="1000" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-brand-primary transition-all" oninput="resetNominalButtons()">
+                            </div>
                         </div>
-                        <button type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4">
-                            Lanjutkan Pembayaran
-                        </button>
+
+                        <!-- Tombol Nominal Cepat -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="nominalContainer">
+                            <button onclick="selectNominal(this, 10000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 10.000</button>
+                            <button onclick="selectNominal(this, 25000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 25.000</button>
+                            <button onclick="selectNominal(this, 50000)" class="nominal-btn bg-brand-primary/20 border border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm active-nominal">Rp 50.000</button>
+                            <button onclick="selectNominal(this, 100000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 100.000</button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-400 ml-1">Metode Pembayaran</label>
+                                <select id="paymentMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none cursor-pointer">
+                                    <option value="QRIS">QRIS (Otomatis)</option>
+                                    <option value="Transfer Bank">Transfer Bank (Manual)</option>
+                                </select>
+                            </div>
+                            <button onclick="processDeposit()" type="button" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4 shadow-lg shadow-brand-primary/20">
+                                Lanjutkan Pembayaran
+                            </button>
+                        </div>
                     </div>
+
+                    <!-- WRAPPER QRIS CHECKOUT (Disembunyikan di awal) -->
+                    <div id="qrisCheckoutWrapper" class="hidden relative z-10 text-center py-2 transition-all duration-300">
+                        
+                        <div class="bg-dark-900/80 p-4 rounded-xl border border-white/5 mb-6 flex items-center justify-between">
+                            <div class="text-left">
+                                <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Tipe Transaksi</span>
+                                <h3 class="text-sm font-bold text-gray-100">Deposit Saldo</h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Tagihan</span>
+                                <h3 id="qrisAmountDisplay" class="text-lg font-black text-emerald-400">Rp 0</h3>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-400 mb-4 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
+                        
+                        <!-- Area Gambar QRIS -->
+                        <div class="bg-white p-3 rounded-xl inline-block w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center mx-auto shadow-md relative overflow-hidden mb-6 border-4 border-dark-700">
+                            <!-- Loading Spinner -->
+                            <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 gap-2">
+                                <svg class="animate-spin h-8 w-8 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                </svg>
+                                <span class="text-[10px] font-bold tracking-wider">MEMBUAT QR...</span>
+                            </div>
+                            <img id="qrisImage" src="" alt="QRIS Payment" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
+                        </div>
+
+                        <div class="space-y-3 max-w-sm mx-auto">
+                            <button id="btnKonfirmasi" onclick="checkPaymentStatus()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200 text-sm">
+                                Saya Sudah Bayar
+                            </button>
+                            <button onclick="cancelDeposit()" class="w-full bg-transparent hover:bg-white/5 border border-white/10 text-gray-400 hover:text-white font-semibold py-3.5 rounded-xl transition-all text-sm">
+                                Batalkan Topup
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -269,7 +328,7 @@
                         <button onclick="saveSettings()" type="button" class="bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition-all text-sm mt-4 inline-flex items-center gap-2">
                             <i class="fa-solid fa-floppy-disk"></i> Simpan Rekening
                         </button>
-                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden"> Berhasil disimpan!</p>
+                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden">✔️ Berhasil disimpan!</p>
                     </div>
                 </div>
             </div>
@@ -289,7 +348,7 @@
                                 </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Bot Server 01 <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400">Running</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 4GB RAM � 200% CPU</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 4GB RAM • 200% CPU</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -303,10 +362,10 @@
                             <div class="flex items-start gap-4">
                                 <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/20">
                                     <i class="fa-solid fa-ban"></i>
-                            </div>
+                                </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Client Web <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400">Suspended</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 2GB RAM � Overdue Bill</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 2GB RAM • Overdue Bill</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -340,7 +399,6 @@
             const saved = localStorage.getItem('fh_rekening');
             if (saved) {
                 withdrawSettings = JSON.parse(saved);
-                // Isi form settings jika sudah ada data
                 if(document.getElementById('inputBank')) {
                     document.getElementById('inputBank').value = withdrawSettings.bank || 'BCA';
                     document.getElementById('inputRekening').value = withdrawSettings.rek || '';
@@ -395,7 +453,6 @@
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
             
-            // Update class tombol navigasi
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200';
             });
@@ -419,9 +476,154 @@
             }
         }
 
+        // --- LOGIKA NOTIFIKASI UI (Dari checkout.html) ---
+        function showNotification(message, type = 'error') {
+            const alertBox = document.getElementById('uiAlert');
+            alertBox.className = "relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg";
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-950/60', 'border-red-800/80', 'text-red-300');
+            } else if (type === 'success') {
+                alertBox.classList.add('bg-emerald-950/60', 'border-emerald-800/80', 'text-emerald-300');
+            } else {
+                alertBox.classList.add('bg-blue-950/60', 'border-brand-primary/50', 'text-blue-300');
+            }
+            
+            alertBox.innerText = message;
+            alertBox.classList.remove('hidden');
+        }
+
+        function hideNotification() {
+            document.getElementById('uiAlert').classList.add('hidden');
+        }
+
+        // --- LOGIKA DEPOSIT SALDO ---
+        let currentTopupId = null;
+        let depositAmount = 0;
+        
+        function selectNominal(btnElement, amount) {
+            document.getElementById('customAmount').value = amount;
+            resetNominalButtons();
+            if(btnElement) {
+                btnElement.className = 'nominal-btn bg-brand-primary/20 border border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm active-nominal';
+            }
+        }
+
+        function resetNominalButtons() {
+            const buttons = document.querySelectorAll('.nominal-btn');
+            buttons.forEach(btn => {
+                btn.className = 'nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm';
+            });
+        }
+
+        async function processDeposit() {
+            hideNotification();
+            const method = document.getElementById('paymentMethod').value;
+            const amountInput = document.getElementById('customAmount').value;
+            depositAmount = parseInt(amountInput);
+            
+            if (!depositAmount || isNaN(depositAmount)) {
+                showNotification("Isi nominal depositnya dulu, Bro!", "error");
+                return;
+            }
+
+            if (depositAmount < 1000) {
+                showNotification("Minimal deposit Rp 1.000 ya!", "error");
+                return;
+            }
+
+            if (method === 'QRIS') {
+                document.getElementById('depositFormWrapper').classList.add('hidden');
+                document.getElementById('qrisCheckoutWrapper').classList.remove('hidden');
+                document.getElementById('qrisAmountDisplay').innerText = `Rp ${depositAmount.toLocaleString('id-ID')}`;
+                
+                document.getElementById('qrisImage').classList.add('hidden');
+                document.getElementById('qrisLoading').style.display = 'flex';
+                
+                try {
+                    // Di backend aslinya: const res = await fetch(`/api/generate-qris?amount=${depositAmount}`);
+                    const dummyData = { success: true, qr_url: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PAY_${depositAmount}`, topup_id: `DEP_${Date.now()}` };
+                    const data = dummyData; 
+                    
+                    if (data.success && data.qr_url) {
+                        const qrisImg = document.getElementById('qrisImage');
+                        document.getElementById('qrisLoading').style.display = 'none';
+                        qrisImg.src = data.qr_url;
+                        qrisImg.classList.remove('hidden');
+                        currentTopupId = data.topup_id; 
+                    } else {
+                        document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gagal Dimuat</span>';
+                        showNotification("Gagal memuat QRIS dari server pembayaran.", "error");
+                    }
+                } catch (err) {
+                    document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gangguan Jaringan</span>';
+                    showNotification("Tidak dapat terhubung ke server pembayaran.", "error");
+                }
+            } else {
+                showNotification("Metode pembayaran manual sedang ditutup sementara.", "error");
+            }
+        }
+
+        function cancelDeposit() {
+            hideNotification();
+            currentTopupId = null;
+            document.getElementById('qrisCheckoutWrapper').classList.add('hidden');
+            document.getElementById('depositFormWrapper').classList.remove('hidden');
+            
+            const btn = document.getElementById('btnKonfirmasi');
+            btn.innerHTML = "Saya Sudah Bayar";
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+
+        async function checkPaymentStatus() {
+            if (!currentTopupId) {
+                showNotification("Sesi pembayaran belum siap. Silakan ulangi transaksi.", "error");
+                return;
+            }
+
+            const btn = document.getElementById('btnKonfirmasi');
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Memeriksa Mutasi...`;
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+            
+            showNotification("🔍 Memeriksa status mutasi pembayaran otomatis...", "info");
+
+            try {
+                // Simulasi delay cek backend API
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                const webhookData = { success: true }; 
+
+                if (!webhookData.success) {
+                    showNotification("Pembayaran belum terdeteksi. Pastikan Anda sudah transfer.", "error");
+                    btn.innerHTML = "Saya Sudah Bayar";
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
+                    return;
+                }
+
+                showNotification("🎉 Pembayaran Sukses! Saldo telah ditambahkan ke akun Anda.", "success");
+                btn.innerHTML = `Deposit Berhasil`;
+                
+                setTimeout(() => {
+                    alert('Simulasi Selesai: Saldo berhasil ditambah Rp ' + depositAmount.toLocaleString('id-ID'));
+                    cancelDeposit(); 
+                }, 1500);
+
+            } catch (err) {
+                showNotification("Terjadi kendala jaringan saat memproses sistem.", "error");
+                btn.innerHTML = "Cek Ulang Pembayaran";
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            }
+        }
+
         // INIT
         window.addEventListener('DOMContentLoaded', () => {
-            loadSettings();
+            loadSettings(); 
+            if(document.getElementById('customAmount')) {
+                document.getElementById('customAmount').value = 50000;
+            }
         });
     </script>
 </body>
