@@ -3,98 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fahmi Hosting - Premium Panel</title>
+    <title>Fahmi Hosting - Premium Pterodactyl Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* Custom scrollbar biar gak kelihatan kaku */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6">
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen flex flex-col">
+    
+    <!-- Navbar Ala Provider Profesional -->
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500 tracking-tighter">
+                FAHMI<span class="text-white">HOSTING.</span>
+            </h1>
+            <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                All Systems Operational
+            </span>
+        </div>
+    </nav>
 
-    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
-        <div class="p-8 text-center">
-            
-            <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
-                Fahmi Hosting
-            </h2>
-            <p class="text-gray-400 mb-6 text-sm">Deploy server Pterodactyl otomatis dalam hitungan detik.</p>
+    <!-- Hero Section / Kepala Halaman -->
+    <div class="max-w-7xl mx-auto px-6 py-16 text-center">
+        <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+            Deploy Server Pterodactyl <br class="hidden md:block"/> 
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Dalam Hitungan Detik.</span>
+        </h2>
+        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12">
+            Infrastruktur anti-lelet dengan NVMe disk dan perlindungan DDoS. Pilih spesifikasi server di bawah dan biarkan sistem kami mengeksekusi otomatis.
+        </p>
+    </div>
 
-            <div class="bg-gray-750 rounded-xl p-6 border border-gray-600 shadow-inner bg-gray-800">
-                
-                <!-- Dropdown Pilih Paket -->
-                <div class="mb-6 text-left">
-                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wider">Pilih Spesifikasi Paket</label>
-                    <select id="planSelector" class="w-full bg-gray-900 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                        <option value="1gb" data-price="Rp5k" data-nominal="5000" data-cpu="30%" data-ram="1 GB" data-disk="512 MB">Paket 1GB Basic</option>
-                        <option value="2gb" data-price="Rp10k" data-nominal="10000" data-cpu="60%" data-ram="2 GB" data-disk="1 GB">Paket 2GB Standard</option>
-                        <option value="3gb" data-price="Rp15k" data-nominal="15000" data-cpu="90%" data-ram="3 GB" data-disk="1.5 GB">Paket 3GB Standard</option>
-                        <option value="4gb" data-price="Rp20k" data-nominal="20000" data-cpu="120%" data-ram="4 GB" data-disk="2 GB">Paket 4GB Advanced</option>
-                        <option value="5gb" data-price="Rp25k" data-nominal="25000" data-cpu="150%" data-ram="5 GB" data-disk="2.5 GB">Paket 5GB Advanced</option>
-                        <option value="6gb" data-price="Rp30k" data-nominal="30000" data-cpu="180%" data-ram="6 GB" data-disk="3 GB">Paket 6GB Pro</option>
-                        <option value="7gb" data-price="Rp35k" data-nominal="35000" data-cpu="210%" data-ram="7 GB" data-disk="3.5 GB">Paket 7GB Pro</option>
-                        <option value="8gb" data-price="Rp40k" data-nominal="40000" data-cpu="240%" data-ram="8 GB" data-disk="4 GB">Paket 8GB Extreme</option>
-                        <option value="9gb" data-price="Rp45k" data-nominal="45000" data-cpu="270%" data-ram="9 GB" data-disk="4.5 GB">Paket 9GB Extreme</option>
-                        <option value="10gb" data-price="Rp50k" data-nominal="50000" data-cpu="300%" data-ram="10 GB" data-disk="5 GB">Paket 10GB Max</option>
-                        <option value="unlimited" data-price="Rp100k" data-nominal="100000" data-cpu="Unlimited" data-ram="Unlimited" data-disk="Unlimited">Paket Unlimited (Sultan)</option>
-                    </select>
-                </div>
-
-                <!-- Tampilan Harga & Spek Dinamis -->
-                <div class="my-5">
-                    <span id="displayPrice" class="text-5xl font-black text-white transition-all">Rp5k</span>
-                    <span class="text-gray-400 text-sm">/bulan</span>
-                </div>
-
-                <ul class="text-sm text-gray-300 text-left space-y-3 mb-8 w-fit mx-auto">
-                    <li class="flex items-center"><span class="text-blue-500 mr-3">⚡</span> <span id="displayCpu" class="font-bold text-white mr-1">30%</span> CPU Limit</li>
-                    <li class="flex items-center"><span class="text-blue-500 mr-3">🚀</span> <span id="displayRam" class="font-bold text-white mr-1">1 GB</span> RAM Allocation</li>
-                    <li class="flex items-center"><span class="text-blue-500 mr-3">💾</span> <span id="displayDisk" class="font-bold text-white mr-1">512 MB</span> NVMe Disk</li>
-                    <li class="flex items-center"><span class="text-blue-500 mr-3">🛡️</span> Anti-DDoS Protection</li>
-                </ul>
-
-                <!-- Tombol Beli -->
-                <button id="btnBayar" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-4 rounded-lg transition-transform duration-200 transform hover:scale-105 focus:outline-none shadow-lg shadow-blue-500/30">
-                    Beli & Bayar via QRIS
-                </button>
-            </div>
-            
+    <!-- Container Grid List Paket -->
+    <div class="max-w-7xl mx-auto px-6 pb-24">
+        <!-- Grid ini akan diisi otomatis oleh Javascript -->
+        <div id="pricing-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Kartu Paket Muncul Di Sini -->
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 mt-auto py-8 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 Fahmi Hosting. All rights reserved.</p>
+    </footer>
+
     <script>
-        // Logika Dropdown mengubah spek UI
-        const selector = document.getElementById('planSelector');
-        
-        selector.addEventListener('change', (e) => {
-            const selectedOption = e.target.options[e.target.selectedIndex];
-            
-            document.getElementById('displayPrice').innerText = selectedOption.getAttribute('data-price');
-            document.getElementById('displayCpu').innerText = selectedOption.getAttribute('data-cpu');
-            document.getElementById('displayRam').innerText = selectedOption.getAttribute('data-ram');
-            document.getElementById('displayDisk').innerText = selectedOption.getAttribute('data-disk');
+        // Data Base Paket lu
+        const plans = [
+            { id: '1gb', name: 'Paket 1GB Basic', price: 'Rp5.000', nominal: 5000, cpu: '30%', ram: '1 GB', disk: '512 MB' },
+            { id: '2gb', name: 'Paket 2GB Standar', price: 'Rp10.000', nominal: 10000, cpu: '60%', ram: '2 GB', disk: '1 GB' },
+            { id: '3gb', name: 'Paket 3GB Standar', price: 'Rp15.000', nominal: 15000, cpu: '90%', ram: '3 GB', disk: '1.5 GB' },
+            { id: '4gb', name: 'Paket 4GB Advance', price: 'Rp20.000', nominal: 20000, cpu: '120%', ram: '4 GB', disk: '2 GB', best: true }, // Kasih flag best seller
+            { id: '5gb', name: 'Paket 5GB Advance', price: 'Rp25.000', nominal: 25000, cpu: '150%', ram: '5 GB', disk: '2.5 GB' },
+            { id: '6gb', name: 'Paket 6GB Pro', price: 'Rp30.000', nominal: 30000, cpu: '180%', ram: '6 GB', disk: '3 GB' },
+            { id: '7gb', name: 'Paket 7GB Pro', price: 'Rp35.000', nominal: 35000, cpu: '210%', ram: '7 GB', disk: '3.5 GB' },
+            { id: '8gb', name: 'Paket 8GB Extreme', price: 'Rp40.000', nominal: 40000, cpu: '240%', ram: '8 GB', disk: '4 GB' },
+            { id: '9gb', name: 'Paket 9GB Extreme', price: 'Rp45.000', nominal: 45000, cpu: '270%', ram: '9 GB', disk: '4.5 GB' },
+            { id: '10gb', name: 'Paket 10GB Max', price: 'Rp50.000', nominal: 50000, cpu: '300%', ram: '10 GB', disk: '5 GB' },
+            { id: 'unlimited', name: 'Paket SULTAN (Unli)', price: 'Rp100.000', nominal: 100000, cpu: 'Unlimited', ram: 'Unlimited', disk: 'Unlimited', sultan: true }
+        ];
+
+        const grid = document.getElementById('pricing-grid');
+
+        // Looping untuk merender setiap kartu paket secara otomatis
+        plans.forEach(plan => {
+            // Styling khusus buat paket Best Seller atau Sultan
+            const isBest = plan.best ? `<div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">Best Seller</div>` : '';
+            const isSultan = plan.sultan ? `ring-2 ring-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)]` : `border border-slate-800`;
+            const bgHeader = plan.sultan ? `bg-gradient-to-r from-purple-900/40 to-indigo-900/40` : `bg-slate-800/40`;
+            const btnClass = plan.sultan 
+                ? `bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25` 
+                : `bg-slate-800 hover:bg-blue-600 border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/25`;
+            const priceColor = plan.sultan ? `text-purple-400` : `text-white`;
+
+            // Struktur HTML per Kotak
+            const cardHTML = `
+                <div class="relative bg-slate-900 rounded-xl flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${isSultan}">
+                    ${isBest}
+                    <div class="p-6 ${bgHeader} rounded-t-xl border-b border-slate-800/80">
+                        <h3 class="text-lg font-bold text-slate-300 mb-2">${plan.name}</h3>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-3xl font-black ${priceColor}">${plan.price}</span>
+                            <span class="text-slate-500 text-sm font-medium">/bln</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 flex-grow flex flex-col">
+                        <ul class="space-y-4 text-sm text-slate-300 mb-8 flex-grow">
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <span><strong class="text-white">${plan.cpu}</strong> CPU Limit</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                                <span><strong class="text-white">${plan.ram}</strong> RAM</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+                                <span><strong class="text-white">${plan.disk}</strong> NVMe Disk</span>
+                            </li>
+                        </ul>
+                        <button onclick="checkout('${plan.id}', ${plan.nominal}, '${plan.name}')" class="w-full py-3 px-4 rounded-lg text-white font-bold transition-all duration-200 focus:outline-none ${btnClass}">
+                            Order Sekarang
+                        </button>
+                    </div>
+                </div>
+            `;
+            // Masukkan kartu ke dalam Grid
+            grid.innerHTML += cardHTML;
         });
 
-        // Logika Klik Tombol Beli
-        document.getElementById('btnBayar').addEventListener('click', () => {
-            const selectedOption = selector.options[selector.selectedIndex];
-            const planKey = selector.value;
-            const nominal = selectedOption.getAttribute('data-nominal');
-            const planName = selectedOption.innerText;
-
+        // Fungsi yang dipanggil saat tombol Order dipencet
+        function checkout(planKey, nominal, planName) {
             Swal.fire({
-                title: 'Menyiapkan Tagihan...',
-                text: `Mengarahkan ke halaman pembayaran Rp ${parseInt(nominal).toLocaleString('id-ID')}`,
+                title: 'Mempersiapkan Checkout...',
+                text: `Mengamankan slot untuk ${planName}`,
                 allowOutsideClick: false,
-                background: '#1f2937',
+                background: '#0f172a',
                 color: '#fff',
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            // Redirect ke halaman checkout lokal bawaan Vercel
+            // Redirect dengan parameter (Sesuai alur kita sebelumnya)
             setTimeout(() => {
                 window.location.href = `/checkout.html?plan=${planKey}&price=${nominal}&name=${encodeURIComponent(planName)}`;
-            }, 1000);
-        });
+            }, 800);
+        }
     </script>
 </body>
 </html>
