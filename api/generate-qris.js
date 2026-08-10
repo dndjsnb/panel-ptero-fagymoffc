@@ -10,7 +10,16 @@ module.exports = async (req, res) => {
             pin: process.env.ZAKKI_PIN || '123456',
         });
 
-        let rawAmount = req.method === 'POST' ? JSON.parse(req.body).amount : req.query.amount;
+        // ✅ KODE BARU
+let rawAmount;
+if (req.method === 'POST') {
+    // Cek apakah req.body masih string atau sudah jadi object
+    const bodyData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    rawAmount = bodyData.amount;
+} else {
+    rawAmount = req.query.amount;
+}
+        
         if (!rawAmount) return res.status(400).json({ success: false, error: "Nominal tidak valid" });
 
         const response = await zakki.topup(parseInt(rawAmount));
