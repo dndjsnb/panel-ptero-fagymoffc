@@ -1,131 +1,31 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Fahmi Hosting</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</head>
-<body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6">
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const planKey = urlParams.get('plan');
+    const price = urlParams.get('price');
+    const planName = urlParams.get('name');
 
-    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
-        <div class="p-8 text-center">
-            
-            <h2 class="text-2xl font-extrabold text-white mb-2">Selesaikan Pembayaran</h2>
-            <p class="text-gray-400 mb-6 text-sm">Scan QRIS di bawah ini menggunakan e-Wallet atau M-Banking Anda.</p>
-
-            <!-- Rincian Tagihan -->
-            <div class="bg-gray-900 rounded-lg p-4 mb-6 border border-gray-700 text-left shadow-inner">
-                <div class="flex justify-between mb-2">
-                    <span class="text-gray-400 text-sm">Paket:</span>
-                    <span id="invoicePlan" class="font-bold text-blue-400">Loading...</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="text-gray-400 text-sm">Total Tagihan:</span>
-                    <span id="invoicePrice" class="font-bold text-white text-lg">Rp 0</span>
-                </div>
-            </div>
-
-            <!-- Tempat Gambar QRIS -->
-            <div class="bg-white p-4 rounded-xl mb-6 mx-auto w-fit shadow-lg shadow-white/10">
-                <!-- TODO: GANTI LINK SRC DI BAWAH INI DENGAN LINK GAMBAR QRIS ASLI LU NANTI -->
-                <img src="https://via.placeholder.com/200x200.png?text=Taruh+QRIS+Disini" alt="QRIS Code" class="w-48 h-48 object-contain">
-            </div>
-
-            <p class="text-yellow-400 text-xs mb-6 px-4">
-                * Screenshot (SS) kode QRIS ini, lalu buka aplikasi M-Banking atau e-Wallet (Dana/Gopay/ShopeePay) untuk membayar.
-            </p>
-
-            <!-- Tombol Konfirmasi -->
-            <button id="btnKonfirmasi" class="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-bold py-3 px-4 rounded-lg transition-transform duration-200 transform hover:scale-105 focus:outline-none shadow-lg shadow-green-500/30">
-                Saya Sudah Bayar
-            </button>
-
-            <!-- Tombol Batal -->
-            <button onclick="window.location.href='/'" class="w-full mt-3 bg-transparent border border-gray-600 text-gray-400 hover:text-white hover:border-gray-400 font-semibold py-2 px-4 rounded-lg transition-colors">
-                Batal & Kembali
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // 1. Ambil data URL yang dilempar dari index.html
-        const urlParams = new URLSearchParams(window.location.search);
-        const planKey = urlParams.get('plan');
-        const price = urlParams.get('price');
-        const planName = urlParams.get('name');
-
-        // 2. Set data ke HTML
-        if (planKey && price) {
-            document.getElementById('invoicePlan').innerText = planName;
-            document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
-        } else {
-            // Kalau ada orang iseng buka /checkout.html tanpa milih paket, lempar balik ke depan
-            window.location.href = '/';
-        }
-
-        // 3. Eksekusi tembak API pas user konfirmasi bayar
-        document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
-            
-            Swal.fire({
-                title: 'Mengecek Pembayaran...',
-                text: 'Sedang memverifikasi mutasi dan membuat server otomatis.',
-                allowOutsideClick: false,
-                background: '#1f2937',
-                color: '#fff',
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            try {
-                // Tembak endpoint Vercel lu buat nge-create server Pterodactyl
-                const res = await fetch('/api/webhook', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        status: 'PAID', // Simulasi statis lunas
-                        email: `klien${Math.floor(Math.random() * 1000)}@test.com`,
-                        username: `Klien_${planKey}_${Math.floor(Math.random() * 1000)}`,
-                        plan_key: planKey
-                    })
-                });
-                
-                const result = await res.json();
-
-                if (res.ok) {
-                    Swal.fire({ 
-                        icon: 'success', 
-                        title: 'Server Aktif!', 
-                        text: 'Pembayaran diterima. Silakan cek email Anda untuk detail login panel.', 
-                        background: '#1f2937', 
-                        color: '#fff', 
-                        confirmButtonColor: '#3b82f6' 
-                    }).then(() => {
-                        window.location.href = '/'; // Balik ke depan kalau udah sukses
-                    });
-                } else {
-                    Swal.fire({ 
-                        icon: 'error', 
-                        title: 'Gagal Dibuat', 
-                        text: result.error || 'Sistem backend menolak request (Panel Pterodactyl mungkin belum disetup).', 
-                        background: '#1f2937', 
-                        color: '#fff', 
-                        confirmButtonColor: '#ef4444' 
-                    });
-                }
-            } catch (error) {
-                Swal.fire({ 
-                    icon: 'error', 
-                    title: 'Koneksi Terputus', 
-                    text: 'Gagal terhubung ke server automasi.', 
-                    background: '#1f2937', 
-                    color: '#fff', 
-                    confirmButtonColor: '#ef4444' 
-                });
-            }
+    // 1. Otomatis Generate QRIS pas halaman dibuka
+    window.onload = async () => {
+        const res = await fetch('/api/generate-qris', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: price, plan_key: planKey })
         });
-    </script>
-</body>
-</html>
+        const data = await res.json();
+        
+        if (data.qr_url) {
+            document.getElementById('qrisImage').src = data.qr_url; // Gambar QRIS asli muncul!
+        } else {
+            alert("Gagal memuat QRIS: " + data.error);
+        }
+    };
+
+    // 2. Tampilkan info tagihan
+    document.getElementById('invoicePlan').innerText = planName;
+    document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
+
+    // 3. Tombol konfirmasi tetep sama, buat nge-trigger Pterodactyl Auto-Create
+    document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
+        // ... (Kode konfirmasi yang tadi, biarin tetep) ...
+    });
+</script>
