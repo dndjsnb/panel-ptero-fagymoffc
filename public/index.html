@@ -3,38 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Store Hosting Ptero</title>
+    <title>Fahmi Hosting - Premium Panel</title>
+    
+    <!-- Menggunakan Tailwind CSS via CDN biar gak ribet setup -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- SweetAlert2 buat gantiin alert() kaku jadi pop-up modern -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body style="font-family: sans-serif; padding: 50px;">
-    <h2>Beli Server Panel</h2>
-    <div style="border: 1px solid #ccc; padding: 20px; width: 300px;">
-        <h3>Paket 1GB</h3>
-        <p>RAM: 1GB | Disk: 512MB | CPU: 30%</p>
-        <strong>Harga: Rp 5.000</strong><br><br>
-        <button id="btnBayar" style="padding: 10px; background: #0070f3; color: white; cursor: pointer; border: none; border-radius: 5px;">
-            Simulasi Webhook
-        </button>
+<body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6">
+
+    <!-- Container Utama -->
+    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
+        <div class="p-8 text-center">
+            
+            <!-- Header Brand -->
+            <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
+                Fahmi Hosting
+            </h2>
+            <p class="text-gray-400 mb-8 text-sm">Deploy server Pterodactyl otomatis dalam hitungan detik.</p>
+
+            <!-- Card Paket -->
+            <div class="bg-gray-750 rounded-xl p-6 border border-gray-600 hover:border-blue-500 transition-all duration-300 shadow-inner bg-gray-800">
+                <h3 class="text-xl font-bold text-blue-400 uppercase tracking-wide">Paket 1GB Basic</h3>
+                
+                <div class="my-5">
+                    <span class="text-5xl font-black text-white">Rp5k</span>
+                    <span class="text-gray-400 text-sm">/bulan</span>
+                </div>
+
+                <!-- List Spesifikasi -->
+                <ul class="text-sm text-gray-300 text-left space-y-3 mb-8 w-fit mx-auto">
+                    <li class="flex items-center">
+                        <span class="text-blue-500 mr-3">⚡</span> 30% CPU Limit
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-blue-500 mr-3">🚀</span> 1 GB RAM Allocation
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-blue-500 mr-3">💾</span> 512 MB NVMe Disk
+                    </li>
+                    <li class="flex items-center">
+                        <span class="text-blue-500 mr-3">🛡️</span> Anti-DDoS Protection
+                    </li>
+                </ul>
+
+                <!-- Tombol Action -->
+                <button id="btnBayar" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-4 rounded-lg transition-transform duration-200 transform hover:scale-105 focus:outline-none shadow-lg shadow-blue-500/30">
+                    Beli & Deploy Sekarang
+                </button>
+            </div>
+            
+        </div>
     </div>
 
     <script>
         document.getElementById('btnBayar').addEventListener('click', async () => {
-            alert('Menembak API...');
-            
-            const res = await fetch('/api/webhook', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    status: 'PAID',
-                    email: `user${Math.floor(Math.random() * 1000)}@test.com`,
-                    username: `buyer${Math.floor(Math.random() * 1000)}`,
-                    plan_key: '1gb'
-                })
+            // Animasi Loading
+            Swal.fire({
+                title: 'Memproses Pembayaran...',
+                text: 'Sedang menghubungi server Vercel',
+                allowOutsideClick: false,
+                background: '#1f2937',
+                color: '#fff',
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-            
-            const result = await res.json();
-            alert(JSON.stringify(result, null, 2));
+
+            try {
+                // Proses tembak API Backend Vercel
+                const res = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        status: 'PAID', // Pura-puranya udah lunas
+                        email: `klien${Math.floor(Math.random() * 1000)}@test.com`,
+                        username: `KlienPremium${Math.floor(Math.random() * 1000)}`,
+                        plan_key: '1gb'
+                    })
+                });
+                
+                const result = await res.json();
+
+                // Handling Response
+                if (res.ok) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Server Aktif!',
+                        text: 'Cek email klien untuk detail login Pterodactyl.',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#3b82f6'
+                    });
+                } else {
+                    // Masuk ke sini kalau panel lu belum disetting (kayak sekarang)
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Waduh, Gagal Bro!',
+                        text: result.error || 'Sistem backend nolak request-nya.',
+                        background: '#1f2937',
+                        color: '#fff',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Koneksi Terputus',
+                    text: 'Gagal terhubung ke jaringan.',
+                    background: '#1f2937',
+                    color: '#fff',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
         });
     </script>
 </body>
-</html>
-
+    </html>
+    
