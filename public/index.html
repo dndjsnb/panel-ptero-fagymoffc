@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Hosting Ptero</title>
+</head>
+<body style="font-family: sans-serif; padding: 50px;">
+    <h2>Beli Server Panel</h2>
+    <div style="border: 1px solid #ccc; padding: 20px; width: 300px;">
+        <h3>Paket 1GB</h3>
+        <p>RAM: 1GB | Disk: 512MB | CPU: 30%</p>
+        <strong>Harga: Rp 5.000</strong><br><br>
+        <button id="btnBayar" style="padding: 10px; background: #0070f3; color: white; cursor: pointer; border: none; border-radius: 5px;">
+            Simulasi Webhook
+        </button>
+    </div>
+
+    <script>
+        document.getElementById('btnBayar').addEventListener('click', async () => {
+            alert('Menembak API...');
+            
+            const res = await fetch('/api/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    status: 'PAID',
+                    email: `user${Math.floor(Math.random() * 1000)}@test.com`,
+                    username: `buyer${Math.floor(Math.random() * 1000)}`,
+                    plan_key: '1gb'
+                })
+            });
+            
+            const result = await res.json();
+            alert(JSON.stringify(result, null, 2));
+        });
+    </script>
+</body>
+</html>
+
