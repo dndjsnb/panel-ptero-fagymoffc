@@ -4,53 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fahmi Hosting - Premium Panel</title>
-    
-    <!-- Menggunakan Tailwind CSS via CDN biar gak ribet setup -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- SweetAlert2 buat gantiin alert() kaku jadi pop-up modern -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-gray-900 text-gray-100 font-sans antialiased min-h-screen flex flex-col items-center justify-center p-6">
 
-    <!-- Container Utama -->
     <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl overflow-hidden border border-gray-700">
         <div class="p-8 text-center">
             
-            <!-- Header Brand -->
             <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">
                 Fahmi Hosting
             </h2>
-            <p class="text-gray-400 mb-8 text-sm">Deploy server Pterodactyl otomatis dalam hitungan detik.</p>
+            <p class="text-gray-400 mb-6 text-sm">Deploy server Pterodactyl otomatis dalam hitungan detik.</p>
 
-            <!-- Card Paket -->
-            <div class="bg-gray-750 rounded-xl p-6 border border-gray-600 hover:border-blue-500 transition-all duration-300 shadow-inner bg-gray-800">
-                <h3 class="text-xl font-bold text-blue-400 uppercase tracking-wide">Paket 1GB Basic</h3>
+            <div class="bg-gray-750 rounded-xl p-6 border border-gray-600 shadow-inner bg-gray-800">
                 
+                <!-- Dropdown Pilih Paket -->
+                <div class="mb-6 text-left">
+                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wider">Pilih Spesifikasi Paket</label>
+                    <select id="planSelector" class="w-full bg-gray-900 text-white border border-gray-600 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="1gb" data-price="Rp5k" data-nominal="5000" data-cpu="30%" data-ram="1 GB" data-disk="512 MB">Paket 1GB Basic</option>
+                        <option value="2gb" data-price="Rp10k" data-nominal="10000" data-cpu="60%" data-ram="2 GB" data-disk="1 GB">Paket 2GB Standard</option>
+                        <option value="3gb" data-price="Rp15k" data-nominal="15000" data-cpu="90%" data-ram="3 GB" data-disk="1.5 GB">Paket 3GB Standard</option>
+                        <option value="4gb" data-price="Rp20k" data-nominal="20000" data-cpu="120%" data-ram="4 GB" data-disk="2 GB">Paket 4GB Advanced</option>
+                        <option value="5gb" data-price="Rp25k" data-nominal="25000" data-cpu="150%" data-ram="5 GB" data-disk="2.5 GB">Paket 5GB Advanced</option>
+                        <option value="6gb" data-price="Rp30k" data-nominal="30000" data-cpu="180%" data-ram="6 GB" data-disk="3 GB">Paket 6GB Pro</option>
+                        <option value="7gb" data-price="Rp35k" data-nominal="35000" data-cpu="210%" data-ram="7 GB" data-disk="3.5 GB">Paket 7GB Pro</option>
+                        <option value="8gb" data-price="Rp40k" data-nominal="40000" data-cpu="240%" data-ram="8 GB" data-disk="4 GB">Paket 8GB Extreme</option>
+                        <option value="9gb" data-price="Rp45k" data-nominal="45000" data-cpu="270%" data-ram="9 GB" data-disk="4.5 GB">Paket 9GB Extreme</option>
+                        <option value="10gb" data-price="Rp50k" data-nominal="50000" data-cpu="300%" data-ram="10 GB" data-disk="5 GB">Paket 10GB Max</option>
+                        <option value="unlimited" data-price="Rp100k" data-nominal="100000" data-cpu="Unlimited" data-ram="Unlimited" data-disk="Unlimited">Paket Unlimited (Sultan)</option>
+                    </select>
+                </div>
+
+                <!-- Tampilan Harga & Spek Dinamis -->
                 <div class="my-5">
-                    <span class="text-5xl font-black text-white">Rp5k</span>
+                    <span id="displayPrice" class="text-5xl font-black text-white transition-all">Rp5k</span>
                     <span class="text-gray-400 text-sm">/bulan</span>
                 </div>
 
-                <!-- List Spesifikasi -->
                 <ul class="text-sm text-gray-300 text-left space-y-3 mb-8 w-fit mx-auto">
-                    <li class="flex items-center">
-                        <span class="text-blue-500 mr-3">⚡</span> 30% CPU Limit
-                    </li>
-                    <li class="flex items-center">
-                        <span class="text-blue-500 mr-3">🚀</span> 1 GB RAM Allocation
-                    </li>
-                    <li class="flex items-center">
-                        <span class="text-blue-500 mr-3">💾</span> 512 MB NVMe Disk
-                    </li>
-                    <li class="flex items-center">
-                        <span class="text-blue-500 mr-3">🛡️</span> Anti-DDoS Protection
-                    </li>
+                    <li class="flex items-center"><span class="text-blue-500 mr-3">⚡</span> <span id="displayCpu" class="font-bold text-white mr-1">30%</span> CPU Limit</li>
+                    <li class="flex items-center"><span class="text-blue-500 mr-3">🚀</span> <span id="displayRam" class="font-bold text-white mr-1">1 GB</span> RAM Allocation</li>
+                    <li class="flex items-center"><span class="text-blue-500 mr-3">💾</span> <span id="displayDisk" class="font-bold text-white mr-1">512 MB</span> NVMe Disk</li>
+                    <li class="flex items-center"><span class="text-blue-500 mr-3">🛡️</span> Anti-DDoS Protection</li>
                 </ul>
 
-                <!-- Tombol Action -->
+                <!-- Tombol Beli -->
                 <button id="btnBayar" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-3 px-4 rounded-lg transition-transform duration-200 transform hover:scale-105 focus:outline-none shadow-lg shadow-blue-500/30">
-                    Beli & Deploy Sekarang
+                    Beli & Bayar via QRIS
                 </button>
             </div>
             
@@ -58,11 +60,28 @@
     </div>
 
     <script>
-        document.getElementById('btnBayar').addEventListener('click', async () => {
-            // Animasi Loading
+        // Logika Dropdown mengubah spek UI
+        const selector = document.getElementById('planSelector');
+        
+        selector.addEventListener('change', (e) => {
+            const selectedOption = e.target.options[e.target.selectedIndex];
+            
+            document.getElementById('displayPrice').innerText = selectedOption.getAttribute('data-price');
+            document.getElementById('displayCpu').innerText = selectedOption.getAttribute('data-cpu');
+            document.getElementById('displayRam').innerText = selectedOption.getAttribute('data-ram');
+            document.getElementById('displayDisk').innerText = selectedOption.getAttribute('data-disk');
+        });
+
+        // Logika Klik Tombol Beli
+        document.getElementById('btnBayar').addEventListener('click', () => {
+            const selectedOption = selector.options[selector.selectedIndex];
+            const planKey = selector.value;
+            const nominal = selectedOption.getAttribute('data-nominal');
+            const planName = selectedOption.innerText;
+
             Swal.fire({
-                title: 'Memproses Pembayaran...',
-                text: 'Sedang menghubungi server Vercel',
+                title: 'Menyiapkan Tagihan...',
+                text: `Mengarahkan ke halaman pembayaran Rp ${parseInt(nominal).toLocaleString('id-ID')}`,
                 allowOutsideClick: false,
                 background: '#1f2937',
                 color: '#fff',
@@ -71,54 +90,11 @@
                 }
             });
 
-            try {
-                // Proses tembak API Backend Vercel
-                const res = await fetch('/api/webhook', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        status: 'PAID', // Pura-puranya udah lunas
-                        email: `klien${Math.floor(Math.random() * 1000)}@test.com`,
-                        username: `KlienPremium${Math.floor(Math.random() * 1000)}`,
-                        plan_key: '1gb'
-                    })
-                });
-                
-                const result = await res.json();
-
-                // Handling Response
-                if (res.ok) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Server Aktif!',
-                        text: 'Cek email klien untuk detail login Pterodactyl.',
-                        background: '#1f2937',
-                        color: '#fff',
-                        confirmButtonColor: '#3b82f6'
-                    });
-                } else {
-                    // Masuk ke sini kalau panel lu belum disetting (kayak sekarang)
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Waduh, Gagal Bro!',
-                        text: result.error || 'Sistem backend nolak request-nya.',
-                        background: '#1f2937',
-                        color: '#fff',
-                        confirmButtonColor: '#ef4444'
-                    });
-                }
-            } catch (error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Koneksi Terputus',
-                    text: 'Gagal terhubung ke jaringan.',
-                    background: '#1f2937',
-                    color: '#fff',
-                    confirmButtonColor: '#ef4444'
-                });
-            }
+            // Redirect ke halaman checkout lokal bawaan Vercel
+            setTimeout(() => {
+                window.location.href = `/checkout.html?plan=${planKey}&price=${nominal}&name=${encodeURIComponent(planName)}`;
+            }, 1000);
         });
     </script>
 </body>
-    </html>
-    
+</html>
