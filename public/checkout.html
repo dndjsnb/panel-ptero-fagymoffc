@@ -1,31 +1,136 @@
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const planKey = urlParams.get('plan');
-    const price = urlParams.get('price');
-    const planName = urlParams.get('name');
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Fahmi Hosting</title>
+    <!-- Pake Tailwind CSS biar tampilannya auto-premium -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen flex items-center justify-center p-4">
 
-    // 1. Otomatis Generate QRIS pas halaman dibuka
-    window.onload = async () => {
-        const res = await fetch('/api/generate-qris', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ amount: price, plan_key: planKey })
+    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full border border-gray-700">
+        <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Selesaikan Pembayaran</h2>
+
+        <!-- Info Tagihan -->
+        <div class="bg-gray-900 p-4 rounded-lg mb-6 border border-gray-700">
+            <p class="text-sm text-gray-400">Paket Pilihan:</p>
+            <h3 id="invoicePlan" class="text-xl font-bold text-white mb-2">Memuat paket...</h3>
+            <p class="text-sm text-gray-400">Total Tagihan:</p>
+            <h3 id="invoicePrice" class="text-2xl font-extrabold text-green-400">Rp 0</h3>
+        </div>
+
+        <!-- Form Data Akun Pterodactyl -->
+        <div class="mb-6">
+            <label class="block text-sm text-gray-400 mb-1">Email (Untuk login panel):</label>
+            <input type="email" id="emailInput" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="contoh@gmail.com" required>
+            
+            <label class="block text-sm text-gray-400 mt-3 mb-1">Username Panel:</label>
+            <input type="text" id="usernameInput" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="fahmi_host" required>
+        </div>
+
+        <!-- Area QRIS -->
+        <div class="text-center mb-6">
+            <p class="text-sm text-gray-400 mb-2">Scan QRIS di bawah ini:</p>
+            <div class="bg-white p-2 rounded-lg inline-block w-48 h-48 flex items-center justify-center mx-auto">
+                <!-- Gambar ini bakal diganti otomatis sama API ZakkiStore -->
+                <img id="qrisImage" src="https://via.placeholder.com/200?text=Memuat+QRIS..." alt="QRIS Payment" class="w-full h-full object-contain">
+            </div>
+        </div>
+
+        <!-- Tombol Konfirmasi -->
+        <button id="btnKonfirmasi" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+            Saya Sudah Bayar
+        </button>
+    </div>
+
+    <!-- Script Logika Checkout -->
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Ambil parameter dari URL (contoh: ?plan=basic&price=5000&name=Paket+Basic)
+            const urlParams = new URLSearchParams(window.location.search);
+            const planKey = urlParams.get('plan');
+            const price = urlParams.get('price');
+            const planName = urlParams.get('name');
+
+            // Proteksi: Kalau URL ngaco, tendang balik ke halaman utama
+            if (!price || !planName || !planKey) {
+                alert("Data paket tidak valid! Silakan pilih paket dari halaman utama.");
+                window.location.href = "/"; 
+                return;
+            }
+
+            // Tampilkan info paket di layar
+            document.getElementById('invoicePlan').innerText = planName;
+            document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
+
+            // --- PROSES GENERATE QRIS ZAKKISTORE ---
+            try {
+                const res = await fetch('/api/generate-qris', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: price, plan_key: planKey })
+                });
+                const data = await res.json();
+                
+                if (data.success && data.qr_url) {
+                    document.getElementById('qrisImage').src = data.qr_url; // Munculin QRIS Asli
+                } else {
+                    alert("Gagal memuat QRIS dari server pembayaran.");
+                }
+            } catch (err) {
+                console.error("Error Generate QRIS:", err);
+                alert("Sistem pembayaran sedang sibuk, silakan refresh.");
+            }
+
+            // --- PROSES KONFIRMASI & BUAT SERVER ---
+            document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
+                const email = document.getElementById('emailInput').value;
+                const username = document.getElementById('usernameInput').value;
+                const btn = document.getElementById('btnKonfirmasi');
+
+                if (!email || !username) {
+                    alert("Bro, isi Email sama Username dulu buat bikin servernya!");
+                    return;
+                }
+
+                // Ubah tombol jadi loading biar user gak nge-klik 2 kali
+                btn.innerText = "Mengecek Pembayaran & Membuat Server...";
+                btn.disabled = true;
+                btn.classList.replace('bg-blue-600', 'bg-gray-500');
+
+                try {
+                    // Nembak ke endpoint Pterodactyl lu
+                    const webhookRes = await fetch('/api/webhook', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            plan_key: planKey,
+                            email_pembeli: email,
+                            username: username
+                        })
+                    });
+                    
+                    const webhookData = await webhookRes.json();
+
+                    if (webhookData.success) {
+                        alert("Pembayaran Berhasil! Server Pterodactyl sedang dibuat. Silakan cek email Anda.");
+                        window.location.href = "/"; // Balik ke home atau halaman sukses
+                    } else {
+                        alert("Gagal memproses pesanan: " + (webhookData.error || "Pembayaran belum masuk"));
+                        btn.innerText = "Cek Ulang Pembayaran";
+                        btn.disabled = false;
+                        btn.classList.replace('bg-gray-500', 'bg-blue-600');
+                    }
+                } catch (err) {
+                    console.error("Error Webhook:", err);
+                    alert("Terjadi kesalahan jaringan saat mengecek pembayaran.");
+                    btn.innerText = "Cek Ulang Pembayaran";
+                    btn.disabled = false;
+                    btn.classList.replace('bg-gray-500', 'bg-blue-600');
+                }
+            });
         });
-        const data = await res.json();
-        
-        if (data.qr_url) {
-            document.getElementById('qrisImage').src = data.qr_url; // Gambar QRIS asli muncul!
-        } else {
-            alert("Gagal memuat QRIS: " + data.error);
-        }
-    };
-
-    // 2. Tampilkan info tagihan
-    document.getElementById('invoicePlan').innerText = planName;
-    document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
-
-    // 3. Tombol konfirmasi tetep sama, buat nge-trigger Pterodactyl Auto-Create
-    document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
-        // ... (Kode konfirmasi yang tadi, biarin tetep) ...
-    });
-</script>
+    </script>
+</body>
+</html>
