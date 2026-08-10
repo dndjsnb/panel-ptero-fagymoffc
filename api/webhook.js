@@ -1,6 +1,6 @@
 const axios = require('axios');
+const ZakkiStore = require('zakkistore-sdk');
 
-// Sesuaikan data ini dengan spek paket lu
 const plans = {
     "basic": { name: "Paket 1GB Basic", ram: 1024, disk: 5000, cpu: 100, price: 5000 },
     "standar": { name: "Paket 2GB Standar", ram: 2048, disk: 10000, cpu: 150, price: 10000 },
@@ -12,11 +12,33 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Harus POST Bro!' });
 
     try {
-        const { plan_key, email_pembeli, username } = req.body;
+        const { plan_key, email_pembeli, username, topup_id } = req.body;
         const plan = plans[plan_key];
 
         if (!plan) {
-            return res.status(400).json({ success: false, error: 'Paket nggak ketemu' });
+            return res.status(400).json({ success: false, error: 'Paket hosting tidak ditemukan.' });
+        }
+
+        // Inisialisasi ZakkiStore buat ngecek status transaksi
+        const zakki = new ZakkiStore({
+            baseUrl: 'https://qris.zakki.store',
+            token: process.env.ZAKKI_TOKEN,
+            iduser: process.env.ZAKKI_IDUSER,
+            email: process.env.ZAKKI_EMAIL,
+            pin: process.env.ZAKKI_PIN || '123456',
+        });
+
+        // CEK STATUS PEMBAYARAN KE ZAKKISTORE
+        // (Pastikan topup_id dikirim dari frontend setelah QRIS dibuat)
+        if (topup_id) {
+            const checkStatus = await zakki.check(topup_id);
+            // Sesuaikan kondisi status sukses dari API Zakki (biasanya 'success' atau 'paid')
+            if (!checkStatus || checkStatus.status !== 'success') {
+                return res.status(400).json({ 
+                    success: false, 
+                    error: 'Pembayaran belum terdeteksi. Silakan selesaikan pembayaran QRIS terlebih dahulu.' 
+                });
+            }
         }
 
         // 1. Bikin Akun User di Pterodactyl
@@ -36,11 +58,11 @@ module.exports = async (req, res) => {
         const userId = userRes.data.attributes.id;
 
         // 2. Bikin Server NodeJS untuk User tersebut
-        const serverRes = await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
+        await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
             name: `Bot-WA-${username}`,
             user: userId,
-            egg: 15, // CEK CATATAN DI BAWAH SOAL ID EGG INI
-            docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18", // Standar image Node.js 18
+            egg: 15, // Ganti dengan ID Egg Node.js di panel lu
+            docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
             startup: "if [[ -d .git ]] && [[ {{AUTO_UPDATE}} == \"1\" ]]; then git pull; fi; if [[ ! -z {{NODE_PACKAGES}} ]]; then /usr/local/bin/npm install {{NODE_PACKAGES}}; fi; if [[ ! -z {{UNNODE_PACKAGES}} ]]; then /usr/local/bin/npm uninstall {{UNNODE_PACKAGES}}; fi; if [ -f /home/container/package.json ]; then /usr/local/bin/npm install; fi; /usr/local/bin/node /home/container/{{MAIN_FILE}}",
             environment: {
                 MAIN_FILE: "index.js",
@@ -55,7 +77,7 @@ module.exports = async (req, res) => {
                 cpu: plan.cpu
             },
             feature_limits: { databases: 1, allocations: 1, backups: 1 },
-            allocation: { default: 1 } // Pastikan ID Allocation/Node lu bener
+            allocation: { default: 1 }
         }, {
             headers: {
                 'Authorization': `Bearer ${process.env.PTERO_APP_KEY}`,
@@ -65,11 +87,10 @@ module.exports = async (req, res) => {
 
         return res.status(200).json({ 
             success: true, 
-            message: 'Mantap, Server Bot WA berhasil dibuat!' 
+            message: 'Server Bot WA berhasil dibuat!' 
         });
 
     } catch (error) {
-        // Balikin pesan asli dari Pterodactyl biar kita tau salahnya dimana
         const pteroError = error.response && error.response.data && error.response.data.errors 
             ? error.response.data.errors[0].detail 
             : error.message;
@@ -77,7 +98,7 @@ module.exports = async (req, res) => {
         console.error("Webhook Error:", pteroError);
         return res.status(500).json({ 
             success: false, 
-            error: pteroError 
+            error: `Gagal memproses sistem: ${pteroError}` 
         });
     }
 };
