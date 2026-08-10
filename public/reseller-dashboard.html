@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Reseller - Fahmi Hosting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
+        .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen p-4 sm:p-6">
+    <div class="max-w-5xl mx-auto space-y-6">
+        
+        <!-- Header Profil & Saldo -->
+        <div class="glass-card p-5 rounded-2xl border border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+            <div class="flex items-center gap-4 w-full sm:w-auto">
+                <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-xl font-bold text-white shadow-lg">R</div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Dashboard Reseller</h2>
+                    <p class="text-xs text-gray-400">Selamat datang, <span class="text-blue-400 font-medium" id="resellerName">Budi Setiawan</span></p>
+                </div>
+            </div>
+            <div class="bg-gray-900 border border-gray-700 px-5 py-2.5 rounded-xl text-right w-full sm:w-auto flex justify-between sm:block">
+                <p class="text-[10px] text-gray-500 uppercase tracking-wide font-bold">Saldo Aktif</p>
+                <p class="text-xl font-black text-emerald-400" id="saldoDisplay">Rp 150.000</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Panel Buat Server -->
+            <div class="glass-card p-6 rounded-2xl border border-blue-900/30 relative overflow-hidden shadow-xl order-2 lg:order-1">
+                <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                    Buat Server Pelanggan
+                </h3>
+                
+                <form id="createServerForm" class="space-y-4 relative z-10">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Pilih Paket</label>
+                        <select id="planSelect" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all">
+                            <option value="basic">Paket 1GB Basic - Rp 5.000</option>
+                            <option value="standar">Paket 2GB Standar - Rp 10.000</option>
+                            <option value="pro">Paket 3GB Pro - Rp 15.000</option>
+                            <option value="advance">Paket 4GB Advance - Rp 20.000</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Email Pelanggan</label>
+                            <input type="email" id="clientEmail" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none transition-all" placeholder="client@mail.com" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
+                            <input type="text" id="clientUsername" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white focus:border-blue-500 outline-none transition-all" placeholder="client_wa" required>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm py-3 rounded-xl shadow-lg shadow-blue-500/20 active:scale-[0.98] transition-all">
+                            Buat Server (Potong Saldo)
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Panel Deposit -->
+            <div class="glass-card p-6 rounded-2xl border border-gray-800 relative overflow-hidden shadow-xl order-1 lg:order-2">
+                <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-3 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Top Up Saldo
+                </h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Nominal Deposit (Minimal Rp 10.000)</label>
+                        <input type="number" id="depositAmount" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 outline-none transition-all" placeholder="Contoh: 50000" min="10000">
+                    </div>
+                    <button id="btnGenerateQris" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-all">
+                        Generate QRIS Deposit
+                    </button>
+                    
+                    <!-- Area Tampil QRIS -->
+                    <div id="qrisArea" class="hidden bg-gray-900/50 p-4 rounded-xl border border-gray-800 text-center mt-4">
+                        <p class="text-xs text-gray-400 mb-3">Scan QRIS menggunakan E-Wallet/M-Banking:</p>
+                        <div class="bg-white p-2 rounded-xl inline-block w-40 h-40 mx-auto relative">
+                            <!-- Dummy Image Placeholder -->
+                            <img id="qrisImage" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=DummyQRIS" class="w-full h-full object-contain rounded-lg">
+                        </div>
+                        <button id="btnCheckDeposit" class="mt-4 text-xs font-semibold bg-gray-800 hover:bg-gray-700 border border-gray-600 px-4 py-2 rounded-xl text-white w-full transition-all">
+                            Saya Sudah Transfer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Riwayat Transaksi (Statik untuk visualisasi) -->
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 shadow-xl">
+            <h3 class="text-lg font-bold text-white mb-4">Riwayat Transaksi</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-400">
+                    <thead class="text-xs uppercase bg-gray-900/50 text-gray-500">
+                        <tr>
+                            <th class="px-4 py-3 rounded-tl-lg font-semibold">Waktu</th>
+                            <th class="px-4 py-3 font-semibold">Jenis</th>
+                            <th class="px-4 py-3 font-semibold">Keterangan</th>
+                            <th class="px-4 py-3 text-right rounded-tr-lg font-semibold">Nominal</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-800">
+                        <tr class="hover:bg-gray-800/30 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap">Hari ini, 16:30</td>
+                            <td class="px-4 py-3"><span class="bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Top Up</span></td>
+                            <td class="px-4 py-3">Deposit via QRIS</td>
+                            <td class="px-4 py-3 text-right text-emerald-400 font-bold">+ Rp 50.000</td>
+                        </tr>
+                        <tr class="hover:bg-gray-800/30 transition-colors">
+                            <td class="px-4 py-3 whitespace-nowrap">Kemarin, 14:15</td>
+                            <td class="px-4 py-3"><span class="bg-blue-500/10 text-blue-400 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Server</span></td>
+                            <td class="px-4 py-3">Paket 2GB Standar (client_wa)</td>
+                            <td class="px-4 py-3 text-right text-white font-bold">- Rp 10.000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script dummy untuk efek UI frontend -->
+    <script>
+        // Simulasi Generate QRIS UI
+        document.getElementById('btnGenerateQris').addEventListener('click', () => {
+            const amount = document.getElementById('depositAmount').value;
+            if(!amount || amount < 10000) return alert("Minimal deposit Rp 10.000");
+            document.getElementById('qrisArea').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
