@@ -40,15 +40,22 @@
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        /* Smooth transition for page switching */
+        /* Smooth Page Transition */
         .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
+
+        /* QRIS Loading Animation */
+        .qr-skeleton {
+            background: linear-gradient(90deg, #1c1c24 25%, #272735 50%, #1c1c24 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
@@ -61,7 +68,6 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <!-- Nav Items with onclick handlers -->
             <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
                 <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
             </button>
@@ -83,10 +89,10 @@
         </div>
     </aside>
 
-    <!-- MAIN CONTENT WRAPPER -->
+    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64">
         
-        <!-- TOP HEADER -->
+        <!-- HEADER -->
         <header class="sticky top-0 z-40 glass border-b border-white/5 px-6 py-4 flex items-center justify-between shrink-0">
             <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2">
                 <i class="fa-solid fa-bars text-xl"></i>
@@ -94,7 +100,6 @@
             
             <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard Overview</h2>
 
-            <!-- Profile Dropdown -->
             <div class="relative group">
                 <button class="flex items-center gap-3 pl-3 pr-1 py-1.5 rounded-full glass hover:bg-white/10 transition-all border border-white/10">
                     <div class="text-right hidden sm:block">
@@ -104,7 +109,6 @@
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-dark-900">R</div>
                 </button>
                 
-                <!-- Dropdown Menu -->
                 <div class="absolute right-0 top-full mt-2 w-48 glass rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 origin-top-right overflow-hidden">
                     <a href="#" class="block px-4 py-3 text-xs text-gray-300 hover:bg-white/5 hover:text-white"><i class="fa-regular fa-user mr-2"></i> Profil Saya</a>
                     <a href="#" class="block px-4 py-3 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout</a>
@@ -112,12 +116,11 @@
             </div>
         </header>
 
-        <!-- SCROLLABLE CONTENT AREA -->
+        <!-- SCROLLABLE AREA -->
         <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
             
             <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
-                <!-- Stats Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="glass rounded-2xl p-5 border-l-4 border-brand-primary">
                         <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Server Aktif</p>
@@ -133,7 +136,6 @@
                     </div>
                 </div>
 
-                <!-- Deploy Form -->
                 <div class="glass rounded-2xl p-6 md:p-8">
                     <div class="flex items-center justify-between mb-6">
                         <div>
@@ -171,18 +173,54 @@
                 </div>
             </div>
 
-            <!-- PAGE: SALDO & TOPUP -->
+            <!-- PAGE: SALDO & TOPUP (REAL PRODUCTION LOGIC) -->
             <div id="page-topup" class="page-section max-w-4xl mx-auto space-y-6">
-                <div class="glass rounded-2xl p-6 md:p-8 text-center py-12">
-                    <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
-                        <i class="fa-solid fa-qrcode"></i>
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
+                            <i class="fa-solid fa-qrcode"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Isi Saldo Manual</h3>
+                        <p class="text-sm text-gray-400">Masukkan jumlah deposit yang Anda inginkan.</p>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Manajemen Saldo QRIS</h3>
-                    <p class="text-sm text-gray-400 max-w-md mx-auto mb-8">Fitur topup saldo otomatis sedang dalam pengembangan. Silakan hubungi admin untuk pengisian manual sementara waktu.</p>
-                    
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-dark-800 border border-white/10 text-xs text-gray-300">
-                        <i class="fa-solid fa-circle-info text-brand-primary"></i> Status: Maintenance
+
+                    <!-- INPUT AMOUNT -->
+                    <div class="space-y-4 max-w-md mx-auto">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Jumlah Deposit (Minimal Rp 1.000)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Rp</span>
+                                <input 
+                                    type="number" 
+                                    id="topupAmount" 
+                                    min="1000"
+                                    placeholder="Contoh: 10000" 
+                                    class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all"
+                                >
+                            </div>
+                        </div>
+
+                        <button id="generateQrisBtn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200">
+                            Buat QRIS untuk Bayar
+                        </button>
                     </div>
+
+                    <!-- QRIS DISPLAY AREA -->
+                    <div id="qrisContainer" class="hidden mt-8 pt-6 border-t border-white/10">
+                        <p class="text-center text-xs text-gray-400 mb-4 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
+                        <div class="bg-gray-900/40 p-4 rounded-xl inline-block mx-auto">
+                            <div class="bg-white p-3 rounded-xl w-44 h-44 flex items-center justify-center relative overflow-hidden">
+                                <!-- LOADING SKELETON -->
+                                <div id="qrisSkeleton" class="absolute inset-0 qr-skeleton"></div>
+                                <!-- QR IMAGE -->
+                                <img id="qrisImage" src="" alt="QRIS Payment" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
+                            </div>
+                        </div>
+                        <p id="qrisAmountDisplay" class="mt-3 text-center text-sm font-bold text-emerald-400"></p>
+                    </div>
+
+                    <!-- NOTIFICATION -->
+                    <div id="topupNotification" class="hidden mt-4 p-3 rounded-xl text-xs font-medium text-center"></div>
                 </div>
             </div>
 
@@ -200,46 +238,38 @@
         </div>
     </main>
 
-    <!-- Overlay for Mobile Sidebar -->
+    <!-- MOBILE OVERLAY -->
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <script>
-        // SPA Navigation Logic
+        // Page Navigation
         function switchPage(pageId) {
-            // Hide all pages
-            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-            // Show selected page
-            const target = document.getElementById('page-' + pageId);
-            if(target) target.classList.add('active');
-
-            // Update Title
+            document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            
             const titles = {
                 'dashboard': 'Dashboard Overview',
                 'topup': 'Manajemen Saldo QRIS',
                 'servers': 'Kelola Server'
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
-
+            
             // Update Active Nav State
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200';
             });
-            
             const activeBtn = document.getElementById('nav-' + pageId);
             if(activeBtn) {
                 activeBtn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
             }
-
-            // Close sidebar on mobile after click
+            
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        // Mobile Sidebar Toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             const isHidden = sidebar.classList.contains('-translate-x-full');
-            
             if(isHidden) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -248,6 +278,75 @@
                 overlay.classList.add('hidden');
             }
         }
+
+        // REAL TOPUP LOGIC (MATCHING CHECKOUT.HTML STRUCTURE)
+        document.getElementById('generateQrisBtn').addEventListener('click', async function() {
+            const amountInput = document.getElementById('topupAmount');
+            const amount = parseInt(amountInput.value);
+            const notification = document.getElementById('topupNotification');
+            const qrisContainer = document.getElementById('qrisContainer');
+            const qrisImage = document.getElementById('qrisImage');
+            const qrisSkeleton = document.getElementById('qrisSkeleton');
+            const qrisAmountDisplay = document.getElementById('qrisAmountDisplay');
+            const btn = this;
+
+            // Reset UI
+            notification.classList.add('hidden');
+            qrisContainer.classList.add('hidden');
+            qrisImage.classList.add('hidden');
+            qrisSkeleton.classList.remove('hidden');
+
+            // Validasi Input
+            if (!amount || amount < 1000) {
+                notification.innerText = '❌ Minimal deposit adalah Rp 1.000.';
+                notification.className = 'mt-4 p-3 rounded-xl text-xs font-medium text-center bg-red-500/10 text-red-400 border border-red-500/20';
+                notification.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                // Tampilkan container QRIS dalam mode loading
+                qrisContainer.classList.remove('hidden');
+                qrisAmountDisplay.innerText = `Total Pembayaran: Rp ${amount.toLocaleString('id-ID')}`;
+                
+                // Disable tombol saat request
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memproses...';
+
+                // --- REAL API CALL (SAMA PERSIS DENGAN CHECKOUT.HTML) ---
+                const response = await fetch(`/api/generate-qris?amount=${amount}`);
+                
+                if (!response.ok) throw new Error('Gagal menghubungi server');
+                
+                const data = await response.json();
+
+                // Sesuaikan parsing JSON dengan response backend lo
+                // Jika checkout.html menggunakan field tertentu, ganti 'data.qr_url' di bawah ini
+                const qrUrl = data.qr_url || data.qris_image || data.image || data.url;
+
+                if (qrUrl) {
+                    qrisImage.src = qrUrl;
+                    qrisImage.onload = () => {
+                        qrisSkeleton.classList.add('hidden');
+                        qrisImage.classList.remove('hidden');
+                        btn.disabled = false;
+                        btn.innerHTML = 'Buat QRIS untuk Bayar';
+                    };
+                } else {
+                    throw new Error('Format response API tidak valid');
+                }
+
+            } catch (error) {
+                console.error('Error generating QRIS:', error);
+                qrisContainer.classList.add('hidden');
+                notification.innerText = '️ Gagal membuat QRIS. Silakan coba lagi atau hubungi admin.';
+                notification.className = 'mt-4 p-3 rounded-xl text-xs font-medium text-center bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
+                notification.classList.remove('hidden');
+                
+                btn.disabled = false;
+                btn.innerHTML = 'Buat QRIS untuk Bayar';
+            }
+        });
     </script>
 </body>
 </html>
