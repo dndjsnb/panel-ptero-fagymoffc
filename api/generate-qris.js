@@ -29,16 +29,17 @@ module.exports = async (req, res) => {
         // Eksekusi API ZakkiStore
         const response = await zakki.topup(amount);
         
-        if (response && response.data && response.data.qr_image) {
+        // PERBAIKAN DISINI: qris_image dan id_transaksi
+        if (response && response.status === 'success' && response.data && response.data.qris_image) {
             return res.status(200).json({ 
                 success: true, 
-                qr_url: response.data.qr_image,
-                topup_id: response.data.idtopup 
+                qr_url: response.data.qris_image,
+                topup_id: response.data.id_transaksi 
             });
         } else {
             return res.status(400).json({ 
                 success: false, 
-                error: 'Respon ZakkiStore error', 
+                error: 'Respon ZakkiStore error atau struktur berubah', 
                 detail_asli: response 
             });
         }
