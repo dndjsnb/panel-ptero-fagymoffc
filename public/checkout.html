@@ -4,103 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Fahmi Hosting</title>
-    <!-- Pake Tailwind CSS biar tampilannya auto-premium -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Tambahan sedikit sentuhan smooth & custom scrollbar */
+        body {
+            background: radial-gradient(circle at top, #111827, #030712);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-200 min-h-screen flex items-center justify-center p-4">
+<body class="text-gray-100 min-h-screen flex items-center justify-center p-4 selection:bg-blue-500 selection:text-white">
 
-    <div class="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full border border-gray-700">
-        <h2 class="text-2xl font-bold text-center text-blue-400 mb-6">Selesaikan Pembayaran</h2>
+    <div class="glass-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-gray-800 relative overflow-hidden">
+        
+        <!-- Efek Glow Dekoratif di Background -->
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- Info Tagihan -->
-        <div class="bg-gray-900 p-4 rounded-lg mb-6 border border-gray-700">
-            <p class="text-sm text-gray-400">Paket Pilihan:</p>
-            <h3 id="invoicePlan" class="text-xl font-bold text-white mb-2">Memuat paket...</h3>
-            <p class="text-sm text-gray-400">Total Tagihan:</p>
-            <h3 id="invoicePrice" class="text-2xl font-extrabold text-green-400">Rp 0</h3>
+        <!-- Header Title -->
+        <div class="relative z-10">
+            <h2 class="text-xl sm:text-2xl font-extrabold text-center tracking-tight text-white mb-2">Checkout Pembayaran</h2>
+            <p class="text-xs text-center text-gray-400 mb-6">Selesaikan transaksi untuk otomatis mengaktifkan server Anda.</p>
         </div>
 
-        <!-- Form Data Akun Pterodactyl -->
-        <div class="mb-6">
-            <label class="block text-sm text-gray-400 mb-1">Email (Untuk login panel):</label>
-            <input type="email" id="emailInput" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="contoh@gmail.com" required>
+        <!-- Kotak Notifikasi UI (Modern & Clean) -->
+        <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
+        </div>
+
+        <!-- Bungkus Konten Utama -->
+        <div id="mainContent" class="relative z-10 space-y-5">
             
-            <label class="block text-sm text-gray-400 mt-3 mb-1">Username Panel:</label>
-            <input type="text" id="usernameInput" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white focus:outline-none focus:border-blue-500" placeholder="fahmi_host" required>
-        </div>
-
-        <!-- Area QRIS -->
-        <div class="text-center mb-6">
-            <p class="text-sm text-gray-400 mb-2">Scan QRIS di bawah ini:</p>
-            <div class="bg-white p-2 rounded-lg inline-block w-48 h-48 flex items-center justify-center mx-auto">
-                <!-- Gambar ini bakal diganti otomatis sama API ZakkiStore -->
-                <img id="qrisImage" src="https://via.placeholder.com/200?text=Memuat+QRIS..." alt="QRIS Payment" class="w-full h-full object-contain">
+            <!-- Info Tagihan Card -->
+            <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800/80 flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Paket Dipilih</span>
+                    <h3 id="invoicePlan" class="text-base sm:text-lg font-bold text-gray-100">Memuat...</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Harga</span>
+                    <h3 id="invoicePrice" class="text-lg sm:text-xl font-black text-emerald-400">Rp 0</h3>
+                </div>
             </div>
-        </div>
 
-        <!-- Tombol Konfirmasi -->
-        <button id="btnKonfirmasi" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-            Saya Sudah Bayar
-        </button>
+            <!-- Form Data Akun Pterodactyl -->
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Email Panel</label>
+                    <input type="email" id="emailInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="contoh@gmail.com" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
+                    <input type="text" id="usernameInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="fahmihost" required>
+                </div>
+            </div>
+
+            <!-- Area QRIS (Fresh & Minimalis) -->
+            <div class="text-center bg-gray-900/40 p-4 rounded-xl border border-gray-800/50">
+                <p class="text-xs text-gray-400 mb-3 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
+                <div class="bg-white p-3 rounded-xl inline-block w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center mx-auto shadow-md relative overflow-hidden">
+                    <!-- Skeleton / Loading Pulse -->
+                    <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400 gap-1">
+                        <svg class="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                        </svg>
+                        <span class="text-[10px] font-semibold tracking-wider">MEMBUAT QR...</span>
+                    </div>
+                    <img id="qrisImage" src="" alt="QRIS Payment" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
+                </div>
+            </div>
+
+            <!-- Tombol Konfirmasi (Smooth Gradient & Interactive) -->
+            <button id="btnKonfirmasi" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-all duration-200">
+                Saya Sudah Bayar
+            </button>
+        </div>
     </div>
 
-    <!-- Script Logika Checkout -->
+    <!-- Script Logic -->
     <script>
+        function showNotification(message, type = 'error') {
+            const alertBox = document.getElementById('uiAlert');
+            alertBox.className = "relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg";
+            
+            if (type === 'error') {
+                alertBox.classList.add('bg-red-950/60', 'border-red-800/80', 'text-red-300');
+            } else if (type === 'success') {
+                alertBox.classList.add('bg-emerald-950/60', 'border-emerald-800/80', 'text-emerald-300');
+            } else {
+                alertBox.classList.add('bg-blue-950/60', 'border-blue-800/80', 'text-blue-300');
+            }
+            
+            alertBox.innerText = message;
+            alertBox.classList.remove('hidden');
+        }
+
         document.addEventListener("DOMContentLoaded", async () => {
-            // Ambil parameter dari URL (contoh: ?plan=basic&price=5000&name=Paket+Basic)
             const urlParams = new URLSearchParams(window.location.search);
             const planKey = urlParams.get('plan');
             const price = urlParams.get('price');
             const planName = urlParams.get('name');
 
-            // Proteksi: Kalau URL ngaco, tendang balik ke halaman utama
             if (!price || !planName || !planKey) {
-                alert("Data paket tidak valid! Silakan pilih paket dari halaman utama.");
-                window.location.href = "/"; 
+                document.getElementById('mainContent').style.display = 'none';
+                showNotification("Akses ditolak: Data paket tidak valid. Mengalihkan...", "error");
+                setTimeout(() => { window.location.href = "/"; }, 2500);
                 return;
             }
 
-            // Tampilkan info paket di layar
             document.getElementById('invoicePlan').innerText = planName;
             document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(price).toLocaleString('id-ID');
 
-            // --- PROSES GENERATE QRIS ZAKKISTORE ---
+            // Request QRIS dengan penanganan error yang rapi
             try {
-                const res = await fetch('/api/generate-qris', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount: price, plan_key: planKey })
-                });
+                const res = await fetch(`/api/generate-qris?amount=${price}`);
                 const data = await res.json();
                 
                 if (data.success && data.qr_url) {
-                    document.getElementById('qrisImage').src = data.qr_url; // Munculin QRIS Asli
+                    const qrisImg = document.getElementById('qrisImage');
+                    document.getElementById('qrisLoading').style.display = 'none';
+                    qrisImg.src = data.qr_url;
+                    qrisImg.classList.remove('hidden');
                 } else {
-                    alert("Gagal memuat QRIS dari server pembayaran.");
+                    document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gagal Dimuat</span>';
+                    showNotification("Gagal memuat QRIS dari server pembayaran.", "error");
                 }
             } catch (err) {
-                console.error("Error Generate QRIS:", err);
-                alert("Sistem pembayaran sedang sibuk, silakan refresh.");
+                document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gangguan Jaringan</span>';
+                showNotification("Tidak dapat terhubung ke server pembayaran.", "error");
             }
 
-            // --- PROSES KONFIRMASI & BUAT SERVER ---
+            // Tombol Aksi
             document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
-                const email = document.getElementById('emailInput').value;
-                const username = document.getElementById('usernameInput').value;
+                const email = document.getElementById('emailInput').value.trim();
+                const username = document.getElementById('usernameInput').value.trim();
                 const btn = document.getElementById('btnKonfirmasi');
 
                 if (!email || !username) {
-                    alert("Bro, isi Email sama Username dulu buat bikin servernya!");
+                    showNotification("Mohon lengkapi kolom Email dan Username panel terlebih dahulu.", "error");
                     return;
                 }
 
-                // Ubah tombol jadi loading biar user gak nge-klik 2 kali
-                btn.innerText = "Mengecek Pembayaran & Membuat Server...";
+                // Smooth Loading State
+                btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg> Memproses Server...`;
                 btn.disabled = true;
-                btn.classList.replace('bg-blue-600', 'bg-gray-500');
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+                
+                showNotification("Sedang memverifikasi pembayaran dan membuat server...", "info");
 
                 try {
-                    // Nembak ke endpoint Pterodactyl lu
                     const webhookRes = await fetch('/api/webhook', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -114,20 +172,19 @@
                     const webhookData = await webhookRes.json();
 
                     if (webhookData.success) {
-                        alert("Pembayaran Berhasil! Server Pterodactyl sedang dibuat. Silakan cek email Anda.");
-                        window.location.href = "/"; // Balik ke home atau halaman sukses
+                        document.getElementById('mainContent').style.display = 'none';
+                        showNotification("✨ Pembayaran Berhasil! Server Pterodactyl Anda sudah aktif. Silakan cek inbox/spam email Anda untuk detail akun.", "success");
                     } else {
-                        alert("Gagal memproses pesanan: " + (webhookData.error || "Pembayaran belum masuk"));
-                        btn.innerText = "Cek Ulang Pembayaran";
+                        showNotification(`Gagal: ${webhookData.error || "Pembayaran belum terdeteksi."}`, "error");
+                        btn.innerHTML = "Cek Ulang Pembayaran";
                         btn.disabled = false;
-                        btn.classList.replace('bg-gray-500', 'bg-blue-600');
+                        btn.classList.remove('opacity-70', 'cursor-not-allowed');
                     }
                 } catch (err) {
-                    console.error("Error Webhook:", err);
-                    alert("Terjadi kesalahan jaringan saat mengecek pembayaran.");
-                    btn.innerText = "Cek Ulang Pembayaran";
+                    showNotification("Terjadi kendala jaringan saat menghubungi server.", "error");
+                    btn.innerHTML = "Cek Ulang Pembayaran";
                     btn.disabled = false;
-                    btn.classList.replace('bg-gray-500', 'bg-blue-600');
+                    btn.classList.remove('opacity-70', 'cursor-not-allowed');
                 }
             });
         });
