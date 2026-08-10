@@ -102,9 +102,11 @@ app.post('/api/register', async (req, res) => {
         const newReseller = new Reseller({ name, email, password });
         await newReseller.save();
         res.status(201).json({ message: 'Mantap Cok! Akun reseller berhasil didaftarkan.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Gagal daftar! Email mungkin udah kepakai.' });
+        } catch (error) {
+        // Ini bakal ngirim pesan error asli dari MongoDB ke layar web lu
+        res.status(500).json({ message: 'Error aslinya: ' + error.message });
     }
+    
 });
 
 // --- ENDPOINT API LOGIN RESELLER ---
