@@ -48,14 +48,6 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
-
-        /* QRIS Loading Animation */
-        .qr-skeleton {
-            background: linear-gradient(90deg, #1c1c24 25%, #272735 50%, #1c1c24 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-        }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
@@ -72,12 +64,16 @@
                 <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
             </button>
             
-            <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
-                <i class="fa-solid fa-server w-5"></i> Kelola Server
+            <button onclick="switchPage('topup')" id="nav-topup" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-wallet w-5"></i> Deposit Saldo
+            </button>
+
+            <button onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana
             </button>
             
-            <button onclick="switchPage('topup')" id="nav-topup" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
-                <i class="fa-solid fa-wallet w-5"></i> Saldo & Topup
+            <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <i class="fa-solid fa-server w-5"></i> Kelola Server
             </button>
         </nav>
 
@@ -127,8 +123,8 @@
                         <h3 class="text-2xl font-bold text-white">24 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
                     </div>
                     <div class="glass rounded-2xl p-5 border-l-4 border-emerald-500">
-                        <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Saldo QRIS</p>
-                        <h3 class="text-2xl font-bold text-white">Rp 0 <span class="text-sm font-normal text-gray-500">,-</span></h3>
+                        <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Saldo Tersedia</p>
+                        <h3 class="text-2xl font-bold text-white" id="currentBalanceDisplay">Rp 500.000 <span class="text-sm font-normal text-gray-500">,-</span></h3>
                     </div>
                     <div class="glass rounded-2xl p-5 border-l-4 border-pink-500">
                         <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Pelanggan</p>
@@ -173,54 +169,100 @@
                 </div>
             </div>
 
-            <!-- PAGE: SALDO & TOPUP (REAL PRODUCTION LOGIC) -->
+            <!-- PAGE: DEPOSIT SALDO -->
             <div id="page-topup" class="page-section max-w-4xl mx-auto space-y-6">
                 <div class="glass rounded-2xl p-6 md:p-8">
                     <div class="text-center mb-8">
-                        <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
+                        <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-500 text-2xl">
                             <i class="fa-solid fa-qrcode"></i>
                         </div>
-                        <h3 class="text-xl font-bold text-white mb-2">Isi Saldo Manual</h3>
-                        <p class="text-sm text-gray-400">Masukkan jumlah deposit yang Anda inginkan.</p>
+                        <h3 class="text-xl font-bold text-white mb-2">Deposit Saldo Reseller</h3>
+                        <p class="text-sm text-gray-400">Isi saldo untuk bertransaksi produk digital & hosting.</p>
                     </div>
 
-                    <!-- INPUT AMOUNT -->
                     <div class="space-y-4 max-w-md mx-auto">
                         <div class="space-y-1.5">
-                            <label class="text-xs font-medium text-gray-400 ml-1">Jumlah Deposit (Minimal Rp 1.000)</label>
+                            <label class="text-xs font-medium text-gray-400 ml-1">Jumlah Deposit (Minimal Rp 10.000)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Rp</span>
-                                <input 
-                                    type="number" 
-                                    id="topupAmount" 
-                                    min="1000"
-                                    placeholder="Contoh: 10000" 
-                                    class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all"
-                                >
+                                <input type="number" id="depositAmount" min="10000" placeholder="Contoh: 50000" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all">
                             </div>
                         </div>
 
-                        <button id="generateQrisBtn" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200">
-                            Buat QRIS untuk Bayar
+                        <button id="btnGenerateQris" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200">
+                            Generate QRIS Pembayaran
                         </button>
                     </div>
 
-                    <!-- QRIS DISPLAY AREA -->
-                    <div id="qrisContainer" class="hidden mt-8 pt-6 border-t border-white/10">
-                        <p class="text-center text-xs text-gray-400 mb-4 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
-                        <div class="bg-gray-900/40 p-4 rounded-xl inline-block mx-auto">
-                            <div class="bg-white p-3 rounded-xl w-44 h-44 flex items-center justify-center relative overflow-hidden">
-                                <!-- LOADING SKELETON -->
-                                <div id="qrisSkeleton" class="absolute inset-0 qr-skeleton"></div>
-                                <!-- QR IMAGE -->
-                                <img id="qrisImage" src="" alt="QRIS Payment" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
-                            </div>
+                    <div id="qrisContainer" class="hidden mt-8 pt-6 border-t border-white/10 text-center">
+                        <p class="text-xs text-gray-400 mb-4 font-medium">Scan QRIS menggunakan E-Wallet / M-Banking:</p>
+                        <div class="bg-white p-3 rounded-xl inline-block w-44 h-44 flex items-center justify-center relative overflow-hidden">
+                            <img id="qrisImage" src="" alt="QRIS Payment" class="w-full h-full object-contain rounded-lg">
                         </div>
-                        <p id="qrisAmountDisplay" class="mt-3 text-center text-sm font-bold text-emerald-400"></p>
+                        <p id="qrisAmountDisplay" class="mt-3 text-sm font-bold text-emerald-400"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: WITHDRAW DANA (FITUR BARU) -->
+            <div id="page-withdraw" class="page-section max-w-4xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 rounded-full bg-brand-primary/10 flex items-center justify-center mx-auto mb-4 text-brand-primary text-2xl">
+                            <i class="fa-solid fa-money-bill-transfer"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Pencairan Dana (Withdraw)</h3>
+                        <p class="text-sm text-gray-400">Tarik keuntungan Anda ke rekening bank atau e-wallet.</p>
                     </div>
 
-                    <!-- NOTIFICATION -->
-                    <div id="topupNotification" class="hidden mt-4 p-3 rounded-xl text-xs font-medium text-center"></div>
+                    <div class="max-w-md mx-auto space-y-5">
+                        <!-- Input Nominal -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nominal Penarikan (Min. Rp 20.000)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">Rp</span>
+                                <input type="number" id="withdrawAmount" min="20000" placeholder="Masukkan jumlah withdraw" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-gray-600 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                            </div>
+                        </div>
+
+                        <!-- Metode Transfer -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Metode Penerimaan</label>
+                            <select id="withdrawMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all appearance-none cursor-pointer">
+                                <option value="">Pilih metode transfer...</option>
+                                <option value="BCA">Transfer Bank BCA</option>
+                                <option value="BRI">Transfer Bank BRI</option>
+                                <option value="MANDIRI">Transfer Bank Mandiri</option>
+                                <option value="GOPAY">GoPay</option>
+                                <option value="DANA">DANA</option>
+                                <option value="OVO">OVO</option>
+                            </select>
+                        </div>
+
+                        <!-- KALKULATOR KOMISI REAL-TIME -->
+                        <div class="mt-6 p-4 rounded-xl bg-dark-800 border border-white/10 space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-400">Nominal Request:</span>
+                                <span class="text-white font-bold" id="previewRequest">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-red-400">Biaya Admin (10%):</span>
+                                <span class="text-red-400 font-bold" id="previewCommission">- Rp 0</span>
+                            </div>
+                            <div class="border-t border-white/10 pt-3 flex justify-between items-center">
+                                <span class="text-emerald-400 font-medium">Dana Diterima Bersih:</span>
+                                <span class="text-emerald-400 font-bold text-xl" id="previewNet">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Tombol Action -->
+                        <button id="btnProcessWithdraw" class="w-full bg-brand-primary hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-brand-primary/20 active:scale-[0.98] transition-all duration-200">
+                            Proses Pencairan Dana
+                        </button>
+
+                        <!-- Notifikasi -->
+                        <div id="withdrawNotification" class="hidden p-3 rounded-xl text-xs font-medium text-center"></div>
+                    </div>
                 </div>
             </div>
 
@@ -242,14 +284,18 @@
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <script>
-        // Page Navigation
+        // --- STATE MANAGEMENT ---
+        let currentBalance = 500000; // Simulasi saldo awal reseller
+        
+        // --- NAVIGASI SPA ---
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
             document.getElementById('page-' + pageId).classList.add('active');
             
             const titles = {
                 'dashboard': 'Dashboard Overview',
-                'topup': 'Manajemen Saldo QRIS',
+                'topup': 'Deposit Saldo',
+                'withdraw': 'Pencairan Dana',
                 'servers': 'Kelola Server'
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
@@ -261,7 +307,7 @@
             const activeBtn = document.getElementById('nav-' + pageId);
             if(activeBtn) {
                 activeBtn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
-            }
+                     }
             
             if(window.innerWidth < 768) toggleSidebar();
         }
@@ -279,74 +325,104 @@
             }
         }
 
-        // REAL TOPUP LOGIC (MATCHING CHECKOUT.HTML STRUCTURE)
-        document.getElementById('generateQrisBtn').addEventListener('click', async function() {
-            const amountInput = document.getElementById('topupAmount');
-            const amount = parseInt(amountInput.value);
-            const notification = document.getElementById('topupNotification');
-            const qrisContainer = document.getElementById('qrisContainer');
-            const qrisImage = document.getElementById('qrisImage');
-            const qrisSkeleton = document.getElementById('qrisSkeleton');
-            const qrisAmountDisplay = document.getElementById('qrisAmountDisplay');
-            const btn = this;
-
-            // Reset UI
-            notification.classList.add('hidden');
-            qrisContainer.classList.add('hidden');
-            qrisImage.classList.add('hidden');
-            qrisSkeleton.classList.remove('hidden');
-
-            // Validasi Input
-            if (!amount || amount < 1000) {
-                notification.innerText = '❌ Minimal deposit adalah Rp 1.000.';
-                notification.className = 'mt-4 p-3 rounded-xl text-xs font-medium text-center bg-red-500/10 text-red-400 border border-red-500/20';
-                notification.classList.remove('hidden');
+        // --- LOGIKA DEPOSIT (SIMULASI ZAKKI STORE) ---
+        document.getElementById('btnGenerateQris').addEventListener('click', async function() {
+            const amount = parseInt(document.getElementById('depositAmount').value);
+            const container = document.getElementById('qrisContainer');
+            const img = document.getElementById('qrisImage');
+            
+            if (!amount || amount < 10000) {
+                alert('Minimal deposit adalah Rp 10.000');
                 return;
             }
 
+            container.classList.remove('hidden');
+            document.getElementById('qrisAmountDisplay').innerText = `Total Bayar: Rp ${amount.toLocaleString('id-ID')}`;
+            
+            // Simulasi generate QRIS statis (Ganti dengan API Zakki Store nanti)
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=DEPOSIT_${amount}_${Date.now()}`;
+        });
+
+        // --- LOGIKA WITHDRAW + KALKULATOR KOMISI 10% ---
+        const COMMISSION_RATE = 0.10;
+        const MIN_WITHDRAW = 20000;
+
+        // 1. Kalkulator Real-time
+        document.getElementById('withdrawAmount').addEventListener('input', function(e) {
+            const amount = parseInt(e.target.value) || 0;
+            const commission = Math.round(amount * COMMISSION_RATE);
+            const net = amount - commission;
+            
+            document.getElementById('previewRequest').innerText = `Rp ${amount.toLocaleString('id-ID')}`;
+            document.getElementById('previewCommission').innerText = `- Rp ${commission.toLocaleString('id-ID')}`;
+            document.getElementById('previewNet').innerText = `Rp ${net.toLocaleString('id-ID')}`;
+        });
+
+        // 2. Proses Withdraw
+        document.getElementById('btnProcessWithdraw').addEventListener('click', async function() {
+            const btn = this;
+            const amountInput = document.getElementById('withdrawAmount');
+            const methodInput = document.getElementById('withdrawMethod');
+            const notification = document.getElementById('withdrawNotification');
+            
+            const requestedAmount = parseInt(amountInput.value);
+            const commission = Math.round(requestedAmount * COMMISSION_RATE);
+            const netAmount = requestedAmount - commission;
+
+            // Reset notif
+            notification.classList.add('hidden');
+
+            // Validasi
+            if (!requestedAmount || requestedAmount < MIN_WITHDRAW) {
+                showNotif(`❌ Minimal penarikan adalah Rp ${MIN_WITHDRAW.toLocaleString('id-ID')}`, 'error');
+                return;
+            }
+            if (!methodInput.value) {
+                showNotif('❌ Silakan pilih metode penerimaan dana.', 'error');
+                return;
+            }
+            if (currentBalance < requestedAmount) {
+                showNotif(`❌ Saldo tidak mencukupi. Saldo Anda: Rp ${currentBalance.toLocaleString('id-ID')}`, 'error');
+                return;
+            }
+
+            // Disable tombol saat proses
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memproses...';
+
             try {
-                // Tampilkan container QRIS dalam mode loading
-                qrisContainer.classList.remove('hidden');
-                qrisAmountDisplay.innerText = `Total Pembayaran: Rp ${amount.toLocaleString('id-ID')}`;
-                
-                // Disable tombol saat request
-                btn.disabled = true;
-                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memproses...';
+                // SIMULASI REQUEST KE API ZAKKI STORE (TRANSFER SALDO)
+                // Nanti ganti fetch ini dengan endpoint backend lo yang beneran
+                await new Promise(resolve => setTimeout(resolve, 1500)); 
 
-                // --- REAL API CALL (SAMA PERSIS DENGAN CHECKOUT.HTML) ---
-                const response = await fetch(`/api/generate-qris?amount=${amount}`);
-                
-                if (!response.ok) throw new Error('Gagal menghubungi server');
-                
-                const data = await response.json();
+                // Kurangi saldo lokal (Simulasi database update)
+                currentBalance -= requestedAmount;
+                document.getElementById('currentBalanceDisplay').innerHTML = `Rp ${currentBalance.toLocaleString('id-ID')} <span class="text-sm font-normal text-gray-500">,-</span>`;
 
-                // Sesuaikan parsing JSON dengan response backend lo
-                // Jika checkout.html menggunakan field tertentu, ganti 'data.qr_url' di bawah ini
-                const qrUrl = data.qr_url || data.qris_image || data.image || data.url;
-
-                if (qrUrl) {
-                    qrisImage.src = qrUrl;
-                    qrisImage.onload = () => {
-                        qrisSkeleton.classList.add('hidden');
-                        qrisImage.classList.remove('hidden');
-                        btn.disabled = false;
-                        btn.innerHTML = 'Buat QRIS untuk Bayar';
-                    };
-                } else {
-                    throw new Error('Format response API tidak valid');
-                }
+                showNotif(`✅ Berhasil! Dana bersih Rp ${netAmount.toLocaleString('id-ID')} sedang dikirim ke ${methodInput.options[methodInput.selectedIndex].text}.`, 'success');
+                
+                // Reset form
+                amountInput.value = '';
+                methodInput.value = '';
+                document.getElementById('previewRequest').innerText = 'Rp 0';
+                document.getElementById('previewCommission').innerText = '- Rp 0';
+                document.getElementById('previewNet').innerText = 'Rp 0';
 
             } catch (error) {
-                console.error('Error generating QRIS:', error);
-                qrisContainer.classList.add('hidden');
-                notification.innerText = '️ Gagal membuat QRIS. Silakan coba lagi atau hubungi admin.';
-                notification.className = 'mt-4 p-3 rounded-xl text-xs font-medium text-center bg-yellow-500/10 text-yellow-400 border border-yellow-500/20';
-                notification.classList.remove('hidden');
-                
+                showNotif('⚠️ Gagal memproses penarikan. Silakan coba lagi.', 'error');
+            } finally {
                 btn.disabled = false;
-                btn.innerHTML = 'Buat QRIS untuk Bayar';
+                btn.innerHTML = 'Proses Pencairan Dana';
             }
         });
+
+        function showNotif(message, type) {
+            const notif = document.getElementById('withdrawNotification');
+            notif.innerText = message;
+            notif.className = `mt-4 p-3 rounded-xl text-xs font-medium text-center ${type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`;
+            notif.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
+     
