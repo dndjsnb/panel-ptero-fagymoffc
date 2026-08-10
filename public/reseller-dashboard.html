@@ -1,326 +1,281 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <!-- SATPAM PENJAGA DASHBOARD -->
-    <script>
-        if (!localStorage.getItem('isLoggedIn')) {
-            window.location.replace('reseller-login.html');
-        }
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reseller Dashboard - Fahmi Hosting</title>
+    <title>FahmiHost - Reseller Dashboard</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: {
+                            900: '#0a0a0f',
+                            800: '#12121a',
+                            700: '#1c1c28',
+                            600: '#2a2a3c',
+                        },
+                        accent: {
+                            primary: '#6366f1', // Indigo
+                            secondary: '#ec4899', // Pink
+                            success: '#10b981', // Emerald
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
+                        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body { background: radial-gradient(circle at top right, #0f172a, #020617); font-family: system-ui, -apple-system, sans-serif; }
-        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        body {
+            background-color: #0a0a0f;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+        
+        .glass-panel {
+            background: rgba(28, 28, 40, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 40px -10px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar-track { background: #0a0a0f; }
+        ::-webkit-scrollbar-thumb { background: #2a2a3c; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+        /* Avatar Glow Animation */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+        }
+        .avatar-glow { animation: pulse-glow 3s infinite; }
     </style>
 </head>
-<body class="text-gray-200 h-screen flex overflow-hidden selection:bg-blue-500/30">
+<body class="text-gray-300 antialiased min-h-screen flex flex-col md:flex-row">
 
-    <!-- Sidebar Menu -->
-    <aside class="w-64 glass-panel border-r border-gray-800 hidden md:flex flex-col z-20">
-        <div class="h-16 flex items-center px-6 border-b border-gray-800">
-            <i class="fa-solid fa-server text-blue-500 text-xl mr-3"></i>
-            <h1 class="text-lg font-bold text-white tracking-wide">Fahmi<span class="text-blue-500">Host</span></h1>
+    <!-- SIDEBAR (Desktop Only) -->
+    <aside class="hidden md:flex w-64 flex-col glass-panel border-r border-white/5 h-screen sticky top-0 z-50">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-white font-bold">F</div>
+            <h1 class="text-xl font-bold text-white tracking-tight">Fahmi<span class="text-accent-primary">Host</span></h1>
         </div>
-        
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto" id="sidebar-menu">
-            <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center px-4 py-3 bg-blue-600/10 text-blue-400 rounded-xl transition-all" data-target="dashboard">
-                <i class="fa-solid fa-chart-pie w-6"></i>
-                <span class="font-medium text-sm">Dashboard</span>
-            </button>
-            <button onclick="switchTab('server')" class="nav-btn w-full flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-xl transition-all" data-target="server">
-                <i class="fa-solid fa-cube w-6"></i>
-                <span class="font-medium text-sm">Kelola Server</span>
-            </button>
-            <button onclick="switchTab('topup')" class="nav-btn w-full flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-xl transition-all" data-target="topup">
-                <i class="fa-solid fa-wallet w-6"></i>
-                <span class="font-medium text-sm">Saldo & Topup</span>
-            </button>
+
+        <nav class="flex-1 px-4 space-y-2 mt-4">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-accent-primary/10 text-accent-primary border border-accent-primary/20 transition-all">
+                <i class="fa-solid fa-chart-pie w-5"></i>
+                <span class="font-medium">Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all group">
+                <i class="fa-solid fa-server w-5 group-hover:text-accent-primary transition-colors"></i>
+                <span class="font-medium">Kelola Server</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 text-gray-400 hover:text-white transition-all group">
+                <i class="fa-solid fa-wallet w-5 group-hover:text-accent-success transition-colors"></i>
+                <span class="font-medium">Saldo & Topup</span>
+            </a>
         </nav>
 
-        <div class="p-4 border-t border-gray-800">
-            <button onclick="logout()" class="w-full flex items-center justify-center px-4 py-2.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all text-sm font-semibold">
-                <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Keluar
-            </button>
+        <div class="p-4 border-t border-white/5">
+            <div class="glass-panel rounded-xl p-4">
+                <p class="text-xs text-gray-500 mb-1">Status Sistem</p>
+                <div class="flex items-center gap-2 text-accent-success text-sm font-medium">
+                    <span class="relative flex h-2 w-2">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    Online & Stabil
+                </div>
+            </div>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-h-screen relative overflow-x-hidden">
+        
+        <!-- TOP HEADER (Fixed Issue Here!) -->
+        <header class="sticky top-0 z-40 glass-panel border-b border-white/5 px-6 py-4 flex items-center justify-between">
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden text-gray-400 hover:text-white">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
 
-        <!-- Top Header -->
-        <header class="h-16 glass-panel border-b border-gray-800 flex items-center justify-between px-6 z-10">
-            <h2 class="text-lg font-semibold text-white" id="header-title">Overview Sistem</h2>
-            <div class="flex items-center space-x-4 ml-auto">
-                <!-- DROPDOWN PROFIL BARU -->
-                <div class="relative">
-                    <button onclick="toggleProfileMenu()" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-sm text-white shadow-lg hover:scale-105 transition-transform">
+            <!-- Page Title -->
+            <h2 class="text-lg font-semibold text-white hidden md:block">Manajemen Saldo QRIS</h2>
+            <h2 class="text-lg font-semibold text-white md:hidden">Dashboard</h2>
+
+            <!-- FIXED AVATAR SECTION -->
+            <div class="relative group">
+                <button class="flex items-center gap-3 pl-4 pr-2 py-1.5 rounded-full glass-panel hover:bg-white/10 transition-all border border-white/10 avatar-glow">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-medium text-white leading-none">Reseller Admin</p>
+                        <p class="text-[10px] text-gray-400 mt-0.5">ID: #FH-8821</p>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-lg ring-2 ring-dark-900">
                         R
-                    </button>
-                    
-                    <!-- Dropdown Menu Profil -->
-                    <div id="profile-menu" class="hidden absolute right-0 mt-3 w-48 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl py-2 z-50">
-                        <div class="px-4 py-2 border-b border-gray-800 mb-1">
-                            <p class="text-xs text-gray-400">Login sebagai</p>
-                            <p class="text-sm font-bold text-white truncate">Reseller VIP</p>
-                        </div>
-                        <a href="#" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
-                            <i class="fa-solid fa-user-gear w-5 text-gray-400"></i> Setting Akun
+                    </div>
+                </button>
+
+                <!-- Dropdown Menu (Smooth Reveal) -->
+                <div class="absolute right-0 top-full mt-3 w-48 glass-panel rounded-xl border border-white/10 shadow-glass opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 origin-top-right">
+                    <div class="py-1">
+                        <a href="#" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+                            <i class="fa-regular fa-user mr-2"></i> Profil Saya
                         </a>
-                        <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors mt-1 border-t border-gray-800 pt-2">
-                            <i class="fa-solid fa-arrow-right-from-bracket w-5"></i> Keluar
-                        </button>
+                        <a href="#" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-white/5 hover:text-white transition-colors">
+                            <i class="fa-solid fa-gear mr-2"></i> Pengaturan
+                        </a>
+                        <div class="my-1 border-t border-white/5"></div>
+                        <a href="#" class="block px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                            <i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Area Konten Utama -->
-        <div class="flex-1 overflow-y-auto p-6 lg:p-8 z-10">
+        <!-- CONTENT AREA -->
+        <div class="p-6 max-w-7xl mx-auto w-full space-y-8">
             
-            <!-- TABS 1: DASHBOARD -->
-            <div id="tab-dashboard" class="tab-content active">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass-panel p-6 rounded-2xl border-blue-500/30">
-                        <h3 class="text-sm font-medium text-gray-400">Total Server Aktif</h3>
-                        <h4 class="text-3xl font-bold text-white mt-2">0</h4>
+            <!-- STATS GRID (Rebuilt Layout) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Card 1 -->
+                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-primary/10 rounded-full blur-2xl group-hover:bg-accent-primary/20 transition-all"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2.5 rounded-xl bg-accent-primary/10 text-accent-primary">
+                            <i class="fa-solid fa-server text-lg"></i>
+                        </div>
+                        <span class="text-xs font-medium text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">+12%</span>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl border-emerald-500/30">
-                        <h3 class="text-sm font-medium text-gray-400">Saldo Qris Aktif</h3>
-                        <h4 class="text-3xl font-bold text-white mt-2" id="display-saldo">Rp 0</h4>
+                    <p class="text-gray-400 text-sm font-medium">Total Server Aktif</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">24 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-success/10 rounded-full blur-2xl group-hover:bg-accent-success/20 transition-all"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2.5 rounded-xl bg-accent-success/10 text-accent-success">
+                            <i class="fa-solid fa-qrcode text-lg"></i>
+                        </div>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl border-purple-500/30">
-                        <h3 class="text-sm font-medium text-gray-400">Total Pelanggan</h3>
-                        <h4 class="text-3xl font-bold text-white mt-2">0</h4>
+                    <p class="text-gray-400 text-sm font-medium">Saldo QRIS Aktif</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">Rp 0 <span class="text-sm font-normal text-gray-500">,-</span></h3>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="stat-card glass-panel rounded-2xl p-5 transition-all duration-300 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 w-24 h-24 bg-accent-secondary/10 rounded-full blur-2xl group-hover:bg-accent-secondary/20 transition-all"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2.5 rounded-xl bg-accent-secondary/10 text-accent-secondary">
+                            <i class="fa-solid fa-users text-lg"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm font-medium">Total Pelanggan</p>
+                    <h3 class="text-2xl font-bold text-white mt-1">0 <span class="text-sm font-normal text-gray-500">User</span></h3>
+                </div>
+            </div>
+
+            <!-- DEPLOY SERVER FORM (Rebuilt) -->
+            <div class="glass-panel rounded-2xl p-6 md:p-8 border border-white/5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">Deploy Server Baru</h3>
+                        <p class="text-sm text-gray-400 mt-1">Buat instance server baru untuk pelanggan Anda.</p>
+                    </div>
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium w-fit">
+                        <i class="fa-solid fa-bolt"></i> Pterodactyl API
                     </div>
                 </div>
 
-                <!-- Form Deploy Server Pterodactyl -->
-                <div class="glass-panel p-6 rounded-2xl max-w-3xl">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-lg font-bold text-white">Deploy Server Baru</h3>
-                        <span class="px-3 py-1 bg-blue-500/20 text-blue-400 text-xs font-semibold rounded-full"><i class="fa-solid fa-bolt mr-1"></i>Pterodactyl API</span>
-                    </div>
-                    
-                    <form id="createServerForm" class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">Username Pelanggan</label>
-                                <input type="text" id="ptero-username" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500 outline-none" placeholder="Misal: joko123" required>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">Email Pelanggan</label>
-                                <input type="email" id="ptero-email" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500 outline-none" placeholder="email@client.com" required>
+                <form class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Input Email -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300 ml-1">Email Pelanggan</label>
+                            <div class="relative">
+                                <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                <input type="email" placeholder="email@client.com" 
+                                    class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-400 mb-1">Pilih Paket Hosting</label>
-                            <select id="ptero-plan" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-blue-500 outline-none" required>
-                                <option value="1gb">Paket 1GB Basic - Rp 5.000</option>
-                                <option value="2gb">Paket 2GB Standar - Rp 10.000</option>
-                                <option value="3gb">Paket 3GB Pro - Rp 15.000</option>
-                                <option value="4gb">Paket 4GB Advance - Rp 20.000</option>
+
+                        <!-- Input Username (Added for completeness) -->
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300 ml-1">Username Panel</label>
+                            <div class="relative">
+                                <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                                <input type="text" placeholder="username_client" 
+                                    class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Package Select -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-gray-300 ml-1">Pilih Paket Hosting</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-box-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-white appearance-none focus:outline-none focus:border-accent-primary focus:ring-1 focus:ring-accent-primary transition-all cursor-pointer">
+                                <option value="" disabled selected>Pilih spesifikasi server...</option>
+                                <option value="1">Starter - Rp 5.000/bulan (1GB RAM)</option>
+                                <option value="2">Pro - Rp 15.000/bulan (2GB RAM)</option>
+                                <option value="3">Ultimate - Rp 30.000/bulan (4GB RAM)</option>
                             </select>
-                        </div>
-                        <button type="submit" id="btn-deploy" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl mt-2 transition-all">
-                            Deploy Server Sekarang
-                        </button>
-                        <div id="ptero-alert" class="hidden mt-3 p-3 rounded-lg text-sm text-center"></div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- TABS 2: KELOLA SERVER -->
-            <div id="tab-server" class="tab-content">
-                <div class="glass-panel p-8 rounded-2xl text-center border-dashed border-gray-700">
-                    <i class="fa-solid fa-server text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-bold text-white mb-2">Daftar Server Kosong</h3>
-                    <p class="text-gray-400 text-sm">Lu belum bikin server apapun buat pelanggan lu, Cok. Buat server dulu di menu Dashboard.</p>
-                </div>
-            </div>
-
-            <!-- TABS 3: SALDO & TOPUP (ZakkiStore) -->
-            <div id="tab-topup" class="tab-content">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Form Generate QRIS -->
-                    <div class="glass-panel p-6 rounded-2xl">
-                        <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-qrcode mr-2 text-emerald-400"></i>Isi Saldo QRIS</h3>
-                        <form id="qrisForm" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-400 mb-1">Nominal Topup (Rp)</label>
-                                <input type="number" id="qris-amount" class="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:border-emerald-500 outline-none" placeholder="Minimal 1000" min="1000" required>
-                            </div>
-                            <button type="submit" id="btn-qris" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl transition-all">
-                                Generate QRIS Sekarang
-                            </button>
-                            <div id="qris-alert" class="hidden mt-3 p-3 rounded-lg text-sm text-center"></div>
-                        </form>
-                    </div>
-
-                    <!-- Tampilan QRIS -->
-                    <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center">
-                        <div id="qris-result" class="hidden w-full flex flex-col items-center">
-                            <h4 class="text-sm font-bold text-emerald-400 mb-3">Scan QRIS di Bawah Ini:</h4>
-                            <div class="bg-white p-2 rounded-xl">
-                                <img id="qris-image" src="" alt="QRIS" class="w-48 h-48 object-contain">
-                            </div>
-                            <p class="text-xs text-gray-400 mt-4">Topup akan otomatis masuk ke saldo lu jika pembayaran berhasil.</p>
-                        </div>
-                        <div id="qris-empty" class="text-gray-500">
-                            <i class="fa-solid fa-qrcode text-6xl mb-3 opacity-50"></i>
-                            <p class="text-sm">QR Code akan muncul di sini.</p>
+                            <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                         </div>
                     </div>
-                </div>
+
+                    <!-- Action Button -->
+                    <button type="button" class="w-full bg-gradient-to-r from-accent-primary to-indigo-600 hover:from-indigo-500 hover:to-accent-primary text-white font-semibold py-4 rounded-xl shadow-glow hover:shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-all duration-300 transform active:scale-[0.99] flex items-center justify-center gap-2 mt-4">
+                        <i class="fa-solid fa-rocket"></i> Deploy Server Sekarang
+                    </button>
+                </form>
             </div>
 
         </div>
     </main>
 
+    <!-- Simple Script for Mobile Menu Toggle (Optional) -->
     <script>
-        // FUNGSI BUKA TUTUP MENU PROFIL
-        function toggleProfileMenu() {
-            const menu = document.getElementById('profile-menu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Biar menu profil otomatis nutup kalau lu ngeklik sembarang tempat
-        window.addEventListener('click', function(e) {
-            const btnProfil = document.querySelector('button[onclick="toggleProfileMenu()"]');
-            const menuProfil = document.getElementById('profile-menu');
-            
-            if (btnProfil && menuProfil && e.target !== btnProfil && !btnProfil.contains(e.target) && !menuProfil.contains(e.target)) {
-                menuProfil.classList.add('hidden');
-            }
-        });
-
-        // 1. FUNGSI GANTI MENU (TABS SPA)
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-600/10', 'text-blue-400');
-                btn.classList.add('text-gray-400');
+        const menuBtn = document.querySelector('button.md\\:hidden');
+        const sidebar = document.querySelector('aside');
+        
+        if(menuBtn && sidebar) {
+            menuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('hidden');
+                sidebar.classList.toggle('fixed');
+                sidebar.classList.toggle('inset-0');
+                sidebar.classList.toggle('w-full');
             });
-            const activeBtn = document.querySelector(`[data-target="${tabId}"]`);
-            if(activeBtn) {
-                activeBtn.classList.remove('text-gray-400');
-                activeBtn.classList.add('bg-blue-600/10', 'text-blue-400');
-            }
-
-            const titles = {
-                'dashboard': 'Overview Sistem',
-                'server': 'Kelola Server Pelanggan',
-                'topup': 'Manajemen Saldo Qris'
-            };
-            document.getElementById('header-title').innerText = titles[tabId];
-        }
-
-        // 2. FUNGSI DEPLOY SERVER (API PTERODACTYL)
-        document.getElementById('createServerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-deploy');
-            const alertBox = document.getElementById('ptero-alert');
-            
-            const username = document.getElementById('ptero-username').value;
-            const email = document.getElementById('ptero-email').value;
-            const plan_key = document.getElementById('ptero-plan').value;
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Mendeploy Server...';
-            alertBox.className = 'hidden mt-3 p-3 rounded-lg text-sm text-center';
-
-            try {
-                const response = await fetch('/api/webhook', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan_key, email_pembeli: email, username })
-                });
-                const result = await response.json();
-
-                alertBox.classList.remove('hidden');
-                if(result.success) {
-                    alertBox.classList.add('bg-emerald-500/20', 'text-emerald-400');
-                    alertBox.innerText = 'Mantap! Server berhasil dibuat di Pterodactyl.';
-                } else {
-                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                    alertBox.innerText = result.error || 'Gagal deploy server.';
-                }
-            } catch (err) {
-                alertBox.classList.remove('hidden');
-                alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                alertBox.innerText = 'Error koneksi ke server lu, Cok!';
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Deploy Server Sekarang';
-            }
-        });
-
-        // 3. FUNGSI GENERATE QRIS (API ZAKKISTORE)
-        document.getElementById('qrisForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-qris');
-            const alertBox = document.getElementById('qris-alert');
-            const amount = document.getElementById('qris-amount').value;
-            
-            const qrisResult = document.getElementById('qris-result');
-            const qrisEmpty = document.getElementById('qris-empty');
-            const qrisImage = document.getElementById('qris-image');
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>Membuat QRIS...';
-            alertBox.className = 'hidden mt-3 p-3 rounded-lg text-sm text-center';
-
-            try {
-                const response = await fetch('/api/generate-qris', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amount })
-                });
-                const result = await response.json();
-
-                if(result.success && result.qr_url) {
-                    qrisEmpty.classList.add('hidden');
-                    qrisResult.classList.remove('hidden');
-                    qrisImage.src = result.qr_url; 
-                } else {
-                    alertBox.classList.remove('hidden');
-                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                    alertBox.innerText = result.error || 'Gagal generate QRIS dari ZakkiStore.';
-                }
-            } catch (err) {
-                alertBox.classList.remove('hidden');
-                alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                alertBox.innerText = 'Server error, coba lagi nanti!';
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'Generate QRIS Sekarang';
-            }
-        });
-
-        // 4. FUNGSI LOGOUT (MENGHAPUS TIKET/SATPAM)
-        function logout() {
-            const btn = document.querySelector('button[onclick="logout()"]');
-            if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Keluar...';
-            
-            // HAPUS TIKET MASUK BIAR DI-LOCK LAGI
-            localStorage.removeItem('isLoggedIn');
-            
-            setTimeout(() => {
-                window.location.href = 'reseller-login.html';
-            }, 800);
         }
     </script>
 </body>
