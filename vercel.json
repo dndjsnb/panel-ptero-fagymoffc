@@ -2,7 +2,13 @@
   "env": {
     "ZAKKI_TOKEN": "ee3db381f9c418",
     "ZAKKI_IDUSER": "afMz",
-    "ZAKKI_EMAIL": "faaahhmmii@gmail.com",
+    "ZAKKI_EMAIL": "faaahhmii@gmail.com",
     "ZAKKI_PIN": "081006"
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    }
+  ]
 }
