@@ -3,140 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fahmi Hosting - Premium Pterodactyl Panel</title>
+    <title>Fahmi Hosting - Server Pterodactyl Otomatis</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        /* Custom scrollbar biar gak kelihatan kaku */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #2563eb; }
+        body {
+            background: radial-gradient(circle at top, #111827, #030712);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.5);
+            transform: translateY(-3px);
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen flex flex-col">
-    
-    <!-- Navbar Ala Provider Profesional -->
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500 tracking-tighter">
-                FAHMI<span class="text-white">HOSTING.</span>
-            </h1>
-            <span class="text-xs font-semibold bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20 flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                All Systems Operational
-            </span>
-        </div>
-    </nav>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 selection:bg-blue-500 selection:text-white">
 
-    <!-- Hero Section / Kepala Halaman -->
-    <div class="max-w-7xl mx-auto px-6 py-16 text-center">
-        <h2 class="text-4xl md:text-5xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-            Deploy Server Pterodactyl <br class="hidden md:block"/> 
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Dalam Hitungan Detik.</span>
-        </h2>
-        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-12">
-            Infrastruktur anti-lelet dengan NVMe disk dan perlindungan DDoS. Pilih spesifikasi server di bawah dan biarkan sistem kami mengeksekusi otomatis.
+    <!-- Header / Hero Section -->
+    <div class="max-w-4xl mx-auto text-center py-10 relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <span class="inline-block bg-blue-500/10 text-blue-400 text-xs font-semibold px-3 py-1 rounded-full mb-4 border border-blue-500/20">
+             Otomatis 24/7 & Instan
+        </span>
+        <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white mb-3">
+            Fahmi <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Hosting</span>
+        </h1>
+        <p class="text-sm sm:text-base text-gray-400 max-w-lg mx-auto">
+            Sewa server Pterodactyl performa tinggi khusus Bot WhatsApp Node.js. Bayar via QRIS, server langsung aktif detik itu juga!
         </p>
     </div>
 
-    <!-- Container Grid List Paket -->
-    <div class="max-w-7xl mx-auto px-6 pb-24">
-        <!-- Grid ini akan diisi otomatis oleh Javascript -->
-        <div id="pricing-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Kartu Paket Muncul Di Sini -->
+    <!-- Pricing Grid -->
+    <div class="max-w-4xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+        
+        <!-- Paket 1GB -->
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transition-all duration-300 shadow-xl">
+            <div>
+                <h3 class="text-base font-bold text-white mb-1">Paket 1GB Basic</h3>
+                <p class="text-xs text-gray-400 mb-4">Cocok untuk bot pemula / self-bot.</p>
+                <div class="mb-6">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 5.000</span>
+                    <span class="text-xs text-gray-500">/bulan</span>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-2.5 mb-6">
+                    <li class="flex items-center gap-2"> RAM 1024 MB (1GB)</li>
+                    <li class="flex items-center gap-2"> Disk 5 GB NVMe</li>
+                    <li class="flex items-center gap-2"> CPU 100%</li>
+                    <li class="flex items-center gap-2"> Node.js Ready</li>
+                </ul>
+            </div>
+            <a href="checkout.html?plan=basic&price=5000&name=Paket+1GB+Basic" class="block text-center bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
+                Beli Sekarang
+            </a>
         </div>
+
+        <!-- Paket 2GB -->
+        <div class="glass-card p-6 rounded-2xl border border-blue-500/40 flex flex-col justify-between transition-all duration-300 shadow-xl relative overflow-hidden">
+            <div class="absolute -top-3 -right-3 bg-blue-600 text-[10px] font-bold text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider">Favorit</div>
+            <div>
+                <h3 class="text-base font-bold text-white mb-1">Paket 2GB Standar</h3>
+                <p class="text-xs text-gray-400 mb-4">Ideal untuk bot public & plugin banyak.</p>
+                <div class="mb-6">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 10.000</span>
+                    <span class="text-xs text-gray-500">/bulan</span>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-2.5 mb-6">
+                    <li class="flex items-center gap-2"> RAM 2048 MB (2GB)</li>
+                    <li class="flex items-center gap-2"> Disk 10 GB NVMe</li>
+                    <li class="flex items-center gap-2"> CPU 150%</li>
+                    <li class="flex items-center gap-2"> Node.js Ready</li>
+                </ul>
+            </div>
+            <a href="checkout.html?plan=standar&price=10000&name=Paket+2GB+Standar" class="block text-center bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
+                Beli Sekarang
+            </a>
+        </div>
+
+        <!-- Paket 3GB -->
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transition-all duration-300 shadow-xl">
+            <div>
+                <h3 class="text-base font-bold text-white mb-1">Paket 3GB Pro</h3>
+                <p class="text-xs text-gray-400 mb-4">Performa tinggi untuk bot rilis.</p>
+                <div class="mb-6">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 15.000</span>
+                    <span class="text-xs text-gray-500">/bulan</span>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-2.5 mb-6">
+                    <li class="flex items-center gap-2"> RAM 3072 MB (3GB)</li>
+                    <li class="flex items-center gap-2"> Disk 15 GB NVMe</li>
+                    <li class="flex items-center gap-2"> CPU 200%</li>
+                    <li class="flex items-center gap-2"> Node.js Ready</li>
+                </ul>
+            </div>
+            <a href="checkout.html?plan=pro&price=15000&name=Paket+3GB+Pro" class="block text-center bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
+                Beli Sekarang
+            </a>
+        </div>
+
+        <!-- Paket 4GB -->
+        <div class="glass-card p-6 rounded-2xl border border-gray-800 flex flex-col justify-between transition-all duration-300 shadow-xl">
+            <div>
+                <h3 class="text-base font-bold text-white mb-1">Paket 4GB Advance</h3>
+                <p class="text-xs text-gray-400 mb-4">Bebas lag untuk multi-sesi bot.</p>
+                <div class="mb-6">
+                    <span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 20.000</span>
+                    <span class="text-xs text-gray-500">/bulan</span>
+                </div>
+                <ul class="text-xs text-gray-300 space-y-2.5 mb-6">
+                    <li class="flex items-center gap-2"> RAM 4096 MB (4GB)</li>
+                    <li class="flex items-center gap-2"> Disk 20 GB NVMe</li>
+                    <li class="flex items-center gap-2"> CPU 250%</li>
+                    <li class="flex items-center gap-2"> Node.js Ready</li>
+                </ul>
+            </div>
+            <a href="checkout.html?plan=advance&price=20000&name=Paket+4GB+Advance" class="block text-center bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs sm:text-sm py-2.5 px-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
+                Beli Sekarang
+            </a>
+        </div>
+
     </div>
 
     <!-- Footer -->
-    <footer class="border-t border-slate-800 mt-auto py-8 text-center text-slate-500 text-sm">
-        <p>&copy; 2026 Fahmi Hosting. All rights reserved.</p>
+    <footer class="text-center text-xs text-gray-500 py-6 border-t border-gray-800/60 max-w-4xl mx-auto w-full">
+        &copy; 2026 Fahmi Hosting. All rights reserved. Powered by Pterodactyl Panel.
     </footer>
 
-    <script>
-        // Data Base Paket lu
-        const plans = [
-            { id: '1gb', name: 'Paket 1GB Basic', price: 'Rp5.000', nominal: 5000, cpu: '30%', ram: '1 GB', disk: '512 MB' },
-            { id: '2gb', name: 'Paket 2GB Standar', price: 'Rp10.000', nominal: 10000, cpu: '60%', ram: '2 GB', disk: '1 GB' },
-            { id: '3gb', name: 'Paket 3GB Standar', price: 'Rp15.000', nominal: 15000, cpu: '90%', ram: '3 GB', disk: '1.5 GB' },
-            { id: '4gb', name: 'Paket 4GB Advance', price: 'Rp20.000', nominal: 20000, cpu: '120%', ram: '4 GB', disk: '2 GB', best: true }, // Kasih flag best seller
-            { id: '5gb', name: 'Paket 5GB Advance', price: 'Rp25.000', nominal: 25000, cpu: '150%', ram: '5 GB', disk: '2.5 GB' },
-            { id: '6gb', name: 'Paket 6GB Pro', price: 'Rp30.000', nominal: 30000, cpu: '180%', ram: '6 GB', disk: '3 GB' },
-            { id: '7gb', name: 'Paket 7GB Pro', price: 'Rp35.000', nominal: 35000, cpu: '210%', ram: '7 GB', disk: '3.5 GB' },
-            { id: '8gb', name: 'Paket 8GB Extreme', price: 'Rp40.000', nominal: 40000, cpu: '240%', ram: '8 GB', disk: '4 GB' },
-            { id: '9gb', name: 'Paket 9GB Extreme', price: 'Rp45.000', nominal: 45000, cpu: '270%', ram: '9 GB', disk: '4.5 GB' },
-            { id: '10gb', name: 'Paket 10GB Max', price: 'Rp50.000', nominal: 50000, cpu: '300%', ram: '10 GB', disk: '5 GB' },
-            { id: 'unlimited', name: 'Paket SULTAN (Unli)', price: 'Rp100.000', nominal: 100000, cpu: 'Unlimited', ram: 'Unlimited', disk: 'Unlimited', sultan: true }
-        ];
-
-        const grid = document.getElementById('pricing-grid');
-
-        // Looping untuk merender setiap kartu paket secara otomatis
-        plans.forEach(plan => {
-            // Styling khusus buat paket Best Seller atau Sultan
-            const isBest = plan.best ? `<div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">Best Seller</div>` : '';
-            const isSultan = plan.sultan ? `ring-2 ring-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)]` : `border border-slate-800`;
-            const bgHeader = plan.sultan ? `bg-gradient-to-r from-purple-900/40 to-indigo-900/40` : `bg-slate-800/40`;
-            const btnClass = plan.sultan 
-                ? `bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-lg shadow-purple-500/25` 
-                : `bg-slate-800 hover:bg-blue-600 border border-slate-700 hover:border-transparent hover:shadow-lg hover:shadow-blue-500/25`;
-            const priceColor = plan.sultan ? `text-purple-400` : `text-white`;
-
-            // Struktur HTML per Kotak
-            const cardHTML = `
-                <div class="relative bg-slate-900 rounded-xl flex flex-col transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${isSultan}">
-                    ${isBest}
-                    <div class="p-6 ${bgHeader} rounded-t-xl border-b border-slate-800/80">
-                        <h3 class="text-lg font-bold text-slate-300 mb-2">${plan.name}</h3>
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-3xl font-black ${priceColor}">${plan.price}</span>
-                            <span class="text-slate-500 text-sm font-medium">/bln</span>
-                        </div>
-                    </div>
-                    
-                    <div class="p-6 flex-grow flex flex-col">
-                        <ul class="space-y-4 text-sm text-slate-300 mb-8 flex-grow">
-                            <li class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                <span><strong class="text-white">${plan.cpu}</strong> CPU Limit</span>
-                            </li>
-                            <li class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
-                                <span><strong class="text-white">${plan.ram}</strong> RAM</span>
-                            </li>
-                            <li class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-                                <span><strong class="text-white">${plan.disk}</strong> NVMe Disk</span>
-                            </li>
-                        </ul>
-                        <button onclick="checkout('${plan.id}', ${plan.nominal}, '${plan.name}')" class="w-full py-3 px-4 rounded-lg text-white font-bold transition-all duration-200 focus:outline-none ${btnClass}">
-                            Order Sekarang
-                        </button>
-                    </div>
-                </div>
-            `;
-            // Masukkan kartu ke dalam Grid
-            grid.innerHTML += cardHTML;
-        });
-
-        // Fungsi yang dipanggil saat tombol Order dipencet
-        function checkout(planKey, nominal, planName) {
-            Swal.fire({
-                title: 'Mempersiapkan Checkout...',
-                text: `Mengamankan slot untuk ${planName}`,
-                allowOutsideClick: false,
-                background: '#0f172a',
-                color: '#fff',
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Redirect dengan parameter (Sesuai alur kita sebelumnya)
-            setTimeout(() => {
-                window.location.href = `/checkout.html?plan=${planKey}&price=${nominal}&name=${encodeURIComponent(planName)}`;
-            }, 800);
-        }
-    </script>
 </body>
 </html>
