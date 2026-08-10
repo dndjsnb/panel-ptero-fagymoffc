@@ -9,6 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // --- BAGIAN DATABASE MONGODB (Silent Mode) ---
+// Ganti pakai username dan password database lu yang bener
 const mongoURI = 'mongodb+srv://faaahhmmii_db_user:NwGmRthZCDYqwafy@clusterfagym.qzt0o1a.mongodb.net/?appName=ClusterFagym';
 
 mongoose.connect(mongoURI).catch(() => {});
@@ -98,13 +99,30 @@ async function createPteroServer(userId, plan) {
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, password } = req.body;
-        
         const newReseller = new Reseller({ name, email, password });
         await newReseller.save();
-        
         res.status(201).json({ message: 'Mantap Cok! Akun reseller berhasil didaftarkan.' });
     } catch (error) {
         res.status(500).json({ message: 'Gagal daftar! Email mungkin udah kepakai.' });
+    }
+});
+
+// --- ENDPOINT API LOGIN RESELLER ---
+app.post('/api/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await Reseller.findOne({ email });
+        
+        if (!user) {
+            return res.status(400).json({ message: 'Email belum terdaftar, Cok!' });
+        }
+        if (user.password !== password) {
+            return res.status(400).json({ message: 'Password salah, Cok!' });
+        }
+        
+        res.status(200).json({ message: 'Login sukses! Mengalihkan...' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server error pas login!' });
     }
 });
 
@@ -113,17 +131,10 @@ app.post('/api/generate-qris', async (req, res) => {
     try {
         const { amount } = req.body;
         if (!amount) return res.status(400).json({ error: "Nominal tidak valid" });
-
         const response = await zakki.topup(parseInt(amount));
-        
         if (response && response.data && response.data.qr_image) {
-            return res.json({ 
-                success: true, 
-                qr_url: response.data.qr_image,
-                topup_id: response.data.idtopup 
-            });
+            return res.json({ success: true, qr_url: response.data.qr_image, topup_id: response.data.idtopup });
         }
-        
         throw new Error("Respon dari ZakkiStore tidak valid");
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -134,23 +145,15 @@ app.post('/api/generate-qris', async (req, res) => {
 app.post('/api/webhook', async (req, res) => {
     try {
         const { plan_key, email_pembeli, username } = req.body;
-        
         const plan = plans[plan_key];
         if (!plan) return res.status(400).json({ success: false, error: 'Paket tidak ditemukan' });
 
         const userId = await createPteroUser(email_pembeli, username);
         const server = await createPteroServer(userId, plan);
 
-        return res.status(200).json({ 
-            success: true, 
-            message: 'Server Pterodactyl berhasil dibuat!',
-            server_id: server.identifier 
-        });
+        return res.status(200).json({ success: true, message: 'Server Pterodactyl berhasil dibuat!', server_id: server.identifier });
     } catch (err) {
-        return res.status(500).json({ 
-            success: false, 
-            error: 'Gagal membuat server Pterodactyl. Cek data API Key / Panel.' 
-        });
+        return res.status(500).json({ success: false, error: 'Gagal membuat server Pterodactyl. Cek data API Key / Panel.' });
     }
 });
 
