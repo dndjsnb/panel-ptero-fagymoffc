@@ -60,7 +60,7 @@
         </div>
 
         <nav class="flex-1 px-4 py-6 space-y-2">
-            <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
+            <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active-nav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20">
                 <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
             </button>
             
@@ -108,11 +108,6 @@
                     </div>
                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs ring-2 ring-dark-900">R</div>
                 </button>
-                
-                <div class="absolute right-0 top-full mt-2 w-48 glass rounded-xl border border-white/10 shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 origin-top-right overflow-hidden">
-                    <a href="#" class="block px-4 py-3 text-xs text-gray-300 hover:bg-white/5 hover:text-white"><i class="fa-regular fa-user mr-2"></i> Profil Saya</a>
-                    <a href="#" class="block px-4 py-3 text-xs text-red-400 hover:bg-red-500/10 hover:text-red-300"><i class="fa-solid fa-arrow-right-from-bracket mr-2"></i> Logout</a>
-                </div>
             </div>
         </header>
 
@@ -121,10 +116,11 @@
             
             <!-- PAGE: DASHBOARD -->
             <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
+                <!-- Cards Stat -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div class="glass rounded-2xl p-5 border-l-4 border-brand-primary">
                         <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Server Aktif</p>
-                        <h3 class="text-2xl font-bold text-white">24 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
+                        <h3 class="text-2xl font-bold text-white">2 <span class="text-sm font-normal text-gray-500">Unit</span></h3>
                     </div>
                     <div class="glass rounded-2xl p-5 border-l-4 border-emerald-500">
                         <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Saldo Tersedia</p>
@@ -132,82 +128,195 @@
                     </div>
                     <div class="glass rounded-2xl p-5 border-l-4 border-pink-500">
                         <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">Total Pelanggan</p>
-                        <h3 class="text-2xl font-bold text-white">0 <span class="text-sm font-normal text-gray-500">User</span></h3>
+                        <h3 class="text-2xl font-bold text-white">12 <span class="text-sm font-normal text-gray-500">User</span></h3>
                     </div>
                 </div>
 
-                <!-- SECTION BARU: LINK JUALAN SAKTI -->
+                <!-- Link Jualan -->
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-lg font-bold text-white">🔗 Link Order Customer</h3>
-                            <p class="text-xs text-gray-400 mt-1">Share link ini ke customer kamu. Saldo profit otomatis masuk saat mereka bayar.</p>
+                            <p class="text-xs text-gray-400 mt-1">Share link ini ke customer kamu. Saldo otomatis masuk saat mereka bayar.</p>
                         </div>
-                        <span class="px-3 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-400 text-[10px] font-bold uppercase tracking-wide">AMAN & TERVALIDASI</span>
                     </div>
-
                     <div class="space-y-4">
-                        <!-- Input Link -->
                         <div class="flex gap-2 bg-black/30 p-2 rounded-lg border border-white/5">
-                            <input type="text" readonly id="secureOrderLinkInput" value=""
+                            <input type="text" readonly id="secureOrderLinkInput" value="https://fahmihost.com/order?ref=RS01"
                                    class="flex-1 bg-transparent text-sm text-gray-200 outline-none font-mono truncate">
                             <button onclick="copySecureLink()" class="bg-brand-primary hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-xs font-bold transition">
-                                COPY LINK
+                                COPY
                             </button>
                         </div>
-                        
-                        <!-- Tombol Buka Langsung -->
-                        <div class="flex justify-end">
-                            <button onclick="openSecureOrderPage()" class="text-xs text-indigo-300 hover:text-white underline flex items-center gap-1">
-                                Buka Halaman Order → <i class="fa-solid fa-arrow-up-right-from-square ml-1 text-[10px]"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- PERINGATAN UNTUK DEVELOPER -->
-                    <div class="mt-4 p-3 text-[10px] rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400">
-                        <strong>Peringatan Developer:</strong> Saat produksi, proses pembuatan signature (<code>sig</code>) HARUS dilakukan di backend menggunakan secret key rahasia. Secret key tidak boleh ada di kode frontend seperti ini!
                     </div>
                 </div>
 
+                <!-- Deploy -->
                 <div class="glass rounded-2xl p-6 md:p-8">
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-lg font-bold text-white">Deploy Server Baru</h3>
-                            <p class="text-xs text-gray-400 mt-1">Instance baru via Pterodactyl API</p>
+                            <p class="text-xs text-gray-400 mt-1">Deploy otomatis via API Panel</p>
                         </div>
-                        <span class="px-3 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-[10px] font-bold uppercase tracking-wide">API Connected</span>
                     </div>
-
                     <form class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="space-y-1.5">
                                 <label class="text-xs font-medium text-gray-400 ml-1">Email Pelanggan</label>
-                                <input type="email" placeholder="client@example.com" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                                <input type="email" placeholder="client@example.com" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-primary">
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-xs font-medium text-gray-400 ml-1">Username Panel</label>
-                                <input type="text" placeholder="username_client" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all">
+                                <input type="text" placeholder="username_client" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-primary">
                             </div>
                         </div>
-                        
                         <div class="space-y-1.5">
                             <label class="text-xs font-medium text-gray-400 ml-1">Pilih Paket Hosting</label>
-                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all appearance-none cursor-pointer">
-                                <option>Pilih spesifikasi server...</option>
-                                <option>Starter - Rp 5.000/bulan</option>
-                                <option>Pro - Rp 15.000/bulan</option>
+                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                                <option>Node ID-1 | 2GB RAM / 100% CPU - Rp 5.000/bln</option>
+                                <option>Node ID-1 | 4GB RAM / 200% CPU - Rp 10.000/bln</option>
                             </select>
                         </div>
-
-                        <button type="button" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.3)] transition-all mt-2 text-sm">
-                            <i class="fa-solid fa-rocket mr-2"></i> Deploy Server Sekarang
+                        <button type="button" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm">
+                            <i class="fa-solid fa-rocket mr-2"></i> Deploy Sekarang
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- ... (Bagian lain seperti Topup, Withdraw, Settings, Servers tetap sama seperti file asli) ... -->
+            <!-- PAGE: TOPUP -->
+            <div id="page-topup" class="page-section max-w-6xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Deposit Saldo Reseller</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 25.000</button>
+                        <button class="bg-brand-primary/20 border border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 50.000</button>
+                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 100.000</button>
+                        <button class="bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-4 text-white font-semibold transition-all">Rp 500.000</button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Metode Pembayaran</label>
+                            <select class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                                <option>QRIS (Otomatis)</option>
+                                <option>Transfer Bank (BCA/Mandiri)</option>
+                                <option>E-Wallet (Dana/OVO/GoPay)</option>
+                            </select>
+                        </div>
+                        <button type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4">
+                            Lanjutkan Pembayaran
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: WITHDRAW -->
+            <div id="page-withdraw" class="page-section max-w-6xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8 border-l-4 border-yellow-500">
+                    <h3 class="text-lg font-bold text-white mb-2">Tarik Dana (Withdraw)</h3>
+                    <p class="text-xs text-gray-400 mb-6">Tarik saldo profit kamu ke rekening pribadi. Proses maksimal 1x24 jam kerja.</p>
+                    
+                    <!-- Info Rekening Default -->
+                    <div class="bg-dark-800 border border-white/5 rounded-xl p-4 mb-6 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gray-400 mb-1">Rekening Tujuan Saat Ini:</p>
+                            <p id="displayWithdrawAccount" class="text-sm font-bold text-white">Belum diatur</p>
+                        </div>
+                        <button onclick="switchPage('settings')" class="text-xs text-brand-primary hover:text-indigo-400 underline">Ubah</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nominal Penarikan</label>
+                            <input type="number" placeholder="Min. Rp 50.000" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none focus:border-brand-primary">
+                        </div>
+                        <button type="button" class="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-2">
+                            Ajukan Penarikan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: SETTINGS -->
+            <div id="page-settings" class="page-section max-w-6xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <i class="fa-solid fa-building-columns text-brand-primary text-xl"></i>
+                        <h3 class="text-lg font-bold text-white">Pengaturan Rekening Penarikan</h3>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Pilih Bank / E-Wallet</label>
+                            <select id="inputBank" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                                <option value="BCA">BCA</option>
+                                <option value="Mandiri">Mandiri</option>
+                                <option value="BRI">BRI</option>
+                                <option value="DANA">DANA</option>
+                                <option value="GoPay">GoPay</option>
+                                <option value="OVO">OVO</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nomor Rekening / HP</label>
+                            <input type="text" id="inputRekening" placeholder="Contoh: 081234567890" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-400 ml-1">Nama Pemilik Rekening</label>
+                            <input type="text" id="inputNama" placeholder="Sesuai buku tabungan/akun" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
+                        </div>
+                        
+                        <button onclick="saveSettings()" type="button" class="bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition-all text-sm mt-4 inline-flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> Simpan Rekening
+                        </button>
+                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden">✔️ Berhasil disimpan!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: SERVERS -->
+            <div id="page-servers" class="page-section max-w-6xl mx-auto space-y-6">
+                <div class="glass rounded-2xl p-6 md:p-8">
+                    <h3 class="text-lg font-bold text-white mb-6">Kelola Server (Panel)</h3>
+                    
+                    <!-- Server List -->
+                    <div class="space-y-4">
+                        <!-- Server 1 -->
+                        <div class="bg-dark-800 border border-white/5 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center border border-emerald-500/20">
+                                    <i class="fa-solid fa-power-off"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">Bot Server 01 <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400">Running</span></h4>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 4GB RAM • 200% CPU</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="p-2 rounded bg-white/5 hover:bg-white/10 text-gray-300 transition" title="Restart"><i class="fa-solid fa-rotate-right"></i></button>
+                                <button class="p-2 rounded bg-white/5 hover:bg-brand-primary hover:text-white text-gray-300 transition text-sm px-4">Panel Login</button>
+                            </div>
+                        </div>
+
+                        <!-- Server 2 -->
+                        <div class="bg-dark-800 border border-white/5 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 opacity-75">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/20">
+                                    <i class="fa-solid fa-ban"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-sm">Client Web <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400">Suspended</span></h4>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 2GB RAM • Overdue Bill</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button class="p-2 rounded bg-white/5 hover:bg-emerald-600 hover:text-white text-gray-300 transition text-sm px-4">Unsuspend</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
         </div>
     </main>
@@ -216,48 +325,60 @@
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <script>
-        // --- STATE MANAGEMENT ---
-        let currentBalance = 500000; // Simulasi saldo awal reseller
-        
-        // State untuk pengaturan rekening default
-        let defaultWithdrawSettings = {
-            method: '',
-            holderName: '',
-            accountNumber: ''
-        };
-
-        // --- FUNGSI KEAMANAN LINK BARU ---
-        // INI HANYA UNTUK DEMO! DI PRODUKSI, INI HARUS DI BACKEND.
-        const SECRET_KEY_FOR_DEMO = 'rahasia_fahmihost_demo'; // JANGAN SIMPAN DI FRONTEND!
-
-        function generateHmacSignature(data, secret) {
-            // Ini simulasi. Di browser, kita pakai SubtleCrypto atau library crypto.
-            // Untuk demo sederhana, kita pakai fungsi hash dasar.
-            // Di backend Node.js, gunakan crypto.createHmac().
-            const encoder = new TextEncoder();
-            const dataBuffer = encoder.encode(data + secret);
-            return Array.from(dataBuffer).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        function generateSecureOrderLink() {
-            const RESELLER_ID = 'RS01'; // Ambil dari session user sebenarnya
-            const signature = generateHmacSignature(RESELLER_ID, SECRET_KEY_FOR_DEMO);
-            return `https://fahmihost.com/order?ref=${RESELLER_ID}&sig=${signature}`;
-        }
-
-        function updateSecureLinkDisplay() {
-            document.getElementById('secureOrderLinkInput').value = generateSecureOrderLink();
-        }
-
+        // --- LOGIKA COPY LINK ---
         function copySecureLink() {
             const input = document.getElementById('secureOrderLinkInput');
             input.select();
             document.execCommand('copy');
-            // Optional: Tampilkan notifikasi "Copied!"
+            alert('Link berhasil disalin!');
         }
 
-        function openSecureOrderPage() {
-            window.open(generateSecureOrderLink(), '_blank');
+        // --- PENGATURAN REKENING & LOCALSTORAGE ---
+        let withdrawSettings = { bank: '', rek: '', nama: '' };
+
+        function loadSettings() {
+            const saved = localStorage.getItem('fh_rekening');
+            if (saved) {
+                withdrawSettings = JSON.parse(saved);
+                // Isi form settings jika sudah ada data
+                if(document.getElementById('inputBank')) {
+                    document.getElementById('inputBank').value = withdrawSettings.bank || 'BCA';
+                    document.getElementById('inputRekening').value = withdrawSettings.rek || '';
+                    document.getElementById('inputNama').value = withdrawSettings.nama || '';
+                }
+            }
+            updateWithdrawUI();
+        }
+
+        function saveSettings() {
+            const bank = document.getElementById('inputBank').value;
+            const rek = document.getElementById('inputRekening').value;
+            const nama = document.getElementById('inputNama').value;
+            
+            if(!rek || !nama) {
+                alert('Harap isi nomor rekening dan nama pemilik!');
+                return;
+            }
+
+            withdrawSettings = { bank, rek, nama };
+            localStorage.setItem('fh_rekening', JSON.stringify(withdrawSettings));
+            
+            const msg = document.getElementById('saveMsg');
+            msg.classList.remove('hidden');
+            setTimeout(() => msg.classList.add('hidden'), 3000);
+            
+            updateWithdrawUI();
+        }
+
+        function updateWithdrawUI() {
+            const display = document.getElementById('displayWithdrawAccount');
+            if (display) {
+                if (withdrawSettings.rek) {
+                    display.innerHTML = `<span class="text-brand-primary">${withdrawSettings.bank}</span> - ${withdrawSettings.rek} a/n ${withdrawSettings.nama}`;
+                } else {
+                    display.innerText = 'Belum diatur';
+                }
+            }
         }
 
         // --- NAVIGASI SPA ---
@@ -274,7 +395,7 @@
             };
             document.getElementById('page-title').innerText = titles[pageId] || 'Dashboard';
             
-            // Update Active Nav State
+            // Update class tombol navigasi
             document.querySelectorAll('.nav-item').forEach(btn => {
                 btn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200';
             });
@@ -283,23 +404,13 @@
                 activeBtn.className = 'nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20';
             }
             
-            // Refresh display setiap kali pindah ke halaman withdraw
-            if (pageId === 'withdraw') {
-                updateDefaultAccountDisplay();
-            }
-            // Update link saat ke dashboard
-            if (pageId === 'dashboard') {
-                updateSecureLinkDisplay();
-            }
-            
             if(window.innerWidth < 768) toggleSidebar();
         }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
-            const isHidden = sidebar.classList.contains('-translate-x-full');
-            if(isHidden) {
+            if(sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
             } else {
@@ -308,13 +419,9 @@
             }
         }
 
-        // ... (Sisanya: Logika Topup, Withdraw, Settings tetap sama seperti file asli) ...
-
-        // Inisialisasi saat halaman dimuat
+        // INIT
         window.addEventListener('DOMContentLoaded', () => {
-            loadWithdrawSettings();
-            updateDefaultAccountDisplay();
-            updateSecureLinkDisplay(); // Generate link pertama kali
+            loadSettings();
         });
     </script>
 </body>
