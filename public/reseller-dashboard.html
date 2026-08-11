@@ -136,7 +136,7 @@
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-lg font-bold text-white">🔗 Link Order Customer</h3>
+                            <h3 class="text-lg font-bold text-white"> Link Order Customer</h3>
                             <p class="text-xs text-gray-400 mt-1">Share link ini ke customer kamu. Saldo otomatis masuk saat mereka bayar.</p>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
                     
                     <h3 class="text-lg font-bold text-white mb-6 relative z-10">Deposit Saldo Reseller</h3>
                     
-                    <!-- Kotak Notifikasi UI (Adaptasi dari Checkout) -->
+                    <!-- Kotak Notifikasi UI -->
                     <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
                     </div>
 
@@ -328,7 +328,7 @@
                         <button onclick="saveSettings()" type="button" class="bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition-all text-sm mt-4 inline-flex items-center gap-2">
                             <i class="fa-solid fa-floppy-disk"></i> Simpan Rekening
                         </button>
-                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden">✔️ Berhasil disimpan!</p>
+                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden"> Berhasil disimpan!</p>
                     </div>
                 </div>
             </div>
@@ -348,7 +348,7 @@
                                 </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Bot Server 01 <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400">Running</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 4GB RAM • 200% CPU</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 4GB RAM � 200% CPU</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -365,7 +365,7 @@
                                 </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Client Web <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400">Suspended</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 2GB RAM • Overdue Bill</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 2GB RAM � Overdue Bill</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -497,7 +497,7 @@
             document.getElementById('uiAlert').classList.add('hidden');
         }
 
-        // --- LOGIKA DEPOSIT SALDO ---
+        // --- LOGIKA DEPOSIT SALDO (REAL API VERSION) ---
         let currentTopupId = null;
         let depositAmount = 0;
         
@@ -533,31 +533,35 @@
             }
 
             if (method === 'QRIS') {
+                // Sembunyikan form, munculkan UI QRIS
                 document.getElementById('depositFormWrapper').classList.add('hidden');
                 document.getElementById('qrisCheckoutWrapper').classList.remove('hidden');
                 document.getElementById('qrisAmountDisplay').innerText = `Rp ${depositAmount.toLocaleString('id-ID')}`;
                 
+                // Reset State QR ke Loading
                 document.getElementById('qrisImage').classList.add('hidden');
                 document.getElementById('qrisLoading').style.display = 'flex';
                 
                 try {
-                    // Di backend aslinya: const res = await fetch(`/api/generate-qris?amount=${depositAmount}`);
-                    const dummyData = { success: true, qr_url: `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=PAY_${depositAmount}`, topup_id: `DEP_${Date.now()}` };
-                    const data = dummyData; 
+                    // REAL FETCH KE API QRIS LU SEPERTI DI CHECKOUT.HTML[span_1](start_span)[span_1](end_span)
+                    const res = await fetch(`/api/generate-qris?amount=${depositAmount}`);
+                    const data = await res.json();
                     
                     if (data.success && data.qr_url) {
                         const qrisImg = document.getElementById('qrisImage');
                         document.getElementById('qrisLoading').style.display = 'none';
+                        
+                        // Menampilkan QRIS Asli dari PayDisini / Payment Gateway lu
                         qrisImg.src = data.qr_url;
                         qrisImg.classList.remove('hidden');
                         currentTopupId = data.topup_id; 
                     } else {
                         document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gagal Dimuat</span>';
-                        showNotification("Gagal memuat QRIS dari server pembayaran.", "error");
+                        showNotification(data.error || "Gagal memuat QRIS dari server pembayaran.", "error");
                     }
                 } catch (err) {
                     document.getElementById('qrisLoading').innerHTML = '<span class="text-[10px] text-red-500 font-bold">Gangguan Jaringan</span>';
-                    showNotification("Tidak dapat terhubung ke server pembayaran.", "error");
+                    showNotification("Tidak dapat terhubung ke API generate-qris.", "error");
                 }
             } else {
                 showNotification("Metode pembayaran manual sedang ditutup sementara.", "error");
@@ -576,6 +580,7 @@
             btn.classList.remove('opacity-70', 'cursor-not-allowed');
         }
 
+        // --- CEK STATUS MUTASI (REAL API VERSION) ---
         async function checkPaymentStatus() {
             if (!currentTopupId) {
                 showNotification("Sesi pembayaran belum siap. Silakan ulangi transaksi.", "error");
@@ -587,28 +592,38 @@
             btn.disabled = true;
             btn.classList.add('opacity-70', 'cursor-not-allowed');
             
-            showNotification("🔍 Memeriksa status mutasi pembayaran otomatis...", "info");
+            showNotification(" Memeriksa status mutasi pembayaran...", "info");
 
             try {
-                // Simulasi delay cek backend API
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                const webhookData = { success: true }; 
+                // REAL FETCH KE API WEBHOOK LU SEPERTI DI CHECKOUT.HTML[span_2](start_span)[span_2](end_span)
+                const webhookRes = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        topup_id: currentTopupId,
+                        amount: depositAmount,
+                        type: 'reseller_deposit'
+                    })
+                });
+                
+                const webhookData = await webhookRes.json();
 
-                if (!webhookData.success) {
-                    showNotification("Pembayaran belum terdeteksi. Pastikan Anda sudah transfer.", "error");
+                if (!webhookRes.ok || !webhookData.success) {
+                    showNotification(webhookData.error || "Pembayaran belum terdeteksi. Pastikan Anda sudah transfer.", "error");
                     btn.innerHTML = "Saya Sudah Bayar";
                     btn.disabled = false;
                     btn.classList.remove('opacity-70', 'cursor-not-allowed');
                     return;
                 }
 
-                showNotification("🎉 Pembayaran Sukses! Saldo telah ditambahkan ke akun Anda.", "success");
+                showNotification(" Pembayaran Sukses! Saldo telah ditambahkan.", "success");
                 btn.innerHTML = `Deposit Berhasil`;
                 
+                // Kembali ke halaman awal setelah sukses
                 setTimeout(() => {
-                    alert('Simulasi Selesai: Saldo berhasil ditambah Rp ' + depositAmount.toLocaleString('id-ID'));
                     cancelDeposit(); 
-                }, 1500);
+                    // Note: Tambahkan fungsi buat update UI Saldo disini kalau backend lu return saldo terbaru
+                }, 2000);
 
             } catch (err) {
                 showNotification("Terjadi kendala jaringan saat memproses sistem.", "error");
