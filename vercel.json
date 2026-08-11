@@ -3,7 +3,10 @@
     "ZAKKI_TOKEN": "ee3db381f9c418",
     "ZAKKI_IDUSER": "afMz",
     "ZAKKI_EMAIL": "faaahhmii@gmail.com",
-    "ZAKKI_PIN": "081006"
+    "ZAKKI_PIN": "081006",
+    "PTERO_URL": "https://cabangdua.lilyss.xyz",
+    "PTERO_PTLA_KEY": "ptla_QyKIKYsYHkIyMGkUNNKAeeqWHYTMzdpG59i03L43qTn",
+    "PTERO_PTLC_KEY": "ptlc_emgwitULUBsSFoxrgbhixncmH6owGCaRMsQvv6d61yl"
   },
   "rewrites": [
     {
