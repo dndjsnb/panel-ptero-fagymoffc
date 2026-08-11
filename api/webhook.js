@@ -40,9 +40,9 @@ module.exports = async (req, res) => {
         }
 
         // ==========================================
-        // TAHAP 2: TEMBAK KE PANEL PTERODACTYL
+        // TAHAP 2: TEMBAK KE PANEL PTERODACTYL (PAKAI PLTA / ADMIN)
         // ==========================================
-        if (!process.env.PTERO_URL || !process.env.PTERO_APP_KEY) {
+        if (!process.env.PTERO_URL || !process.env.PTERO_PTLA_KEY) {
             return res.status(500).json({ 
                 success: false, 
                 error: '🎉 Pembayaran Sukses! Tapi server gagal dibuat karena Konfigurasi Panel Pterodactyl belum siap di server hosting. Hubungi Admin.' 
@@ -51,6 +51,7 @@ module.exports = async (req, res) => {
 
         let userId;
         try {
+            // Create User Pterodactyl
             const userRes = await axios.post(`${process.env.PTERO_URL}/api/application/users`, {
                 email: email_pembeli,
                 username: username,
@@ -59,7 +60,7 @@ module.exports = async (req, res) => {
                 language: "en"
             }, {
                 headers: {
-                    'Authorization': `Bearer ${process.env.PTERO_APP_KEY}`,
+                    'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
@@ -73,6 +74,7 @@ module.exports = async (req, res) => {
         }
 
         try {
+            // Create Server Pterodactyl
             await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
                 name: `Bot-WA-${username}`,
                 user: userId,
@@ -95,7 +97,7 @@ module.exports = async (req, res) => {
                 allocation: { default: 1 }
             }, {
                 headers: {
-                    'Authorization': `Bearer ${process.env.PTERO_APP_KEY}`,
+                    'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`,
                     'Content-Type': 'application/json'
                 }
             });
