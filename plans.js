@@ -11,7 +11,7 @@ const defaultConfig = {
 module.exports = {
     "1gb": {
         name: "Server 1GB",
-        price: 5000,
+        price: 1000,
         limits: { memory: 1024, swap: defaultConfig.swap, disk: 512, io: defaultConfig.io, cpu: 30 },
         feature_limits: { databases: 1, backups: 1, allocations: 1 },
         ...defaultConfig
