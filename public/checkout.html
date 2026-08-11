@@ -27,12 +27,12 @@
         <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
         <!-- Header Title -->
-        <div class="relative z-10">
+        <div class="relative z-10" id="headerTitle">
             <h2 class="text-xl sm:text-2xl font-extrabold text-center tracking-tight text-white mb-2">Checkout Pembayaran</h2>
             <p class="text-xs text-center text-gray-400 mb-6">Selesaikan transaksi untuk otomatis mengaktifkan server Anda.</p>
         </div>
 
-        <!-- Kotak Notifikasi UI -->
+        <!-- Kotak Notifikasi UI (Juga dipakai buat nampilin data akun nanti) -->
         <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
         </div>
 
@@ -51,15 +51,15 @@
                 </div>
             </div>
 
-            <!-- Form Data Akun Pterodactyl -->
+            <!-- Form Data Akun Pterodactyl (Ubah Email jadi Password) -->
             <div class="space-y-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Email Panel</label>
-                    <input type="email" id="emailInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="contoh@gmail.com" required>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
+                    <input type="text" id="usernameInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Misal: fagem" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
-                    <input type="text" id="usernameInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="fahmihost" required>
+                    <label class="block text-xs font-medium text-gray-400 mb-1">Password Panel</label>
+                    <input type="text" id="passwordInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all" placeholder="Buat password login Anda" required>
                 </div>
             </div>
 
@@ -144,12 +144,12 @@
 
             // Tombol Aksi Bertahap
             document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
-                const email = document.getElementById('emailInput').value.trim();
                 const username = document.getElementById('usernameInput').value.trim();
+                const password = document.getElementById('passwordInput').value.trim();
                 const btn = document.getElementById('btnKonfirmasi');
 
-                if (!email || !username) {
-                    showNotification("Mohon lengkapi kolom Email dan Username panel terlebih dahulu.", "error");
+                if (!username || !password) {
+                    showNotification("Mohon lengkapi kolom Username dan Password panel terlebih dahulu.", "error");
                     return;
                 }
 
@@ -170,32 +170,57 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             plan_key: planKey,
-                            email_pembeli: email,
                             username: username,
+                            password: password, // Sekarang ngirim password ke backend
                             topup_id: currentTopupId
                         })
                     });
                     
                     const webhookData = await webhookRes.json();
 
-                    // Jika belum bayar, berhenti di sini
                     if (!webhookRes.ok || !webhookData.success) {
-                        showNotification(webhookData.error || "Pembayaran belum terdeteksi.", "error");
+                        showNotification(webhookData.error || "Pembayaran belum terdeteksi atau sistem error.", "error");
                         btn.innerHTML = "Cek Ulang Pembayaran";
                         btn.disabled = false;
                         btn.classList.remove('opacity-70', 'cursor-not-allowed');
                         return;
                     }
 
-                    // Jika LUNAS: Beri tahu sukses bayar dulu, lalu jeda 2 detik sebelum nembak ke Pterodactyl
-                    showNotification("🎉 Pembayaran Sukses! Menyiapkan server Pterodactyl...", "info");
-                    btn.innerHTML = `Menghubungkan ke Panel...`;
-
-                    await new Promise(resolve => setTimeout(resolve, 2000)); // Jeda 2 detik
-
-                    if (webhookData.success) {
+                    // TAMPILKAN DATA AKUN KE PEMBELI!
+                    if (webhookData.success && webhookData.data_akun) {
+                        // Sembunyikan form checkout & header
                         document.getElementById('mainContent').style.display = 'none';
-                        showNotification("✨ Pembayaran Sukses & Server Pterodactyl Berhasil Dibuat! Cek inbox/spam email Anda untuk detail login.", "success");
+                        document.getElementById('headerTitle').style.display = 'none';
+                        
+                        const alertBox = document.getElementById('uiAlert');
+                        alertBox.className = "relative z-10 p-5 rounded-xl border border-emerald-800/80 bg-emerald-950/60 text-emerald-300 text-sm font-medium transition-all duration-300 shadow-lg text-left";
+                        
+                        // Render UI Box Keren buat Data Akun
+                        alertBox.innerHTML = `
+                            <div class="text-center mb-4 text-lg font-bold text-emerald-400">🎉 Server Berhasil Dibuat!</div>
+                            <p class="mb-3 text-xs text-emerald-200/80 text-center">Silakan simpan atau screenshot data login Anda di bawah ini:</p>
+                            
+                            <div class="bg-gray-900/80 p-4 rounded-lg border border-emerald-800/50 space-y-3 font-mono text-xs sm:text-sm">
+                                <div>
+                                    <span class="text-gray-500 block mb-1">URL Login Panel:</span> 
+                                    <a href="${webhookData.data_akun.login_url}" target="_blank" class="text-blue-400 underline block break-all">${webhookData.data_akun.login_url}</a>
+                                </div>
+                                <div class="border-t border-gray-800/80 pt-2">
+                                    <span class="text-gray-500 inline-block w-20">Email:</span> 
+                                    <span class="text-white">${webhookData.data_akun.email}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500 inline-block w-20">Username:</span> 
+                                    <span class="text-white">${webhookData.data_akun.username}</span>
+                                </div>
+                                <div>
+                                    <span class="text-gray-500 inline-block w-20">Password:</span> 
+                                    <span class="text-white">${webhookData.data_akun.password}</span>
+                                </div>
+                            </div>
+                            <button onclick="window.location.href='${webhookData.data_akun.login_url}'" class="mt-5 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg transition">Masuk ke Panel Sekarang</button>
+                        `;
+                        alertBox.classList.remove('hidden');
                     }
 
                 } catch (err) {
