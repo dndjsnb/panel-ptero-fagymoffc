@@ -11,12 +11,14 @@ module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method salah' });
 
     try {
-        const { plan_key, email_pembeli, username, topup_id } = req.body;
+        const { plan_key, username, password, topup_id } = req.body;
         const plan = plans[plan_key];
 
-        if (!plan || !topup_id) {
-            return res.status(400).json({ success: false, error: 'Data transaksi tidak lengkap.' });
+        if (!plan || !topup_id || !username || !password) {
+            return res.status(400).json({ success: false, error: 'Data tidak lengkap. Pastikan Username dan Password terisi.' });
         }
+
+        const autoEmail = `${username.toLowerCase().replace(/\s+/g, '')}@petrofagem.com`;
 
         // ==========================================
         // TAHAP 1: CEK PEMBAYARAN KE ZAKKISTORE
@@ -40,23 +42,23 @@ module.exports = async (req, res) => {
         }
 
         // ==========================================
-        // TAHAP 2: TEMBAK KE PANEL PTERODACTYL (PAKAI PLTA / ADMIN)
+        // TAHAP 2: BIKIN AKUN PTERODACTYL
         // ==========================================
         if (!process.env.PTERO_URL || !process.env.PTERO_PTLA_KEY) {
             return res.status(500).json({ 
                 success: false, 
-                error: '🎉 Pembayaran Sukses! Tapi server gagal dibuat karena Konfigurasi Panel Pterodactyl belum siap di server hosting. Hubungi Admin.' 
+                error: 'Sistem error: Konfigurasi Panel belum siap.' 
             });
         }
 
         let userId;
         try {
-            // Create User Pterodactyl
             const userRes = await axios.post(`${process.env.PTERO_URL}/api/application/users`, {
-                email: email_pembeli,
+                email: autoEmail,
                 username: username,
                 first_name: username,
                 last_name: "Customer",
+                password: password,
                 language: "en"
             }, {
                 headers: {
@@ -69,16 +71,18 @@ module.exports = async (req, res) => {
             const errDetail = pteroUserErr.response?.data?.errors?.[0]?.detail || pteroUserErr.message;
             return res.status(500).json({ 
                 success: false, 
-                error: `🎉 Pembayaran Sukses! Namun gagal mendaftarkan akun panel: ${errDetail}` 
+                error: `Gagal mendaftarkan akun panel: ${errDetail}` 
             });
         }
 
+        // ==========================================
+        // TAHAP 3: BIKIN SERVER PTERODACTYL & AUTO-DELETE JIKA GAGAL
+        // ==========================================
         try {
-            // Create Server Pterodactyl
             await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
                 name: `Bot-WA-${username}`,
                 user: userId,
-                egg: 15, // Sesuaikan ID Egg Node.js lu
+                egg: 15, 
                 docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
                 startup: "/usr/local/bin/node /home/container/index.js",
                 environment: {
@@ -94,7 +98,12 @@ module.exports = async (req, res) => {
                     cpu: plan.cpu
                 },
                 feature_limits: { databases: 1, allocations: 1, backups: 1 },
-                allocation: { default: 1 }
+                allocation: { default: 1 },
+                deploy: {
+                    locations: [1], 
+                    dedicated_ip: false,
+                    port_range: []
+                }
             }, {
                 headers: {
                     'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`,
@@ -102,16 +111,34 @@ module.exports = async (req, res) => {
                 }
             });
         } catch (pteroServerErr) {
+            // ROLLBACK: Bikin server gagal, langsung hapus akunnya!
+            try {
+                await axios.delete(`${process.env.PTERO_URL}/api/application/users/${userId}`, {
+                    headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}` }
+                });
+            } catch (deleteErr) {
+                console.error("Gagal menghapus akun rollback:", deleteErr.message);
+            }
+
             const errDetail = pteroServerErr.response?.data?.errors?.[0]?.detail || pteroServerErr.message;
             return res.status(500).json({ 
                 success: false, 
-                error: `🎉 Pembayaran Sukses & Akun Terbuat! Tapi gagal membuat server Pterodactyl: ${errDetail}` 
+                error: `Gagal membuat server: ${errDetail}. Akun telah dihapus otomatis (Rollback).` 
             });
         }
 
+        // ==========================================
+        // TAHAP 4: BERHASIL SEMUA, KIRIM DATA KE FRONTEND
+        // ==========================================
         return res.status(200).json({ 
             success: true, 
-            message: '🎉 Pembayaran Sukses & Server Pterodactyl Berhasil Dibuat!' 
+            message: '🎉 Pembayaran Sukses & Server Berhasil Dibuat!',
+            data_akun: {
+                username: username,
+                email: autoEmail,
+                password: password,
+                login_url: process.env.PTERO_URL // Biar pembeli tau link login panelnya
+            }
         });
 
     } catch (error) {
