@@ -136,7 +136,7 @@
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
-                            <h3 class="text-lg font-bold text-white">🔗 Link Order Customer</h3>
+                            <h3 class="text-lg font-bold text-white"> Link Order Customer</h3>
                             <p class="text-xs text-gray-400 mt-1">Share link ini ke customer kamu. Saldo otomatis masuk saat mereka bayar.</p>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
                     
                     <h3 class="text-lg font-bold text-white mb-6 relative z-10">Deposit Saldo Reseller</h3>
                     
-                    <!-- Kotak Notifikasi UI -->
+                    <!-- Kotak Notifikasi UI (Style dari Checkout) -->
                     <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg">
                     </div>
 
@@ -221,7 +221,7 @@
                                     <option value="Transfer Bank">Transfer Bank (Manual)</option>
                                 </select>
                             </div>
-                            <button onclick="processDeposit()" type="button" class="w-full bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4 shadow-lg shadow-brand-primary/20">
+                            <button onclick="processDeposit()" type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4 shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                                 Lanjutkan Pembayaran
                             </button>
                         </div>
@@ -230,7 +230,7 @@
                     <!-- WRAPPER QRIS CHECKOUT (Disembunyikan di awal) -->
                     <div id="qrisCheckoutWrapper" class="hidden relative z-10 text-center py-2 transition-all duration-300">
                         
-                        <div class="bg-dark-900/80 p-4 rounded-xl border border-white/5 mb-6 flex items-center justify-between">
+                        <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800/80 flex items-center justify-between mb-6">
                             <div class="text-left">
                                 <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Tipe Transaksi</span>
                                 <h3 class="text-sm font-bold text-gray-100">Deposit Saldo</h3>
@@ -247,7 +247,7 @@
                         <div class="bg-white p-3 rounded-xl inline-block w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center mx-auto shadow-md relative overflow-hidden mb-6 border-4 border-dark-700">
                             <!-- Loading Spinner -->
                             <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 gap-2">
-                                <svg class="animate-spin h-8 w-8 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                                 </svg>
@@ -257,7 +257,8 @@
                         </div>
 
                         <div class="space-y-3 max-w-sm mx-auto">
-                            <button id="btnKonfirmasi" onclick="checkPaymentStatus()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg shadow-emerald-600/20 active:scale-[0.98] transition-all duration-200 text-sm">
+                            <!-- Style tombol disamakan dengan checkout.html -->
+                            <button id="btnKonfirmasi" onclick="checkPaymentStatus()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-all duration-200">
                                 Saya Sudah Bayar
                             </button>
                             <button onclick="cancelDeposit()" class="w-full bg-transparent hover:bg-white/5 border border-white/10 text-gray-400 hover:text-white font-semibold py-3.5 rounded-xl transition-all text-sm">
@@ -328,7 +329,7 @@
                         <button onclick="saveSettings()" type="button" class="bg-brand-primary hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-xl transition-all text-sm mt-4 inline-flex items-center gap-2">
                             <i class="fa-solid fa-floppy-disk"></i> Simpan Rekening
                         </button>
-                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden">✔️ Berhasil disimpan!</p>
+                        <p id="saveMsg" class="text-xs text-emerald-400 mt-2 hidden"> Berhasil disimpan!</p>
                     </div>
                 </div>
             </div>
@@ -348,7 +349,7 @@
                                 </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Bot Server 01 <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-400">Running</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 4GB RAM • 200% CPU</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 4GB RAM � 200% CPU</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -365,7 +366,7 @@
                                 </div>
                                 <div>
                                     <h4 class="text-white font-bold text-sm">Client Web <span class="ml-2 px-2 py-0.5 rounded text-[10px] bg-red-500/20 text-red-400">Suspended</span></h4>
-                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 • 2GB RAM • Overdue Bill</p>
+                                    <p class="text-xs text-gray-400 mt-1">ID-Node1 � 2GB RAM � Overdue Bill</p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">
@@ -476,7 +477,8 @@
             }
         }
 
-        // --- LOGIKA NOTIFIKASI UI (Dari checkout_2.html) ---
+        // --- LOGIKA NOTIFIKASI UI ---
+        // Logika notifikasi diambil dari struktur checkout_2.html
         function showNotification(message, type = 'error') {
             const alertBox = document.getElementById('uiAlert');
             alertBox.className = "relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg";
@@ -486,7 +488,7 @@
             } else if (type === 'success') {
                 alertBox.classList.add('bg-emerald-950/60', 'border-emerald-800/80', 'text-emerald-300');
             } else {
-                alertBox.classList.add('bg-blue-950/60', 'border-brand-primary/50', 'text-blue-300');
+                alertBox.classList.add('bg-blue-950/60', 'border-blue-800/80', 'text-blue-300');
             }
             
             alertBox.innerText = message;
@@ -541,7 +543,7 @@
                 document.getElementById('qrisLoading').style.display = 'flex';
                 
                 try {
-                    // REAL FETCH API QRIS
+                    // Murni memanggil fetch ke API QRIS persis seperti di checkout_2.html
                     const res = await fetch(`/api/generate-qris?amount=${depositAmount}`);
                     const data = await res.json();
                     
@@ -576,7 +578,7 @@
             btn.classList.remove('opacity-70', 'cursor-not-allowed');
         }
 
-        // --- CEK STATUS MUTASI (100% REAL TIME API) ---
+        // --- CEK STATUS MUTASI (100% REAL TIME API SESUAI CHECKOUT) ---
         async function checkPaymentStatus() {
             if (!currentTopupId) {
                 showNotification("Sesi pembayaran belum siap. Silakan ulangi transaksi.", "error");
@@ -588,17 +590,22 @@
             btn.disabled = true;
             btn.classList.add('opacity-70', 'cursor-not-allowed');
             
-            showNotification("🔍 Memeriksa status mutasi pembayaran otomatis...", "info");
+            showNotification(" Memeriksa status mutasi pembayaran otomatis...", "info");
+
+            // Info email & username reseller (Bisa disesuaikan dengan sesi pengguna nantinya)
+            const emailReseller = "reseller@fahmihost.com"; 
+            const usernameReseller = "fahmi_reseller";      
 
             try {
-                // REAL FETCH API WEBHOOK
+                // REAL FETCH API WEBHOOK (Menyesuaikan parameter plan_key, email_pembeli, username, dan topup_id dengan struktur checkout_2.html)[span_1](start_span)[span_1](end_span)
                 const webhookRes = await fetch('/api/webhook', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        topup_id: currentTopupId,
-                        amount: depositAmount,
-                        type: 'reseller_deposit'
+                        plan_key: "deposit_saldo", // Penanda ke backend
+                        email_pembeli: emailReseller,
+                        username: usernameReseller,
+                        topup_id: currentTopupId
                     })
                 });
                 
@@ -612,7 +619,7 @@
                     return;
                 }
 
-                showNotification("🎉 Pembayaran Sukses! Saldo telah ditambahkan ke akun Anda.", "success");
+                showNotification(" Pembayaran Sukses! Saldo telah ditambahkan ke akun Anda.", "success");
                 btn.innerHTML = `Deposit Berhasil`;
                 
                 setTimeout(() => {
