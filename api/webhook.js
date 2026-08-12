@@ -3,7 +3,7 @@ const axios = require('axios');
 // ==========================================
 // MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
 // ==========================================
-const DEMO_MODE = true; 
+const DEMO_MODE = false; 
 
 const plans = {
     "basic": { ram: 1024, disk: 5000, cpu: 100 },
@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ success: false, error: 'Data tidak lengkap. Pastikan Username dan Password terisi.' });
         }
 
-        const autoEmail = `${username.toLowerCase().replace(/\s+/g, '')}@petrofagem.com`;
+        const autoEmail = `${username.toLowerCase().replace(/\s+/g, '')}@petrofagym.com`;
 
         // TAHAP 1: CEK PEMBAYARAN
         if (!DEMO_MODE) {
