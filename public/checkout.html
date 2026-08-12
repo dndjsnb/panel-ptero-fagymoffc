@@ -1,17 +1,28 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="bg-[#030712]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Fahmi Hosting</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
+        html { background-color: #030712; }
+        body { background: radial-gradient(circle at top, #111827, #030712); background-color: #030712; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh;}
         .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
+        
+        /* Animasi Keren buat Halaman Sukses */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen flex items-center justify-center p-4">
-    <div class="glass-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-gray-800 relative overflow-hidden">
+<body class="text-gray-100 flex items-center justify-center p-4">
+    <div id="cardContainer" class="glass-card p-6 sm:p-8 rounded-2xl shadow-2xl max-w-md w-full border border-gray-800 relative overflow-hidden transition-all duration-500">
+        <!-- Efek Glow Background -->
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
@@ -66,16 +77,8 @@
         }
 
         const daftarPaket = {
-            "basic": "Paket 1GB Basic",
-            "standar": "Paket 2GB Standar",
-            "pro": "Paket 3GB Pro",
-            "advance": "Paket 4GB Advance",
-            "5gb": "Paket 5GB",
-            "6gb": "Paket 6GB",
-            "7gb": "Paket 7GB",
-            "8gb": "Paket 8GB",
-            "9gb": "Paket 9GB",
-            "10gb": "Paket 10GB Max",
+            "basic": "Paket 1GB Basic", "standar": "Paket 2GB Standar", "pro": "Paket 3GB Pro", "advance": "Paket 4GB Advance",
+            "5gb": "Paket 5GB", "6gb": "Paket 6GB", "7gb": "Paket 7GB", "8gb": "Paket 8GB", "9gb": "Paket 9GB", "10gb": "Paket 10GB Max",
             "unlimited": "Paket Unlimited"
         };
 
@@ -125,20 +128,54 @@
                     const data = await res.json();
 
                     if (res.ok && data.success && data.data_akun) {
-                        document.getElementById('mainContent').style.display = 'none';
-                        document.getElementById('headerTitle').style.display = 'none';
-                        const box = document.getElementById('uiAlert');
-                        box.className = "relative z-10 p-5 rounded-xl border border-emerald-800 bg-emerald-950/60 text-emerald-300 text-sm shadow-lg text-left";
-                        box.innerHTML = `
-                            <div class="text-center mb-4 text-lg font-bold text-emerald-400"> Server Dibuat!</div>
-                            <div class="bg-gray-900 p-4 rounded-lg border border-emerald-800/50 space-y-2 font-mono text-xs">
-                                <div><span class="text-gray-500">URL:</span> <a href="${data.data_akun.login_url}" class="text-blue-400 underline">${data.data_akun.login_url}</a></div>
-                                <div><span class="text-gray-500">Username:</span> ${data.data_akun.username}</div>
-                                <div><span class="text-gray-500">Password:</span> ${data.data_akun.password}</div>
+                        // ROMBAKAN UI SUKSES YANG PROFESIONAL
+                        const cardContainer = document.getElementById('cardContainer');
+                        cardContainer.innerHTML = `
+                            <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+                            <div class="relative z-10 text-center animate-fade-in-up py-4">
+                                <!-- Ikon Sukses SVG -->
+                                <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-full mb-5 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                                    <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                                
+                                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Pembayaran Sukses!</h2>
+                                <p class="text-sm text-gray-400 mb-8">Server bot Anda telah aktif dan siap digunakan.</p>
+
+                                <!-- Box Kredensial Ala Struk Digital -->
+                                <div class="bg-[#0f172a]/90 p-5 rounded-2xl border border-gray-700/50 text-left space-y-4 mb-8 shadow-inner relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+                                    
+                                    <div class="relative z-10">
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔗 Panel URL</p>
+                                        <div class="bg-black/50 p-3 rounded-xl border border-gray-800/80">
+                                            <a href="${data.data_akun.login_url}" target="_blank" class="text-sm font-mono text-blue-400 hover:text-blue-300 break-all transition-colors">${data.data_akun.login_url}</a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex flex-col sm:flex-row gap-4 relative z-10">
+                                        <div class="flex-1">
+                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">👤 Username</p>
+                                            <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
+                                                ${data.data_akun.username}
+                                            </div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔑 Password</p>
+                                            <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
+                                                ${data.data_akun.password}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button onclick="window.open('${data.data_akun.login_url}', '_blank')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
+                                    Masuk ke Panel Sekarang
+                                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                                </button>
                             </div>
-                            <button onclick="window.open('${data.data_akun.login_url}')" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-lg">Masuk Panel</button>
                         `;
-                        box.classList.remove('hidden');
                     } else {
                         showNotification(data.error || "Belum lunas.", "error");
                         btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
