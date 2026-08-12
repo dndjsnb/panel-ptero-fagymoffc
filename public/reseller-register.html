@@ -27,24 +27,27 @@
                 <input type="email" id="email" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="reseller@mail.com" required>
             </div>
             <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Nomor WhatsApp</label>
+                <input type="tel" id="whatsapp" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="081234567890" required>
+            </div>
+            <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
                 <input type="password" id="password" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Daftar Sekarang</button>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Daftar & Verifikasi WA</button>
             
-            <!-- Tempat Notifikasi UI -->
             <div id="alertBox" class="hidden mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
         </form>
         <p class="text-center text-xs text-gray-400 mt-6 relative z-10">Sudah punya akun? <a href="reseller-login.html" class="text-emerald-400 hover:underline">Masuk disini</a></p>
     </div>
 
-    <!-- Script API Backend -->
     <script>
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault(); 
             
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
+            const whatsapp = document.getElementById('whatsapp').value;
             const password = document.getElementById('password').value;
             const alertBox = document.getElementById('alertBox');
             const submitBtn = document.querySelector('button[type="submit"]');
@@ -56,33 +59,35 @@
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({ name, email, whatsapp, password })
                 });
 
                 const result = await response.json();
-
-                // Bersihin warna sebelum dikasih warna baru
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400');
 
                 if (response.ok) {
-                    // Berhasil = Hijau
                     alertBox.classList.add('bg-emerald-500/20', 'text-emerald-400');
-                    alertBox.innerText = result.message; 
-                    document.getElementById('registerForm').reset(); 
-                } else {
-                    // Gagal/Udah Terdaftar = Merah
-                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                    alertBox.innerText = result.message; 
-                }
-                
-                alertBox.classList.remove('hidden');
+                    alertBox.innerText = "Berhasil! Mengalihkan ke WhatsApp..."; 
+                    
+                    // GANTI NOMOR INI PAKE NOMOR LU
+                    const nomorAdmin = "6281234567890"; 
+                    const pesanWa = `Halo Admin FahmiHost, saya sudah daftar akun Reseller dan ingin meminta aktivasi.%0A%0ANama: ${name}%0AEmail: ${email}%0AWA: ${whatsapp}`;
+                    
+                    setTimeout(() => {
+                        window.location.href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
+                    }, 1500);
 
+                } else {
+                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
+                    alertBox.innerText = result.message || 'Gagal mendaftar.'; 
+                    submitBtn.innerText = "Daftar & Verifikasi WA";
+                    submitBtn.disabled = false;
+                }
             } catch (error) {
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400');
                 alertBox.classList.add('bg-red-500/20', 'text-red-400');
                 alertBox.innerText = 'Server error/gagal dihubungi, Cok!';
-            } finally {
-                submitBtn.innerText = "Daftar Sekarang";
+                submitBtn.innerText = "Daftar & Verifikasi WA";
                 submitBtn.disabled = false;
             }
         });

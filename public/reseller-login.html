@@ -15,73 +15,68 @@
         <div class="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="text-center mb-8 relative z-10">
             <h2 class="text-2xl font-extrabold text-white mb-1">Portal Reseller</h2>
-            <p class="text-xs text-gray-400">Masuk untuk mengelola pelanggan</p>
+            <p class="text-xs text-gray-400">Silakan login untuk akses dashboard</p>
         </div>
+        
         <form id="loginForm" class="space-y-4 relative z-10">
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Email</label>
-                <input type="email" id="email" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="reseller@mail.com" required>
+                <input type="email" id="loginEmail" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="reseller@mail.com" required>
             </div>
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
-                <input type="password" id="password" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                <input type="password" id="loginPassword" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Masuk ke Dashboard</button>
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Masuk Dashboard</button>
             
-            <!-- Tempat Notifikasi UI -->
-            <div id="alertBox" class="hidden mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
+            <div id="alertBox" class="hidden w-full mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
         </form>
+        
         <p class="text-center text-xs text-gray-400 mt-6 relative z-10">Belum punya akun? <a href="reseller-register.html" class="text-blue-400 hover:underline">Daftar Gratis</a></p>
     </div>
 
-    <!-- Script API Backend buat Login -->
     <script>
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); 
+            e.preventDefault();
             
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
             const alertBox = document.getElementById('alertBox');
             const submitBtn = document.querySelector('button[type="submit"]');
 
-            submitBtn.innerText = "Mengecek...";
+            alertBox.classList.remove('hidden', 'bg-blue-500/20', 'text-blue-400', 'bg-red-500/20', 'text-red-400');
+            alertBox.classList.add('bg-blue-500/20', 'text-blue-400');
+            alertBox.innerText = "Memverifikasi...";
             submitBtn.disabled = true;
 
             try {
-                const response = await fetch('/api/login', {
+                const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
-                const result = await response.json();
+                const result = await res.json();
+                alertBox.classList.remove('bg-blue-500/20', 'text-blue-400', 'bg-red-500/20', 'text-red-400');
 
-                // Bersihin warna notif
-                alertBox.classList.remove('hidden', 'bg-blue-500/20', 'text-blue-400', 'bg-red-500/20', 'text-red-400');
-
-                if (response.ok) {
+                if (res.ok && result.verified) {
                     alertBox.classList.add('bg-blue-500/20', 'text-blue-400');
-                    alertBox.innerText = result.message; 
-                    
-                    // KASIH TIKET MASUK (SATPAM)
+                    alertBox.innerText = "Login Berhasil!"; 
                     localStorage.setItem('isLoggedIn', 'true'); 
-                    
-                    setTimeout(() => {
-                        window.location.href = 'reseller-dashboard.html'; 
-                    }, 1500);
+                    setTimeout(() => { window.location.href = 'reseller-dashboard.html'; }, 1500);
+                } else if (res.ok && !result.verified) {
+                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
+                    alertBox.innerText = "Akun belum diverifikasi oleh Admin via WA!";
+                    submitBtn.disabled = false;
                 } else {
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                    alertBox.innerText = result.message; 
+                    alertBox.innerText = result.message || "Email atau password salah!"; 
+                    submitBtn.disabled = false;
                 }
-                
-                alertBox.classList.remove('hidden');
-
             } catch (error) {
-                alertBox.classList.remove('hidden', 'bg-blue-500/20', 'text-blue-400');
+                alertBox.classList.remove('bg-blue-500/20', 'text-blue-400');
                 alertBox.classList.add('bg-red-500/20', 'text-red-400');
                 alertBox.innerText = 'Server error/gagal dihubungi, Cok!';
-            } finally {
-                submitBtn.innerText = "Masuk ke Dashboard";
                 submitBtn.disabled = false;
             }
         });
