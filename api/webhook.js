@@ -94,13 +94,12 @@ module.exports = async (req, res) => {
                 egg: 15, 
                 docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
                 startup: "/usr/local/bin/node /home/container/index.js",
-                                environment: {
+                environment: {
                     MAIN_FILE: "index.js",
                     AUTO_UPDATE: "0",
                     USER_UPLOAD: "0",
-                    CMD_RUN: "npm start" // <--- Tambahkan baris ini, nilainya ambil dari Default Value di panel
+                    CMD_RUN: "npm start"
                 },
-                ,
                 limits: {
                     memory: plan.ram,
                     swap: 0,
@@ -155,7 +154,8 @@ module.exports = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ 
             success: false, 
-            error: 'Terjadi kendala tak terduga pada sistem.' 
+            error: 'Terjadi kendala tak terduga pada sistem.',
+            details: error.message
         });
     }
 };
