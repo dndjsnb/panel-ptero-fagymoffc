@@ -1,5 +1,16 @@
 const axios = require('axios');
-const { createCanvas, loadImage } = require('canvas');
+const path = require('path');
+const { createCanvas, registerFont } = require('canvas');
+
+// ==========================================
+// REGISTER FONT MANUAL BUKAT VERCEL (WAJIB ADA FILE font.ttf)
+// ==========================================
+try {
+    // Membaca file font.ttf di folder yang sama dengan webhook.js
+    registerFont(path.join(__dirname, 'font.ttf'), { family: 'FahmiFont' });
+} catch (error) {
+    console.error("Waduh, file font.ttf nggak ketemu Bro!", error.message);
+}
 
 // ==========================================
 // MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
@@ -20,21 +31,21 @@ const plans = {
     "unlimited": { ram: 0, disk: 0, cpu: 0, name: "Paket Unlimited", price: "50.000" }
 };
 
-// Fungsi Pembuat Gambar Struk (Canvas) yang Clean & Aesthetic
+// Fungsi Pembuat Gambar Struk (Sudah pakai FahmiFont)
 async function generateReceiptImage(data) {
     const width = 800;
     const height = 950;
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
-    // 1. Background Utama (Dark Premium Gradient)
+    // 1. Background Utama
     const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
     bgGradient.addColorStop(0, '#0a0f1d');
     bgGradient.addColorStop(1, '#030712');
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 2. Card Pembungkus Struk (Glassmorphism Style)
+    // 2. Card Pembungkus
     ctx.fillStyle = 'rgba(17, 24, 39, 0.75)';
     ctx.strokeStyle = 'rgba(75, 85, 99, 0.4)';
     ctx.lineWidth = 2;
@@ -45,12 +56,12 @@ async function generateReceiptImage(data) {
 
     // 3. Header Toko
     ctx.textAlign = 'center';
-    ctx.fillStyle = '#818cf8'; // Warna Ungu/Indigo Modern
-    ctx.font = 'bold 36px sans-serif';
+    ctx.fillStyle = '#818cf8';
+    ctx.font = 'bold 36px FahmiFont, sans-serif';
     ctx.fillText('FAHMI HOSTING', width / 2, 120);
 
     ctx.fillStyle = '#6b7280';
-    ctx.font = '14px sans-serif';
+    ctx.font = '14px FahmiFont, sans-serif';
     ctx.fillText('— OFFICIAL STORE —', width / 2, 150);
 
     // Badge "PEMBELIAN PANEL"
@@ -62,12 +73,12 @@ async function generateReceiptImage(data) {
     ctx.stroke();
 
     ctx.fillStyle = '#93c5fd';
-    ctx.font = 'bold 14px sans-serif';
+    ctx.font = 'bold 14px FahmiFont, sans-serif';
     ctx.fillText('PEMBELIAN PANEL', width / 2, 208);
 
-    // 4. Baris Informasi Struk (Detail Transaksi)
-    const startY = 280;
-    const spacing = 75;
+    // 4. Baris Informasi Struk
+    const startY = 320;
+    const spacing = 80;
     const items = [
         { label: 'PRODUK', value: data.productName.toUpperCase() },
         { label: 'USERNAME PANEL', value: data.username.toUpperCase() },
@@ -80,7 +91,6 @@ async function generateReceiptImage(data) {
     items.forEach((item, index) => {
         const y = startY + (index * spacing);
 
-        // Garis Pembatas Tipis
         ctx.strokeStyle = 'rgba(55, 65, 81, 0.4)';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -88,36 +98,33 @@ async function generateReceiptImage(data) {
         ctx.lineTo(width - 90, y - 20);
         ctx.stroke();
 
-        // Label Kiri
         ctx.textAlign = 'left';
         ctx.fillStyle = '#9ca3af';
-        ctx.font = 'bold 13px sans-serif';
+        ctx.font = 'bold 14px FahmiFont, sans-serif';
         ctx.fillText(item.label, 90, y + 10);
 
-        // Nilai Kanan
         ctx.textAlign = 'right';
-        ctx.fillStyle = item.isPrice ? '#34d399' : '#ffffff'; // Hijau terang untuk harga
-        ctx.font = item.isPrice ? 'bold 22px sans-serif' : 'bold 16px sans-serif';
+        ctx.fillStyle = item.isPrice ? '#34d399' : '#ffffff';
+        ctx.font = item.isPrice ? 'bold 24px FahmiFont, sans-serif' : 'bold 18px FahmiFont, sans-serif';
         ctx.fillText(item.value, width - 90, y + 10);
     });
 
     // 5. Kotak Status Berhasil di Bagian Bawah
     const boxY = height - 190;
-    ctx.fillStyle = 'rgba(6, 78, 59, 0.6)'; // Hijau gelap transparan
+    ctx.fillStyle = 'rgba(6, 78, 59, 0.6)';
     ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
     ctx.beginPath();
     ctx.roundRect(90, boxY, width - 180, 75, 16);
     ctx.fill();
     ctx.stroke();
 
-    // Teks Status
     ctx.textAlign = 'left';
     ctx.fillStyle = '#34d399';
-    ctx.font = 'bold 16px sans-serif';
+    ctx.font = 'bold 18px FahmiFont, sans-serif';
     ctx.fillText('✓  PEMBAYARAN BERHASIL', 125, boxY + 32);
 
     ctx.fillStyle = '#a7f3d0';
-    ctx.font = '13px sans-serif';
+    ctx.font = '14px FahmiFont, sans-serif';
     ctx.fillText('Transaksi telah dikonfirmasi secara otomatis', 125, boxY + 56);
 
     return canvas.toBuffer('image/png');
@@ -137,7 +144,7 @@ module.exports = async (req, res) => {
         const autoEmail = `${username.toLowerCase().replace(/\s+/g, '')}@petrofagem.com`;
 
         // ==========================================
-        // TAHAP 1: CEK PEMBAYARAN KE ZAKKISTORE
+        // TAHAP 1: CEK PEMBAYARAN
         // ==========================================
         if (!DEMO_MODE) {
             try {
@@ -146,117 +153,60 @@ module.exports = async (req, res) => {
                 });
 
                 if (!checkRes.data || checkRes.data.status !== 'found' || checkRes.data.data.status !== 'SUCCESS') {
-                    return res.status(400).json({ 
-                        success: false, 
-                        error: '❌ Pembayaran belum lunas! Silakan selesaikan pembayaran QRIS terlebih dahulu.' 
-                    });
+                    return res.status(400).json({ success: false, error: '❌ Pembayaran belum lunas!' });
                 }
             } catch (err) {
-                return res.status(400).json({ 
-                    success: false, 
-                    error: '❌ Gagal memverifikasi pembayaran ke server QRIS. Coba ulangi beberapa saat lagi.' 
-                });
+                return res.status(400).json({ success: false, error: '❌ Gagal verifikasi QRIS.' });
             }
-        } else {
-            console.log("DEMO MODE AKTIF: Melewati validasi pembayaran ZakkiStore.");
         }
 
         // ==========================================
         // TAHAP 2: BIKIN AKUN PTERODACTYL
         // ==========================================
         if (!process.env.PTERO_URL || !process.env.PTERO_PTLA_KEY) {
-            return res.status(500).json({ 
-                success: false, 
-                error: 'Sistem error: Konfigurasi Panel belum siap.' 
-            });
+            return res.status(500).json({ success: false, error: 'Sistem error: Panel belum siap.' });
         }
 
         let userId;
         try {
             const userRes = await axios.post(`${process.env.PTERO_URL}/api/application/users`, {
-                email: autoEmail,
-                username: username,
-                first_name: username,
-                last_name: "Customer",
-                password: password,
-                language: "en"
+                email: autoEmail, username: username, first_name: username, last_name: "Customer", password: password, language: "en"
             }, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`, 'Content-Type': 'application/json' }
             });
             userId = userRes.data.attributes.id;
-        } catch (pteroUserErr) {
-            const errDetail = pteroUserErr.response?.data?.errors?.[0]?.detail || pteroUserErr.message;
-            return res.status(500).json({ 
-                success: false, 
-                error: `Gagal mendaftarkan akun panel: ${errDetail}` 
-            });
+        } catch (err) {
+            return res.status(500).json({ success: false, error: `Gagal daftar akun: ${err.message}` });
         }
 
         // ==========================================
-        // TAHAP 3: BIKIN SERVER PTERODACTYL & ROLLBACK
+        // TAHAP 3: BIKIN SERVER PTERODACTYL
         // ==========================================
         try {
             await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
                 name: `Bot-WA-${username}`,
-                user: userId,
-                egg: 15, 
-                docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
+                user: userId, egg: 15, docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
                 startup: "/usr/local/bin/node /home/container/index.js",
-                environment: {
-                    MAIN_FILE: "index.js",
-                    AUTO_UPDATE: "0",
-                    USER_UPLOAD: "0",
-                    CMD_RUN: "npm start"
-                },
-                limits: {
-                    memory: plan.ram,
-                    swap: 0,
-                    disk: plan.disk,
-                    io: 500,
-                    cpu: plan.cpu
-                },
+                environment: { MAIN_FILE: "index.js", AUTO_UPDATE: "0", USER_UPLOAD: "0", CMD_RUN: "npm start" },
+                limits: { memory: plan.ram, swap: 0, disk: plan.disk, io: 500, cpu: plan.cpu },
                 feature_limits: { databases: 1, allocations: 1, backups: 1 },
-                allocation: { default: 1 },
-                deploy: {
-                    locations: [1], 
-                    dedicated_ip: false,
-                    port_range: []
-                }
+                allocation: { default: 1 }, deploy: { locations: [1], dedicated_ip: false, port_range: [] }
             }, {
-                headers: {
-                    'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`,
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`, 'Content-Type': 'application/json' }
             });
-        } catch (pteroServerErr) {
-            try {
-                await axios.delete(`${process.env.PTERO_URL}/api/application/users/${userId}`, {
-                    headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}` }
-                });
-            } catch (deleteErr) {
-                console.error("Gagal menghapus akun rollback:", deleteErr.message);
-            }
-
-            const errDetail = pteroServerErr.response?.data?.errors?.[0]?.detail || pteroServerErr.message;
-            return res.status(500).json({ 
-                success: false, 
-                error: `Gagal membuat server: ${errDetail}. Akun telah dihapus otomatis (Rollback).` 
-            });
+        } catch (err) {
+            try { await axios.delete(`${process.env.PTERO_URL}/api/application/users/${userId}`, { headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}` } }); } catch (e) {}
+            return res.status(500).json({ success: false, error: `Gagal membuat server: ${err.message}. (Rollback)` });
         }
 
         // ==========================================
-        // TAHAP 4: GENERATE GAMBAR STRUK & KIRIM KE CHANNEL TELEGRAM
+        // TAHAP 4: GENERATE GAMBAR STRUK & KIRIM TELEGRAM
         // ==========================================
         try {
             if (process.env.BOT_TOKEN && process.env.TESTI_CHAT_ID) {
-                // Ambil Waktu Indonesia Saat Ini
                 const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
                 const timeString = new Intl.DateTimeFormat('id-ID', options).format(new Date()).replace(/\./g, '/');
 
-                // Bikin Buffer Gambar Struk pakai Canvas
                 const imageBuffer = await generateReceiptImage({
                     productName: plan.name,
                     username: username,
@@ -264,7 +214,6 @@ module.exports = async (req, res) => {
                     time: timeString
                 });
 
-                // Kirim Foto menggunakan FormData / Multipart ke Telegram API
                 const FormData = require('form-data');
                 const form = new FormData();
                 form.append('chat_id', process.env.TESTI_CHAT_ID);
@@ -277,28 +226,19 @@ module.exports = async (req, res) => {
                 });
             }
         } catch (botErr) {
-            console.error("Gagal mengirim struk gambar ke Telegram:", botErr.message);
+            console.error("Gagal kirim gambar ke Telegram:", botErr.message);
         }
 
         // ==========================================
-        // TAHAP 5: KIRIM DATA AKUN KE FRONTEND (WEB)
+        // TAHAP 5: KIRIM RESPONSE KE WEB
         // ==========================================
         return res.status(200).json({ 
             success: true, 
             message: '🎉 Pembayaran Sukses & Server Berhasil Dibuat!',
-            data_akun: {
-                username: username,
-                email: autoEmail,
-                password: password,
-                login_url: process.env.PTERO_URL 
-            }
+            data_akun: { username: username, email: autoEmail, password: password, login_url: process.env.PTERO_URL }
         });
 
     } catch (error) {
-        return res.status(500).json({ 
-            success: false, 
-            error: 'Terjadi kendala tak terduga pada sistem.',
-            details: error.message
-        });
+        return res.status(500).json({ success: false, error: 'Terjadi kendala.', details: error.message });
     }
 };
