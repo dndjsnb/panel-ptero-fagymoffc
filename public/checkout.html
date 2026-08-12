@@ -65,18 +65,25 @@
             box.innerText = msg; box.classList.remove('hidden');
         }
 
+        // Ini daftar nama paketnya, bebas lu edit teksnya sesuai keinginan
+        const daftarPaket = {
+            "basic": "Paket 1GB Basic",
+            "standar": "Paket 2GB Standar",
+            "pro": "Paket 3GB Pro",
+            "advance": "Paket 4GB Advance"
+        };
+
         document.addEventListener("DOMContentLoaded", async () => {
             const params = new URLSearchParams(window.location.search);
-            const planKey = params.get('plan');
-            const planName = params.get('name');
-            const displayPrice = params.get('price'); 
+            const planKey = params.get('plan'); // Cuma ngambil data plan, abaikan sisanya
 
             if (!planKey) return showNotification("Data paket tidak valid.", "error");
-            document.getElementById('invoicePlan').innerText = planName || planKey;
-            document.getElementById('invoicePrice').innerText = displayPrice ? 'Rp ' + parseInt(displayPrice).toLocaleString() : 'Menghitung...';
+            
+            // Pasang nama dari daftarPaket, dan set teks awal jadi Menghitung
+            document.getElementById('invoicePlan').innerText = daftarPaket[planKey] || planKey;
+            document.getElementById('invoicePrice').innerText = 'Menghitung...';
 
             try {
-                // UPDATE: Jalur endpoint disesuaikan dengan nama file
                 const res = await fetch(`/api/generate-qris`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -89,6 +96,8 @@
                     document.getElementById('qrisLoading').style.display = 'none';
                     img.src = data.qr_url; img.classList.remove('hidden');
                     currentTopupId = data.topup_id; 
+                    
+                    // Harga asli dari backend langsung nempel ke UI
                     if(data.real_price) document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(data.real_price).toLocaleString();
                 } else {
                     showNotification("Gagal memuat QRIS.", "error");
@@ -118,7 +127,7 @@
                         const box = document.getElementById('uiAlert');
                         box.className = "relative z-10 p-5 rounded-xl border border-emerald-800 bg-emerald-950/60 text-emerald-300 text-sm shadow-lg text-left";
                         box.innerHTML = `
-                            <div class="text-center mb-4 text-lg font-bold text-emerald-400"> Server Dibuat!</div>
+                            <div class="text-center mb-4 text-lg font-bold text-emerald-400">🎉 Server Dibuat!</div>
                             <div class="bg-gray-900 p-4 rounded-lg border border-emerald-800/50 space-y-2 font-mono text-xs">
                                 <div><span class="text-gray-500">URL:</span> <a href="${data.data_akun.login_url}" class="text-blue-400 underline">${data.data_akun.login_url}</a></div>
                                 <div><span class="text-gray-500">Username:</span> ${data.data_akun.username}</div>
