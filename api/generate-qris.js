@@ -1,15 +1,20 @@
 const ZakkiStore = require('zakkistore-sdk');
 
-// Daftar harga sesuai plan. Pastikan harganya benar di sini ya Bro.
 const planPrices = {
     "basic": 5000,
-    "standar": 10000,
-    "pro": 15000,
-    "advance": 20000
+    "standar": 8000,
+    "pro": 11000,
+    "advance": 14000,
+    "5gb": 17000,
+    "6gb": 20000,
+    "7gb": 23000,
+    "8gb": 26000,
+    "9gb": 29000,
+    "10gb": 32000,
+    "unlimited": 50000 // Ganti harga Unlimited di sini kalau mau
 };
 
 module.exports = async (req, res) => {
-    // Wajibkan metode POST
     if (req.method !== 'POST') {
         return res.status(405).json({ success: false, error: 'Method salah' });
     }
@@ -23,11 +28,8 @@ module.exports = async (req, res) => {
             pin: process.env.ZAKKI_PIN || '123456',
         });
 
-        // Parse body dengan aman agar tidak crash kalau sudah berwujud Object dari Vercel
         const bodyData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         const planKey = bodyData?.plan_key;
-
-        // Ambil harga dari server berdasarkan planKey
         const amount = planPrices[planKey];
 
         if (!amount) {
@@ -37,7 +39,6 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Tembak nominal ke ZakkiStore
         const response = await zakki.topup(amount);
         
         if (response && response.status === 'success' && response.data) {
@@ -45,7 +46,7 @@ module.exports = async (req, res) => {
                 success: true, 
                 qr_url: response.data.qris_image,
                 topup_id: response.data.id_transaksi,
-                real_price: amount // Kembalikan harga asli ke frontend
+                real_price: amount
             });
         } else {
             return res.status(400).json({ success: false, error: 'Gagal generate QRIS' });
