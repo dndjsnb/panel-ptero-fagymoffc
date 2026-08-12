@@ -1,12 +1,13 @@
 const axios = require('axios');
 const path = require('path');
 const { createCanvas, registerFont } = require('canvas');
+const FormData = require('form-data');
 
 // ==========================================
-// REGISTER FONT MANUAL BUKAT VERCEL (WAJIB ADA FILE font.ttf)
+// REGISTER FONT MANUAL (ANTI KOTAK-KOTAK)
+// Pastikan file font.ttf ada di sebelah webhook.js
 // ==========================================
 try {
-    // Membaca file font.ttf di folder yang sama dengan webhook.js
     registerFont(path.join(__dirname, 'font.ttf'), { family: 'FahmiFont' });
 } catch (error) {
     console.error("Waduh, file font.ttf nggak ketemu Bro!", error.message);
@@ -15,7 +16,7 @@ try {
 // ==========================================
 // MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
 // ==========================================
-const DEMO_MODE = false; 
+const DEMO_MODE = true; 
 
 const plans = {
     "basic": { ram: 1024, disk: 5000, cpu: 100, name: "Paket 1GB Basic", price: "5.000" },
@@ -31,7 +32,9 @@ const plans = {
     "unlimited": { ram: 0, disk: 0, cpu: 0, name: "Paket Unlimited", price: "50.000" }
 };
 
-// Fungsi Pembuat Gambar Struk (Sudah pakai FahmiFont)
+// ==========================================
+// FUNGSI PEMBUAT STRUK GAMBAR ESTETIK
+// ==========================================
 async function generateReceiptImage(data) {
     const width = 800;
     const height = 950;
@@ -130,6 +133,9 @@ async function generateReceiptImage(data) {
     return canvas.toBuffer('image/png');
 }
 
+// ==========================================
+// FUNGSI UTAMA SERVERLESS (HANDLER)
+// ==========================================
 module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method salah' });
 
@@ -144,7 +150,7 @@ module.exports = async (req, res) => {
         const autoEmail = `${username.toLowerCase().replace(/\s+/g, '')}@petrofagem.com`;
 
         // ==========================================
-        // TAHAP 1: CEK PEMBAYARAN
+        // TAHAP 1: CEK PEMBAYARAN KE ZAKKISTORE
         // ==========================================
         if (!DEMO_MODE) {
             try {
@@ -176,11 +182,12 @@ module.exports = async (req, res) => {
             });
             userId = userRes.data.attributes.id;
         } catch (err) {
-            return res.status(500).json({ success: false, error: `Gagal daftar akun: ${err.message}` });
+            const errDetail = err.response?.data?.errors?.[0]?.detail || err.message;
+            return res.status(500).json({ success: false, error: `Gagal daftar akun: ${errDetail}` });
         }
 
         // ==========================================
-        // TAHAP 3: BIKIN SERVER PTERODACTYL
+        // TAHAP 3: BIKIN SERVER PTERODACTYL & ROLLBACK
         // ==========================================
         try {
             await axios.post(`${process.env.PTERO_URL}/api/application/servers`, {
@@ -195,42 +202,50 @@ module.exports = async (req, res) => {
                 headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}`, 'Content-Type': 'application/json' }
             });
         } catch (err) {
-            try { await axios.delete(`${process.env.PTERO_URL}/api/application/users/${userId}`, { headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}` } }); } catch (e) {}
-            return res.status(500).json({ success: false, error: `Gagal membuat server: ${err.message}. (Rollback)` });
+            try { 
+                await axios.delete(`${process.env.PTERO_URL}/api/application/users/${userId}`, { 
+                    headers: { 'Authorization': `Bearer ${process.env.PTERO_PTLA_KEY}` } 
+                }); 
+            } catch (e) {}
+            const errDetail = err.response?.data?.errors?.[0]?.detail || err.message;
+            return res.status(500).json({ success: false, error: `Gagal membuat server: ${errDetail}. (Rollback)` });
         }
 
         // ==========================================
-        // TAHAP 4: GENERATE GAMBAR STRUK & KIRIM TELEGRAM
+        // TAHAP 4: GENERATE GAMBAR & KIRIM KE BOT WA PTERODACTYL
         // ==========================================
         try {
-            if (process.env.BOT_TOKEN && process.env.TESTI_CHAT_ID) {
-                const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-                const timeString = new Intl.DateTimeFormat('id-ID', options).format(new Date()).replace(/\./g, '/');
+            // ⚠️ EDIT BAGIAN INI Bro! ⚠️
+            const TARGET_JID_WA = '120363428864413425@newsletter'; 
+            const URL_BOT_WA_LU = 'http://cabangdua.lilyss.xyz:2019//api/send-testi';
 
-                const imageBuffer = await generateReceiptImage({
-                    productName: plan.name,
-                    username: username,
-                    price: plan.price,
-                    time: timeString
-                });
+            const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const timeString = new Intl.DateTimeFormat('id-ID', options).format(new Date()).replace(/\./g, '/');
 
-                const FormData = require('form-data');
-                const form = new FormData();
-                form.append('chat_id', process.env.TESTI_CHAT_ID);
-                form.append('photo', imageBuffer, { filename: 'struk-pembelian.png' });
-                form.append('caption', `✨ *TRANSAKSI BERHASIL OTOMATIS* ✨\n\nTerima kasih *${username}* telah membeli ${plan.name} di Fahmi Hosting! Server Anda sudah aktif.`);
-                form.append('parse_mode', 'Markdown');
+            const imageBuffer = await generateReceiptImage({
+                productName: plan.name,
+                username: username,
+                price: plan.price,
+                time: timeString
+            });
 
-                await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`, form, {
-                    headers: form.getHeaders()
-                });
-            }
+            const form = new FormData();
+            form.append('target_jid', TARGET_JID_WA);
+            form.append('photo', imageBuffer, { filename: 'struk-wa.png' });
+            form.append('caption', `✨ *TRANSAKSI BERHASIL OTOMATIS* ✨\n\nTerima kasih *${username}* telah membeli ${plan.name} di Fahmi Hosting! Server Anda sudah aktif.`);
+
+            // Eksekusi tembak ke Jembatan API Bot WA
+            await axios.post(URL_BOT_WA_LU, form, {
+                headers: form.getHeaders()
+            });
+
+            console.log("Struk berhasil dikirim ke API Bot WA lokal!");
         } catch (botErr) {
-            console.error("Gagal kirim gambar ke Telegram:", botErr.message);
+            console.error("Gagal mengirim struk ke Jembatan Bot WA:", botErr.message);
         }
 
         // ==========================================
-        // TAHAP 5: KIRIM RESPONSE KE WEB
+        // TAHAP 5: KIRIM RESPONSE KE WEB FRONTEND
         // ==========================================
         return res.status(200).json({ 
             success: true, 
@@ -239,6 +254,6 @@ module.exports = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({ success: false, error: 'Terjadi kendala.', details: error.message });
+        return res.status(500).json({ success: false, error: 'Terjadi kendala sistem.', details: error.message });
     }
 };
