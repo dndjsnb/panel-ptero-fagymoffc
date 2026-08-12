@@ -212,36 +212,61 @@ module.exports = async (req, res) => {
         }
 
         // ==========================================
-        // TAHAP 4: GENERATE GAMBAR & KIRIM KE BOT WA PTERODACTYL
+        // TAHAP 4: GENERATE GAMBAR & KIRIM KE TELEGRAM + WA
         // ==========================================
         try {
-            // ⚠️ EDIT BAGIAN INI Bro! ⚠️
+            // Konfigurasi WA
             const TARGET_JID_WA = '120363428864413425@newsletter'; 
-            const URL_BOT_WA_LU = 'http://cabangdua.lilyss.xyz:2019//api/send-testi';
+            const URL_BOT_WA_LU = 'http://cabangdua.lilyss.xyz:2019/api/send-testi';
 
             const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
             const timeString = new Intl.DateTimeFormat('id-ID', options).format(new Date()).replace(/\./g, '/');
 
+            // 1. Render Gambar Struk (Cukup 1x kerja)
             const imageBuffer = await generateReceiptImage({
                 productName: plan.name,
                 username: username,
                 price: plan.price,
                 time: timeString
             });
+            
+            const captionText = `✨ *TRANSAKSI BERHASIL OTOMATIS* ✨\n\nTerima kasih *${username}* telah membeli ${plan.name} di Fahmi Hosting! Server Anda sudah aktif.`;
 
-            const form = new FormData();
-            form.append('target_jid', TARGET_JID_WA);
-            form.append('photo', imageBuffer, { filename: 'struk-wa.png' });
-            form.append('caption', `✨ *TRANSAKSI BERHASIL OTOMATIS* ✨\n\nTerima kasih *${username}* telah membeli ${plan.name} di Fahmi Hosting! Server Anda sudah aktif.`);
+            // 2. Eksekusi Tembak ke Telegram
+            if (process.env.BOT_TOKEN && process.env.TESTI_CHAT_ID) {
+                try {
+                    const formTele = new FormData();
+                    formTele.append('chat_id', process.env.TESTI_CHAT_ID);
+                    formTele.append('photo', imageBuffer, { filename: 'struk-pembelian.png' });
+                    formTele.append('caption', captionText);
+                    formTele.append('parse_mode', 'Markdown');
 
-            // Eksekusi tembak ke Jembatan API Bot WA
-            await axios.post(URL_BOT_WA_LU, form, {
-                headers: form.getHeaders()
-            });
+                    await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`, formTele, {
+                        headers: formTele.getHeaders()
+                    });
+                    console.log("Struk berhasil dikirim ke Telegram!");
+                } catch (teleErr) {
+                    console.error("Gagal kirim ke Telegram:", teleErr.message);
+                }
+            }
 
-            console.log("Struk berhasil dikirim ke API Bot WA lokal!");
+            // 3. Eksekusi Tembak ke API Bot WA Pterodactyl
+            try {
+                const formWA = new FormData();
+                formWA.append('target_jid', TARGET_JID_WA);
+                formWA.append('photo', imageBuffer, { filename: 'struk-wa.png' });
+                formWA.append('caption', captionText);
+
+                await axios.post(URL_BOT_WA_LU, formWA, {
+                    headers: formWA.getHeaders()
+                });
+                console.log("Struk berhasil dikirim ke API Bot WA lokal!");
+            } catch (waErr) {
+                console.error("Gagal mengirim struk ke Jembatan Bot WA:", waErr.message);
+            }
+
         } catch (botErr) {
-            console.error("Gagal mengirim struk ke Jembatan Bot WA:", botErr.message);
+            console.error("Gagal memproses gambar/notifikasi:", botErr.message);
         }
 
         // ==========================================
