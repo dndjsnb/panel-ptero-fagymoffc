@@ -76,8 +76,8 @@
             document.getElementById('invoicePrice').innerText = displayPrice ? 'Rp ' + parseInt(displayPrice).toLocaleString() : 'Menghitung...';
 
             try {
-                // ROMBAK: Request QRIS pake POST plan_key. Harga diatur backend lu, bodo amat isi di URL!
-                const res = await fetch(`/api/generate-qris-secure`, {
+                // UPDATE: Jalur endpoint disesuaikan dengan nama file
+                const res = await fetch(`/api/generate-qris`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan_key: planKey }) 
@@ -118,7 +118,7 @@
                         const box = document.getElementById('uiAlert');
                         box.className = "relative z-10 p-5 rounded-xl border border-emerald-800 bg-emerald-950/60 text-emerald-300 text-sm shadow-lg text-left";
                         box.innerHTML = `
-                            <div class="text-center mb-4 text-lg font-bold text-emerald-400">🎉 Server Dibuat!</div>
+                            <div class="text-center mb-4 text-lg font-bold text-emerald-400"> Server Dibuat!</div>
                             <div class="bg-gray-900 p-4 rounded-lg border border-emerald-800/50 space-y-2 font-mono text-xs">
                                 <div><span class="text-gray-500">URL:</span> <a href="${data.data_akun.login_url}" class="text-blue-400 underline">${data.data_akun.login_url}</a></div>
                                 <div><span class="text-gray-500">Username:</span> ${data.data_akun.username}</div>
