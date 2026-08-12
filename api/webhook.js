@@ -1,5 +1,10 @@
 const axios = require('axios');
 
+// ==========================================
+// MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
+// ==========================================
+const DEMO_MODE = true; 
+
 const plans = {
     "basic": { ram: 1024, disk: 5000, cpu: 100 },
     "standar": { ram: 2048, disk: 10000, cpu: 150 },
@@ -23,22 +28,26 @@ module.exports = async (req, res) => {
         // ==========================================
         // TAHAP 1: CEK PEMBAYARAN KE ZAKKISTORE
         // ==========================================
-        try {
-            const checkRes = await axios.get(`https://qris.zakki.store/cektopup`, {
-                params: { idtopup: topup_id }
-            });
+        if (!DEMO_MODE) {
+            try {
+                const checkRes = await axios.get(`https://qris.zakki.store/cektopup`, {
+                    params: { idtopup: topup_id }
+                });
 
-            if (!checkRes.data || checkRes.data.status !== 'found' || checkRes.data.data.status !== 'SUCCESS') {
+                if (!checkRes.data || checkRes.data.status !== 'found' || checkRes.data.data.status !== 'SUCCESS') {
+                    return res.status(400).json({ 
+                        success: false, 
+                        error: '❌ Pembayaran belum lunas! Silakan selesaikan pembayaran QRIS terlebih dahulu.' 
+                    });
+                }
+            } catch (err) {
                 return res.status(400).json({ 
                     success: false, 
-                    error: '❌ Pembayaran belum lunas! Silakan selesaikan pembayaran QRIS terlebih dahulu.' 
+                    error: '❌ Gagal memverifikasi pembayaran ke server QRIS. Coba ulangi beberapa saat lagi.' 
                 });
             }
-        } catch (err) {
-            return res.status(400).json({ 
-                success: false, 
-                error: '❌ Gagal memverifikasi pembayaran ke server QRIS. Coba ulangi beberapa saat lagi.' 
-            });
+        } else {
+            console.log("DEMO MODE AKTIF: Melewati validasi pembayaran ZakkiStore.");
         }
 
         // ==========================================
@@ -137,7 +146,7 @@ module.exports = async (req, res) => {
                 username: username,
                 email: autoEmail,
                 password: password,
-                login_url: process.env.PTERO_URL // Biar pembeli tau link login panelnya
+                login_url: process.env.PTERO_URL 
             }
         });
 
