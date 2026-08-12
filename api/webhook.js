@@ -1,9 +1,10 @@
 const axios = require('axios');
+const { createCanvas, loadImage } = require('canvas');
 
 // ==========================================
 // MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
 // ==========================================
-const DEMO_MODE = false; 
+const DEMO_MODE = true; 
 
 const plans = {
     "basic": { ram: 1024, disk: 5000, cpu: 100, name: "Paket 1GB Basic", price: "5.000" },
@@ -18,6 +19,109 @@ const plans = {
     "10gb": { ram: 10240, disk: 50000, cpu: 550, name: "Paket 10GB Max", price: "32.000" },
     "unlimited": { ram: 0, disk: 0, cpu: 0, name: "Paket Unlimited", price: "50.000" }
 };
+
+// Fungsi Pembuat Gambar Struk (Canvas) yang Clean & Aesthetic
+async function generateReceiptImage(data) {
+    const width = 800;
+    const height = 950;
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+
+    // 1. Background Utama (Dark Premium Gradient)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a0f1d');
+    bgGradient.addColorStop(1, '#030712');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Card Pembungkus Struk (Glassmorphism Style)
+    ctx.fillStyle = 'rgba(17, 24, 39, 0.75)';
+    ctx.strokeStyle = 'rgba(75, 85, 99, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.roundRect(50, 50, width - 100, height - 100, 24);
+    ctx.fill();
+    ctx.stroke();
+
+    // 3. Header Toko
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#818cf8'; // Warna Ungu/Indigo Modern
+    ctx.font = 'bold 36px sans-serif';
+    ctx.fillText('FAHMI HOSTING', width / 2, 120);
+
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '14px sans-serif';
+    ctx.fillText('— OFFICIAL STORE —', width / 2, 150);
+
+    // Badge "PEMBELIAN PANEL"
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.9)';
+    ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+    ctx.beginPath();
+    ctx.roundRect(width / 2 - 160, 180, 320, 45, 12);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = '#93c5fd';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillText('PEMBELIAN PANEL', width / 2, 208);
+
+    // 4. Baris Informasi Struk (Detail Transaksi)
+    const startY = 280;
+    const spacing = 75;
+    const items = [
+        { label: 'PRODUK', value: data.productName.toUpperCase() },
+        { label: 'USERNAME PANEL', value: data.username.toUpperCase() },
+        { label: 'TOTAL', value: `Rp ${data.price}`, isPrice: true },
+        { label: 'METODE', value: 'QRIS' },
+        { label: 'PEMBELI', value: data.username.toUpperCase() },
+        { label: 'WAKTU', value: data.time }
+    ];
+
+    items.forEach((item, index) => {
+        const y = startY + (index * spacing);
+
+        // Garis Pembatas Tipis
+        ctx.strokeStyle = 'rgba(55, 65, 81, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(90, y - 20);
+        ctx.lineTo(width - 90, y - 20);
+        ctx.stroke();
+
+        // Label Kiri
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#9ca3af';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.fillText(item.label, 90, y + 10);
+
+        // Nilai Kanan
+        ctx.textAlign = 'right';
+        ctx.fillStyle = item.isPrice ? '#34d399' : '#ffffff'; // Hijau terang untuk harga
+        ctx.font = item.isPrice ? 'bold 22px sans-serif' : 'bold 16px sans-serif';
+        ctx.fillText(item.value, width - 90, y + 10);
+    });
+
+    // 5. Kotak Status Berhasil di Bagian Bawah
+    const boxY = height - 190;
+    ctx.fillStyle = 'rgba(6, 78, 59, 0.6)'; // Hijau gelap transparan
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+    ctx.beginPath();
+    ctx.roundRect(90, boxY, width - 180, 75, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    // Teks Status
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#34d399';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.fillText('✓  PEMBAYARAN BERHASIL', 125, boxY + 32);
+
+    ctx.fillStyle = '#a7f3d0';
+    ctx.font = '13px sans-serif';
+    ctx.fillText('Transaksi telah dikonfirmasi secara otomatis', 125, boxY + 56);
+
+    return canvas.toBuffer('image/png');
+}
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method salah' });
@@ -144,28 +248,36 @@ module.exports = async (req, res) => {
         }
 
         // ==========================================
-        // TAHAP 4: KIRIM TESTIMONI OTOMATIS KE BOT (OPSIONAL / ENV VERCEL)
+        // TAHAP 4: GENERATE GAMBAR STRUK & KIRIM KE CHANNEL TELEGRAM
         // ==========================================
         try {
-            const teksTesti = `🎉 *PEMBAYARAN & SERVER BERHASIL* 🎉\n\n` +
-                              `📦 Paket: *${plan.name}*\n` +
-                              `💰 Harga: *Rp ${plan.price}*\n` +
-                              `👤 Username: \`${username}\`\n` +
-                              `🚀 Status: Server Pterodactyl Aktif Otomatis!\n\n` +
-                              `_Terima kasih telah menggunakan layanan Fahmi Hosting!_`;
-
-            // Jika pakai Telegram Bot (Contoh menggunakan BOT_TOKEN dan CHAT_ID di Vercel .env)
             if (process.env.BOT_TOKEN && process.env.TESTI_CHAT_ID) {
-                await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`, {
-                    chat_id: process.env.TESTI_CHAT_ID,
-                    text: teksTesti,
-                    parse_mode: 'Markdown'
+                // Ambil Waktu Indonesia Saat Ini
+                const options = { timeZone: 'Asia/Jakarta', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                const timeString = new Intl.DateTimeFormat('id-ID', options).format(new Date()).replace(/\./g, '/');
+
+                // Bikin Buffer Gambar Struk pakai Canvas
+                const imageBuffer = await generateReceiptImage({
+                    productName: plan.name,
+                    username: username,
+                    price: plan.price,
+                    time: timeString
+                });
+
+                // Kirim Foto menggunakan FormData / Multipart ke Telegram API
+                const FormData = require('form-data');
+                const form = new FormData();
+                form.append('chat_id', process.env.TESTI_CHAT_ID);
+                form.append('photo', imageBuffer, { filename: 'struk-pembelian.png' });
+                form.append('caption', `✨ *TRANSAKSI BERHASIL OTOMATIS* ✨\n\nTerima kasih *${username}* telah membeli ${plan.name} di Fahmi Hosting! Server Anda sudah aktif.`);
+                form.append('parse_mode', 'Markdown');
+
+                await axios.post(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendPhoto`, form, {
+                    headers: form.getHeaders()
                 });
             }
-
-            console.log("Log Testimoni:", teksTesti);
         } catch (botErr) {
-            console.error("Gagal kirim notif ke bot:", botErr.message);
+            console.error("Gagal mengirim struk gambar ke Telegram:", botErr.message);
         }
 
         // ==========================================
