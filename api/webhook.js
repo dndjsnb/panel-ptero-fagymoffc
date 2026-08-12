@@ -94,11 +94,13 @@ module.exports = async (req, res) => {
                 egg: 15, 
                 docker_image: "ghcr.io/pterodactyl/yolks:nodejs_18",
                 startup: "/usr/local/bin/node /home/container/index.js",
-                environment: {
+                                environment: {
                     MAIN_FILE: "index.js",
                     AUTO_UPDATE: "0",
-                    USER_UPLOAD: "0"
+                    USER_UPLOAD: "0",
+                    CMD_RUN: "npm start" // <--- Tambahkan baris ini, nilainya ambil dari Default Value di panel
                 },
+                ,
                 limits: {
                     memory: plan.ram,
                     swap: 0,
