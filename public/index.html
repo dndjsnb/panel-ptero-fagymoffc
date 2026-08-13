@@ -1,197 +1,236 @@
 <!DOCTYPE html>
-<html lang="id" class="bg-[#030712]">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fahmi Hosting - Server Pterodactyl Otomatis</title>
+    <title>PteroHost - Hosting Bot Node.js</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
     <style>
-        html {
-            background-color: #030712;
-        }
         body {
-            background: radial-gradient(circle at top, #111827, #030712);
-            background-color: #030712;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-        .glass-card {
-            background: rgba(17, 24, 39, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(75, 85, 99, 0.4);
-            transition: all 0.3s ease;
-        }
-        .glass-card:hover {
-            background: rgba(17, 24, 39, 0.7);
-            border-color: rgba(59, 130, 246, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
-        }
-        .glass-card-favorite {
-            background: rgba(17, 24, 39, 0.6);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.15);
+        .mobile-container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: #ffffff;
+            min-height: 100vh;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
         }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white bg-[#030712]">
+<body class="antialiased text-gray-800">
 
-    <main class="flex-grow flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 sm:space-y-16">
+    <div class="mobile-container pb-12">
         
-        <!-- Header -->
-        <div class="text-center relative w-full max-w-2xl">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 bg-blue-600/20 rounded-full blur-[80px] pointer-events-none"></div>
-            
-            <div class="relative z-10 mb-6">
-                <span class="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-400 text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full border border-blue-500/20 shadow-lg">
-                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
-                    Otomatis 24/7 & Instan
-                </span>
+        <!-- Header / Navbar -->
+        <header class="flex justify-between items-center p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">
+                    PH
+                </div>
+                <span class="font-bold text-lg tracking-tight">Ptero<span class="text-blue-600">Host</span></span>
             </div>
-            
-            <h1 class="relative z-10 text-4xl sm:text-6xl font-black tracking-tight text-white mb-4">
-                Fahmi <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Hosting</span>
+            <button class="text-gray-500 hover:text-blue-600">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="px-5 pt-8 pb-6 text-center">
+            <div class="inline-block bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                <i class="fas fa-robot mr-1"></i> Hosting Khusus Bot & Script
+            </div>
+            <h1 class="text-2xl font-bold leading-tight mb-3">
+                Server Pterodactyl Andal untuk Bot WhatsApp & Telegram
             </h1>
-            
-            <p class="relative z-10 text-sm sm:text-base text-gray-400 leading-relaxed px-4">
-                Sewa server Pterodactyl performa tinggi khusus Bot WhatsApp Node.js. Bayar via QRIS, server langsung aktif detik itu juga!
+            <p class="text-sm text-gray-500 mb-6 px-2">
+                Deploy script Node.js Anda dengan mudah. Nikmati akses penuh ke Panel Pterodactyl untuk mengelola bot Anda agar tetap online 24/7 tanpa kendala.
             </p>
 
-            <div class="mt-8 flex justify-center relative z-10">
-                <a href="/reseller-login.html" class="group flex items-center gap-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-700 hover:border-emerald-500/50 text-gray-300 hover:text-white font-medium text-sm py-2.5 px-6 rounded-full shadow-lg transition-all duration-300">
-                    <svg class="w-4 h-4 text-emerald-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    Portal Reseller
+            <div class="space-y-3 mb-6 text-left">
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="text-green-500"><i class="fab fa-node-js text-lg"></i></div>
+                    <div>
+                        <h4 class="text-sm font-semibold">Optimasi Node.js</h4>
+                        <p class="text-xs text-gray-500">Lingkungan khusus yang di-tuning untuk script bot.</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="text-blue-500"><i class="fas fa-server text-lg"></i></div>
+                    <div>
+                        <h4 class="text-sm font-semibold">Akses Panel Pterodactyl</h4>
+                        <p class="text-xs text-gray-500">Kontrol penuh via konsol, file manager, dan log real-time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Pesan Server Sekarang yang Mengarah ke Dashboard -->
+            <a href="dashboard.html" class="block text-center w-full bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+                Pesan Server Sekarang
+            </a>
+
+        </section>
+
+        <!-- Divider -->
+        <div class="h-2 w-full bg-gray-50 my-2"></div>
+
+        <!-- Keunggulan Sistem -->
+        <section class="p-5">
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Fitur Unggulan</span>
+                <h2 class="text-lg font-bold mt-1">Mengapa Host Bot di Sini?</h2>
+                <p class="text-xs text-gray-500 mt-2">Infrastruktur kami dirancang agar script otomatisasi Anda berjalan mulus dengan resource yang efisien.</p>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Card 1 -->
+                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
+                    <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-3">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3 class="font-semibold text-sm mb-1">Instant Deployment</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Server Pterodactyl Anda aktif dalam hitungan detik setelah pembayaran. Langsung upload script via ZIP atau Git.</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
+                    <div class="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center mb-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="font-semibold text-sm mb-1">Online 24/7 Nonstop</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Tinggalkan cara lama PC menyala seharian. Bot WA & Telegram Anda akan selalu aktif merespons pengguna.</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
+                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-3">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="font-semibold text-sm mb-1">Aman & Terisolasi</h3>
+                    <p class="text-xs text-gray-500 leading-relaxed">Setiap server bot diisolasi di dalam container terpisah, memastikan resource dan source code Anda selalu aman.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="p-5 bg-gray-50 mt-4">
+            <div class="text-center mb-6">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Bantuan</span>
+                <h2 class="text-lg font-bold mt-1">Pertanyaan Umum</h2>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
+                    <span class="text-sm font-medium">Bisa untuk bot selain Node.js?</span>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
+                    <span class="text-sm font-medium">Bagaimana cara upload script bot?</span>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
+                    <span class="text-sm font-medium">Apakah Pterodactyl panel mudah digunakan?</span>
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form & CTA Banner -->
+        <section class="p-5">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-bold">Punya Pertanyaan Lain?</h2>
+                <p class="text-xs text-gray-500 mt-1">Konsultasikan kebutuhan spesifikasi bot Anda.</p>
+            </div>
+
+            <!-- Form Kontak ke WhatsApp -->
+            <div class="bg-white border border-gray-100 p-5 rounded-xl shadow-sm mb-8">
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Anda</label>
+                    <input type="text" id="namaClient" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Masukkan nama">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Pertanyaan Anda</label>
+                    <textarea rows="3" id="pesanClient" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Misal: Tanya soal error script atau spesifikasi RAM..."></textarea>
+                </div>
+                <button onclick="kirimKeWA()" class="w-full bg-blue-600 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                    <i class="fab fa-whatsapp text-lg"></i> Kirim Pesan via WA
+                </button>
+            </div>
+
+            <!-- Blue Promo Banner -->
+            <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-center text-white shadow-lg">
+                <h3 class="font-bold text-lg mb-2">Jasa Pembuatan Bot</h3>
+                <p class="text-xs text-blue-100 mb-5 leading-relaxed">
+                    Tidak bisa coding? Kami juga menyediakan jasa pembuatan Bot WhatsApp & Telegram *custom* sesuai alur bisnis Anda.
+                </p>
+                <!-- Tombol Konsultasi ke WhatsApp -->
+                <a href="https://wa.me/6283175993830?text=Halo%20Fahmi,%20saya%20tertarik%20untuk%20konsultasi%20jasa%20pembuatan%20Bot%20Custom." target="_blank" class="block text-center bg-white text-blue-700 font-bold text-sm py-2.5 px-6 rounded-full shadow hover:bg-gray-50 transition w-full">
+                    Konsultasi Bot Custom
                 </a>
             </div>
-        </div>
+        </section>
 
-        <!-- Pricing Grid -->
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 relative z-10">
+        <!-- Footer -->
+        <footer class="p-6 bg-gray-50 border-t border-gray-100 text-sm">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-gray-700 font-bold text-xs">
+                    PH
+                </div>
+                <span class="font-bold text-gray-700">Ptero<span class="text-gray-500">Host</span></span>
+            </div>
+            <p class="text-xs text-gray-500 mb-6">
+                Penyedia layanan hosting Pterodactyl terbaik untuk deployment bot Node.js tanpa ribet.
+            </p>
             
-            <!-- Paket 1GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div class="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 1GB Basic</h3>
-                    <p class="text-xs text-gray-400 mb-5">Cocok untuk bot pemula.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 5.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 1GB</li><li>Disk 5GB</li><li>CPU 100%</li></ul>
+                    <h4 class="font-semibold text-gray-700 mb-3 text-xs uppercase">Layanan</h4>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li><a href="#" class="hover:text-blue-600">Hosting Bot WA</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Server Node.js</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Jasa Scripting</a></li>
+                    </ul>
                 </div>
-                <a href="checkout.html?plan=basic" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 2GB -->
-            <div class="glass-card glass-card-favorite p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-blue-600 text-[10px] font-bold text-white px-3 py-1.5 rounded-bl-xl rounded-tr-2xl uppercase">Favorit</div>
                 <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 2GB Standar</h3>
-                    <p class="text-xs text-gray-400 mb-5">Ideal untuk bot public.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 8.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 2GB</li><li>Disk 10GB</li><li>CPU 150%</li></ul>
+                    <h4 class="font-semibold text-gray-700 mb-3 text-xs uppercase">Dukungan</h4>
+                    <ul class="space-y-2 text-xs text-gray-500">
+                        <li><a href="#" class="hover:text-blue-600">Login Pterodactyl</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Syarat & Ketentuan</a></li>
+                        <li><a href="#" class="hover:text-blue-600">Kontak Admin</a></li>
+                    </ul>
                 </div>
-                <a href="checkout.html?plan=standar" class="block text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl shadow-lg transition-all">Beli Sekarang</a>
             </div>
-
-            <!-- Paket 3GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 3GB Pro</h3>
-                    <p class="text-xs text-gray-400 mb-5">Performa tinggi rilis.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 11.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 3GB</li><li>Disk 15GB</li><li>CPU 200%</li></ul>
-                </div>
-                <a href="checkout.html?plan=pro" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
+            <div class="text-center text-xs text-gray-400 pt-4 border-t border-gray-200">
+                &copy; 2026 PteroHost. All rights reserved.
             </div>
+        </footer>
 
-            <!-- Paket 4GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 4GB Advance</h3>
-                    <p class="text-xs text-gray-400 mb-5">Bebas lag multi-sesi.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 14.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 4GB</li><li>Disk 20GB</li><li>CPU 250%</li></ul>
-                </div>
-                <a href="checkout.html?plan=advance" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
+    </div>
 
-            <!-- Paket 5GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 5GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 17.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 5GB</li><li>Disk 25GB</li><li>CPU 300%</li></ul>
-                </div>
-                <a href="checkout.html?plan=5gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
+    <!-- Script JavaScript untuk Form WhatsApp -->
+    <script>
+        function kirimKeWA() {
+            // Mengambil nilai dari inputan
+            let nama = document.getElementById("namaClient").value;
+            let pesan = document.getElementById("pesanClient").value;
+            
+            // Validasi jika kosong
+            if(nama === "" || pesan === "") {
+                alert("Harap isi nama dan pertanyaan terlebih dahulu!");
+                return;
+            }
 
-            <!-- Paket 6GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 6GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 20.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 6GB</li><li>Disk 30GB</li><li>CPU 350%</li></ul>
-                </div>
-                <a href="checkout.html?plan=6gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 7GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 7GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 23.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 7GB</li><li>Disk 35GB</li><li>CPU 400%</li></ul>
-                </div>
-                <a href="checkout.html?plan=7gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 8GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 8GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 26.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 8GB</li><li>Disk 40GB</li><li>CPU 450%</li></ul>
-                </div>
-                <a href="checkout.html?plan=8gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 9GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 9GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 29.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 9GB</li><li>Disk 45GB</li><li>CPU 500%</li></ul>
-                </div>
-                <a href="checkout.html?plan=9gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 10GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 10GB Max</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 32.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 10GB</li><li>Disk 50GB</li><li>CPU 550%</li></ul>
-                </div>
-                <a href="checkout.html?plan=10gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket Unlimited -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket Unlimited</h3>
-                    <p class="text-xs text-emerald-400 mb-5 font-bold">Tanpa Batasan (Anti Limit)</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 50.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM Unlimited</li><li>Disk Unlimited</li><li>CPU Unlimited</li></ul>
-                </div>
-                <a href="checkout.html?plan=unlimited" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-        </div>
-    </main>
-
-    <footer class="text-center text-[11px] text-gray-500 py-6 border-t border-gray-800/60 w-full mt-auto bg-[#030712]">
-        &copy; 2026 Fahmi Hosting. All rights reserved. Powered by Pterodactyl Panel.
-    </footer>
+            // Format pesan untuk WhatsApp (termasuk spasi dan enter)
+            let textWA = `Halo Fahmi, saya ${nama}.%0A%0A${pesan}`;
+            
+            // Membuka tab baru ke WhatsApp
+            window.open(`https://wa.me/6283175993830?text=${textWA}`, '_blank');
+        }
+    </script>
 
 </body>
 </html>
