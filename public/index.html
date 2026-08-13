@@ -15,219 +15,270 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
-        .mobile-container {
-            max-width: 420px;
-            margin: 0 auto;
-            background: #ffffff;
-            min-height: 100vh;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-        }
+        /* Hapus .mobile-container yang bikin sempit, biarkan Tailwind yang atur layoutnya */
     </style>
 </head>
-<body class="antialiased text-gray-800">
+<body class="antialiased text-gray-800 flex flex-col min-h-screen bg-white">
 
-    <div class="mobile-container pb-12">
-        
-        <!-- Header / Navbar -->
-        <header class="flex justify-between items-center p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">
-                    PH
-                </div>
-                <span class="font-bold text-lg tracking-tight">Ptero<span class="text-blue-600">Host</span></span>
+    <!-- Header / Navbar -->
+    <header class="flex justify-between items-center p-5 md:px-12 border-b border-gray-100 sticky top-0 bg-white/90 backdrop-blur-md z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm shadow-md">
+                PH
             </div>
-            <button class="text-gray-500 hover:text-blue-600">
-                <i class="fas fa-bars text-xl"></i>
-            </button>
-        </header>
+            <span class="font-bold text-xl tracking-tight">Ptero<span class="text-blue-600">Host</span></span>
+        </div>
+        <button class="text-gray-500 hover:text-blue-600 md:hidden">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+        <!-- Nav Menu untuk Desktop -->
+        <nav class="hidden md:flex gap-6 font-medium text-sm text-gray-600">
+            <a href="#" class="hover:text-blue-600 transition">Fitur</a>
+            <a href="#" class="hover:text-blue-600 transition">FAQ</a>
+            <a href="#" class="hover:text-blue-600 transition">Kontak</a>
+        </nav>
+    </header>
 
+    <main class="flex-grow">
         <!-- Hero Section -->
-        <section class="px-5 pt-8 pb-6 text-center">
-            <div class="inline-block bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+        <section class="max-w-5xl mx-auto px-5 pt-12 pb-10 md:pt-20 md:pb-16 text-center">
+            <div class="inline-block bg-blue-50 text-blue-600 text-xs md:text-sm font-semibold px-4 py-1.5 rounded-full mb-6 border border-blue-100">
                 <i class="fas fa-robot mr-1"></i> Hosting Khusus Bot & Script
             </div>
-            <h1 class="text-2xl font-bold leading-tight mb-3">
-                Server Pterodactyl Andal untuk Bot WhatsApp & Telegram
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight mb-4 text-gray-900">
+                Server Pterodactyl Andal untuk <br class="hidden md:block" /> Bot WhatsApp & Telegram
             </h1>
-            <p class="text-sm text-gray-500 mb-6 px-2">
+            <p class="text-sm md:text-lg text-gray-500 mb-8 max-w-2xl mx-auto leading-relaxed">
                 Deploy script Node.js Anda dengan mudah. Nikmati akses penuh ke Panel Pterodactyl untuk mengelola bot Anda agar tetap online 24/7 tanpa kendala.
             </p>
 
-            <div class="space-y-3 mb-6 text-left">
-                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div class="text-green-500"><i class="fab fa-node-js text-lg"></i></div>
+            <div class="flex flex-col md:flex-row justify-center gap-4 mb-10 text-left max-w-3xl mx-auto">
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 flex-1 shadow-sm hover:shadow-md transition">
+                    <div class="text-green-500 bg-green-100 w-10 h-10 rounded-full flex items-center justify-center"><i class="fab fa-node-js text-xl"></i></div>
                     <div>
-                        <h4 class="text-sm font-semibold">Optimasi Node.js</h4>
-                        <p class="text-xs text-gray-500">Lingkungan khusus yang di-tuning untuk script bot.</p>
+                        <h4 class="text-sm md:text-base font-semibold text-gray-800">Optimasi Node.js</h4>
+                        <p class="text-xs md:text-sm text-gray-500">Lingkungan khusus di-tuning untuk bot.</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                    <div class="text-blue-500"><i class="fas fa-server text-lg"></i></div>
+                <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100 flex-1 shadow-sm hover:shadow-md transition">
+                    <div class="text-blue-500 bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center"><i class="fas fa-server text-xl"></i></div>
                     <div>
-                        <h4 class="text-sm font-semibold">Akses Panel Pterodactyl</h4>
-                        <p class="text-xs text-gray-500">Kontrol penuh via konsol, file manager, dan log real-time.</p>
+                        <h4 class="text-sm md:text-base font-semibold text-gray-800">Akses Panel Pterodactyl</h4>
+                        <p class="text-xs md:text-sm text-gray-500">Kontrol penuh via konsol & file manager.</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Tombol Pesan Server Sekarang yang Mengarah ke Dashboard -->
-            <a href="dashboard.html" class="block text-center w-full bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
-                Pesan Server Sekarang
-            </a>
-
+            <!-- Tombol Pesan Server -->
+            <div class="max-w-md mx-auto">
+                <a href="dashboard.html" class="block text-center w-full bg-blue-600 text-white font-semibold py-3.5 md:py-4 rounded-xl shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-1 transition-all duration-300 text-lg">
+                    Pesan Server Sekarang
+                </a>
+            </div>
         </section>
 
         <!-- Divider -->
-        <div class="h-2 w-full bg-gray-50 my-2"></div>
+        <div class="h-px w-full max-w-6xl mx-auto bg-gradient-to-r from-transparent via-gray-200 to-transparent my-4"></div>
 
         <!-- Keunggulan Sistem -->
-        <section class="p-5">
-            <div class="text-center mb-6">
-                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Fitur Unggulan</span>
-                <h2 class="text-lg font-bold mt-1">Mengapa Host Bot di Sini?</h2>
-                <p class="text-xs text-gray-500 mt-2">Infrastruktur kami dirancang agar script otomatisasi Anda berjalan mulus dengan resource yang efisien.</p>
+        <section class="max-w-6xl mx-auto p-5 md:py-16 text-center">
+            <div class="mb-10 md:mb-12">
+                <span class="text-xs md:text-sm font-bold text-blue-600 uppercase tracking-wider">Fitur Unggulan</span>
+                <h2 class="text-2xl md:text-3xl font-bold mt-2 text-gray-900">Mengapa Host Bot di Sini?</h2>
+                <p class="text-sm md:text-base text-gray-500 mt-3 max-w-xl mx-auto">Infrastruktur kami dirancang agar script otomatisasi Anda berjalan mulus dengan resource yang efisien.</p>
             </div>
 
-            <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
                 <!-- Card 1 -->
-                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
-                    <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-3">
+                <div class="p-6 md:p-8 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300">
+                    <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-5 text-xl">
                         <i class="fas fa-rocket"></i>
                     </div>
-                    <h3 class="font-semibold text-sm mb-1">Instant Deployment</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Server Pterodactyl Anda aktif dalam hitungan detik setelah pembayaran. Langsung upload script via ZIP atau Git.</p>
+                    <h3 class="font-bold text-lg mb-2 text-gray-900">Instant Deployment</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed">Server Pterodactyl Anda aktif dalam hitungan detik setelah pembayaran. Langsung upload script via ZIP atau Git.</p>
                 </div>
                 <!-- Card 2 -->
-                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
-                    <div class="w-10 h-10 bg-green-50 text-green-600 rounded-lg flex items-center justify-center mb-3">
+                <div class="p-6 md:p-8 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300">
+                    <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center mb-5 text-xl">
                         <i class="fas fa-clock"></i>
                     </div>
-                    <h3 class="font-semibold text-sm mb-1">Online 24/7 Nonstop</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Tinggalkan cara lama PC menyala seharian. Bot WA & Telegram Anda akan selalu aktif merespons pengguna.</p>
+                    <h3 class="font-bold text-lg mb-2 text-gray-900">Online 24/7 Nonstop</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed">Tinggalkan cara lama PC menyala seharian. Bot WA & Telegram Anda akan selalu aktif merespons pengguna kapan pun.</p>
                 </div>
                 <!-- Card 3 -->
-                <div class="p-4 border border-gray-100 rounded-xl shadow-sm hover:shadow-md transition flex flex-col items-start">
-                    <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-3">
+                <div class="p-6 md:p-8 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-5 text-xl">
                         <i class="fas fa-shield-alt"></i>
                     </div>
-                    <h3 class="font-semibold text-sm mb-1">Aman & Terisolasi</h3>
-                    <p class="text-xs text-gray-500 leading-relaxed">Setiap server bot diisolasi di dalam container terpisah, memastikan resource dan source code Anda selalu aman.</p>
+                    <h3 class="font-bold text-lg mb-2 text-gray-900">Aman & Terisolasi</h3>
+                    <p class="text-sm text-gray-500 leading-relaxed">Setiap server bot diisolasi di dalam container Docker terpisah, memastikan resource dan source code Anda selalu aman.</p>
                 </div>
             </div>
         </section>
 
         <!-- FAQ Section -->
-        <section class="p-5 bg-gray-50 mt-4">
-            <div class="text-center mb-6">
-                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Bantuan</span>
-                <h2 class="text-lg font-bold mt-1">Pertanyaan Umum</h2>
-            </div>
-            
-            <div class="space-y-3">
-                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
-                    <span class="text-sm font-medium">Bisa untuk bot selain Node.js?</span>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+        <section class="bg-gray-50 py-12 md:py-20">
+            <div class="max-w-3xl mx-auto px-5">
+                <div class="text-center mb-10">
+                    <span class="text-xs md:text-sm font-bold text-blue-600 uppercase tracking-wider">Bantuan</span>
+                    <h2 class="text-2xl md:text-3xl font-bold mt-2 text-gray-900">Pertanyaan Umum</h2>
                 </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
-                    <span class="text-sm font-medium">Bagaimana cara upload script bot?</span>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
-                </div>
-                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer">
-                    <span class="text-sm font-medium">Apakah Pterodactyl panel mudah digunakan?</span>
-                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                
+                <div class="space-y-4">
+                    <!-- FAQ Item 1 -->
+                    <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden transition-all duration-300">
+                        <div class="p-5 flex justify-between items-center cursor-pointer select-none hover:bg-gray-50" onclick="toggleFAQ(1)">
+                            <span class="text-sm md:text-base font-semibold text-gray-800">Bisa untuk bot selain Node.js?</span>
+                            <i id="icon-1" class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                        </div>
+                        <div id="answer-1" class="hidden px-5 pb-5 text-sm md:text-base text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                            Saat ini kami mengoptimalkan server khusus untuk environment Node.js guna memastikan performa maksimal untuk script bot WhatsApp dan Telegram. Namun, sistem Pterodactyl kami juga mendukung beberapa environment lain jika Anda memiliki permintaan khusus.
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 2 -->
+                    <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden transition-all duration-300">
+                        <div class="p-5 flex justify-between items-center cursor-pointer select-none hover:bg-gray-50" onclick="toggleFAQ(2)">
+                            <span class="text-sm md:text-base font-semibold text-gray-800">Bagaimana cara upload script bot?</span>
+                            <i id="icon-2" class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                        </div>
+                        <div id="answer-2" class="hidden px-5 pb-5 text-sm md:text-base text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                            Anda dapat mengunggah script melalui fitur File Manager bawaan di Panel Pterodactyl. Anda bisa mengunggah file dalam format <b>.zip</b> lalu mengekstraknya secara langsung di panel, atau menggunakan koneksi SFTP untuk transfer file yang lebih cepat.
+                        </div>
+                    </div>
+
+                    <!-- FAQ Item 3 -->
+                    <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden transition-all duration-300">
+                        <div class="p-5 flex justify-between items-center cursor-pointer select-none hover:bg-gray-50" onclick="toggleFAQ(3)">
+                            <span class="text-sm md:text-base font-semibold text-gray-800">Apakah Pterodactyl panel mudah digunakan?</span>
+                            <i id="icon-3" class="fas fa-chevron-down text-gray-400 text-sm transition-transform duration-300"></i>
+                        </div>
+                        <div id="answer-3" class="hidden px-5 pb-5 text-sm md:text-base text-gray-500 leading-relaxed border-t border-gray-50 pt-3">
+                            Ya, sangat mudah! Panel Pterodactyl dirancang dengan antarmuka yang modern dan <i>user-friendly</i>. Anda dapat memantau log bot secara real-time, mengatur environment variables, serta melakukan start, stop, atau restart server hanya dengan satu klik.
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Contact Form & CTA Banner -->
-        <section class="p-5">
-            <div class="text-center mb-6">
-                <h2 class="text-lg font-bold">Punya Pertanyaan Lain?</h2>
-                <p class="text-xs text-gray-500 mt-1">Konsultasikan kebutuhan spesifikasi bot Anda.</p>
+        <section class="max-w-6xl mx-auto p-5 py-12 md:py-20">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-900">Punya Pertanyaan Lain?</h2>
+                <p class="text-sm md:text-base text-gray-500 mt-2">Konsultasikan kebutuhan spesifikasi bot Anda langsung dengan tim kami.</p>
             </div>
 
-            <!-- Form Kontak ke WhatsApp -->
-            <div class="bg-white border border-gray-100 p-5 rounded-xl shadow-sm mb-8">
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Anda</label>
-                    <input type="text" id="namaClient" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Masukkan nama">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+                <!-- Form Kontak -->
+                <div class="bg-white border border-gray-100 p-6 md:p-8 rounded-2xl shadow-md h-full flex flex-col justify-center">
+                    <h3 class="font-bold text-lg mb-6 text-gray-800 border-b pb-3">Kirim Pesan ke Admin</h3>
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Anda</label>
+                        <input type="text" id="namaClient" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Masukkan nama panggilan">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pertanyaan Anda</label>
+                        <textarea rows="4" id="pesanClient" class="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" placeholder="Misal: Halo min, mau tanya spesifikasi RAM yang cocok untuk bot WA..."></textarea>
+                    </div>
+                    <button onclick="kirimKeWA()" class="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl text-sm hover:bg-blue-700 hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+                        <i class="fab fa-whatsapp text-xl"></i> Kirim Pesan via WA
+                    </button>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Pertanyaan Anda</label>
-                    <textarea rows="3" id="pesanClient" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:border-blue-500" placeholder="Misal: Tanya soal error script atau spesifikasi RAM..."></textarea>
-                </div>
-                <button onclick="kirimKeWA()" class="w-full bg-blue-600 text-white font-medium py-2.5 rounded-lg text-sm hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                    <i class="fab fa-whatsapp text-lg"></i> Kirim Pesan via WA
-                </button>
-            </div>
 
-            <!-- Blue Promo Banner -->
-            <div class="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-6 text-center text-white shadow-lg">
-                <h3 class="font-bold text-lg mb-2">Jasa Pembuatan Bot</h3>
-                <p class="text-xs text-blue-100 mb-5 leading-relaxed">
-                    Tidak bisa coding? Kami juga menyediakan jasa pembuatan Bot WhatsApp & Telegram *custom* sesuai alur bisnis Anda.
-                </p>
-                <!-- Tombol Konsultasi ke WhatsApp -->
-                <a href="https://wa.me/6283175993830?text=Halo%20Fahmi,%20saya%20tertarik%20untuk%20konsultasi%20jasa%20pembuatan%20Bot%20Custom." target="_blank" class="block text-center bg-white text-blue-700 font-bold text-sm py-2.5 px-6 rounded-full shadow hover:bg-gray-50 transition w-full">
-                    Konsultasi Bot Custom
-                </a>
+                <!-- Blue Promo Banner -->
+                <div class="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-2xl p-8 text-center text-white shadow-xl flex flex-col justify-center h-full relative overflow-hidden">
+                    <!-- Efek hiasan background -->
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-white opacity-5 rounded-full -mr-10 -mt-10 blur-xl"></div>
+                    <div class="absolute bottom-0 left-0 w-40 h-40 bg-white opacity-5 rounded-full -ml-10 -mb-10 blur-xl"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3 class="font-extrabold text-2xl mb-3">Jasa Pembuatan Bot</h3>
+                        <p class="text-sm md:text-base text-blue-100 mb-8 leading-relaxed max-w-sm mx-auto">
+                            Tidak bisa coding? Kami juga menyediakan jasa pembuatan Bot WhatsApp & Telegram <b>Custom</b> sesuai kebutuhan alur bisnis Anda.
+                        </p>
+                        <!-- Tombol Konsultasi ke WhatsApp -->
+                        <a href="https://wa.me/6283175993830?text=Halo%20Fahmi,%20saya%20tertarik%20untuk%20konsultasi%20jasa%20pembuatan%20Bot%20Custom." target="_blank" class="inline-block bg-white text-blue-700 font-bold text-sm md:text-base py-3 px-8 rounded-full shadow-lg hover:bg-gray-50 hover:scale-105 transition-all duration-300">
+                            Konsultasi Bot Custom
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
+    </main>
 
-        <!-- Footer -->
-        <footer class="p-6 bg-gray-50 border-t border-gray-100 text-sm">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="w-6 h-6 bg-gray-300 rounded flex items-center justify-center text-gray-700 font-bold text-xs">
-                    PH
+    <!-- Footer -->
+    <footer class="bg-gray-900 pt-12 pb-6 text-sm border-t border-gray-800 mt-auto">
+        <div class="max-w-6xl mx-auto px-5">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white font-bold text-sm">
+                            PH
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-white">Ptero<span class="text-blue-500">Host</span></span>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed max-w-sm">
+                        Penyedia layanan hosting Pterodactyl terbaik untuk deployment bot Node.js tanpa ribet. Stabil, aman, dan online 24/7.
+                    </p>
                 </div>
-                <span class="font-bold text-gray-700">Ptero<span class="text-gray-500">Host</span></span>
+                
+                <div>
+                    <h4 class="font-bold text-white mb-4 uppercase tracking-wider text-xs">Layanan</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#" class="hover:text-blue-400 transition">Hosting Bot WA</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Server Node.js</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Jasa Scripting</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white mb-4 uppercase tracking-wider text-xs">Dukungan</h4>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="dashboard.html" class="hover:text-blue-400 transition">Login Pterodactyl</a></li>
+                        <li><a href="#" class="hover:text-blue-400 transition">Syarat & Ketentuan</a></li>
+                        <li><a href="https://wa.me/6283175993830" class="hover:text-blue-400 transition">Kontak Admin</a></li>
+                    </ul>
+                </div>
             </div>
-            <p class="text-xs text-gray-500 mb-6">
-                Penyedia layanan hosting Pterodactyl terbaik untuk deployment bot Node.js tanpa ribet.
-            </p>
             
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                    <h4 class="font-semibold text-gray-700 mb-3 text-xs uppercase">Layanan</h4>
-                    <ul class="space-y-2 text-xs text-gray-500">
-                        <li><a href="#" class="hover:text-blue-600">Hosting Bot WA</a></li>
-                        <li><a href="#" class="hover:text-blue-600">Server Node.js</a></li>
-                        <li><a href="#" class="hover:text-blue-600">Jasa Scripting</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-gray-700 mb-3 text-xs uppercase">Dukungan</h4>
-                    <ul class="space-y-2 text-xs text-gray-500">
-                        <li><a href="#" class="hover:text-blue-600">Login Pterodactyl</a></li>
-                        <li><a href="#" class="hover:text-blue-600">Syarat & Ketentuan</a></li>
-                        <li><a href="#" class="hover:text-blue-600">Kontak Admin</a></li>
-                    </ul>
-                </div>
+            <div class="text-center text-xs text-gray-500 pt-6 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                <span>&copy; 2026 PteroHost. All rights reserved.</span>
+                <span class="flex items-center gap-2">Made with <i class="fas fa-heart text-red-500"></i> in Indonesia</span>
             </div>
-            <div class="text-center text-xs text-gray-400 pt-4 border-t border-gray-200">
-                &copy; 2026 PteroHost. All rights reserved.
-            </div>
-        </footer>
+        </div>
+    </footer>
 
-    </div>
-
-    <!-- Script JavaScript untuk Form WhatsApp -->
+    <!-- Script JavaScript untuk FAQ dan WhatsApp -->
     <script>
+        // Fungsi untuk buka tutup FAQ
+        function toggleFAQ(id) {
+            const answer = document.getElementById('answer-' + id);
+            const icon = document.getElementById('icon-' + id);
+            
+            if (answer.classList.contains('hidden')) {
+                // Buka FAQ
+                answer.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                // Tutup FAQ
+                answer.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Fungsi untuk form ke WhatsApp
         function kirimKeWA() {
-            // Mengambil nilai dari inputan
             let nama = document.getElementById("namaClient").value;
             let pesan = document.getElementById("pesanClient").value;
             
-            // Validasi jika kosong
-            if(nama === "" || pesan === "") {
+            if(nama.trim() === "" || pesan.trim() === "") {
                 alert("Harap isi nama dan pertanyaan terlebih dahulu!");
                 return;
             }
 
-            // Format pesan untuk WhatsApp (termasuk spasi dan enter)
             let textWA = `Halo Fahmi, saya ${nama}.%0A%0A${pesan}`;
-            
-            // Membuka tab baru ke WhatsApp
             window.open(`https://wa.me/6283175993830?text=${textWA}`, '_blank');
         }
     </script>
