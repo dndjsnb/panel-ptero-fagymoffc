@@ -16,7 +16,7 @@ try {
 // ==========================================
 // MODE DEMO: Ubah jadi false kalau web sudah mau dirilis ke pembeli!
 // ==========================================
-const DEMO_MODE = false; 
+const DEMO_MODE = true; 
 
 const plans = {
     "basic": { ram: 1024, disk: 5000, cpu: 100, name: "Paket 1GB Basic", price: "5.000" },
