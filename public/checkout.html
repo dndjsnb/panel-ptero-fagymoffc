@@ -10,7 +10,6 @@
         body { background: radial-gradient(circle at top, #111827, #030712); background-color: #030712; font-family: system-ui, -apple-system, sans-serif; min-height: 100vh;}
         .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
         
-        /* Animasi Keren buat Halaman Sukses */
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -39,37 +38,52 @@
                     <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Paket</span>
                     <h3 id="invoicePlan" class="text-base font-bold text-gray-100">Memuat...</h3>
                 </div>
-                <div class="text-right">
-                    <span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Harga Asli</span>
-                    <h3 id="invoicePrice" class="text-lg font-black text-emerald-400">Rp 0</h3>
-                </div>
             </div>
 
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
-                    <input type="text" id="usernameInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-blue-500 transition-all" placeholder="fagem" required>
+            <!-- TAHAP 1: FORM INPUT (Muncul duluan) -->
+            <div id="formSection" class="space-y-4">
+                <div class="bg-blue-500/10 border border-blue-500/20 p-3 rounded-xl">
+                    <p class="text-xs text-blue-300">Silakan buat Username dan Password untuk akses Panel Pterodactyl Anda terlebih dahulu.</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Password Panel</label>
-                    <input type="password" id="passwordInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-blue-500 transition-all" placeholder="Buat password login Anda" required>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Username Panel</label>
+                        <input type="text" id="usernameInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-blue-500 transition-all outline-none" placeholder="fagem" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Password Panel</label>
+                        <input type="password" id="passwordInput" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-3.5 py-2.5 text-sm text-white focus:border-blue-500 transition-all outline-none" placeholder="Buat password login Anda" required>
+                    </div>
                 </div>
+                <button id="btnLanjut" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all mt-2">Lanjutkan Pembayaran</button>
             </div>
 
-            <div class="text-center bg-gray-900/40 p-4 rounded-xl border border-gray-800/50">
-                <p class="text-xs text-gray-400 mb-3 font-medium">Scan QRIS untuk bayar:</p>
-                <div class="bg-white p-3 rounded-xl inline-block w-44 h-44 flex items-center justify-center mx-auto shadow-md relative overflow-hidden">
-                    <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400"><span class="text-[10px] font-bold">MEMBUAT QR...</span></div>
-                    <img id="qrisImage" src="" alt="QRIS" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
+            <!-- TAHAP 2: QRIS CHECKOUT (Sembunyi dulu) -->
+            <div id="qrisSection" class="hidden space-y-5 animate-fade-in-up">
+                <div class="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl flex justify-between items-center">
+                     <div>
+                        <span class="text-[11px] uppercase tracking-wider text-emerald-500 font-semibold">Total Tagihan</span>
+                        <h3 id="invoicePrice" class="text-xl font-black text-emerald-400">Menghitung...</h3>
+                     </div>
                 </div>
-            </div>
 
-            <button id="btnKonfirmasi" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all">Saya Sudah Bayar</button>
+                <div class="text-center bg-gray-900/40 p-4 rounded-xl border border-gray-800/50">
+                    <p class="text-xs text-gray-400 mb-3 font-medium">Scan QRIS untuk bayar:</p>
+                    <div class="bg-white p-3 rounded-xl inline-block w-44 h-44 flex items-center justify-center mx-auto shadow-md relative overflow-hidden">
+                        <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-400"><span class="text-[10px] font-bold">MEMBUAT QR...</span></div>
+                        <img id="qrisImage" src="" alt="QRIS" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
+                    </div>
+                </div>
+
+                <button id="btnKonfirmasi" class="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-semibold py-3 rounded-xl shadow-lg transition-all">Saya Sudah Bayar</button>
+            </div>
         </div>
     </div>
 
     <script>
         let currentTopupId = null;
+        let selectedPlanKey = null;
+
         function showNotification(msg, type='error') {
             const box = document.getElementById('uiAlert');
             box.className = `relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all ${type==='error'?'bg-red-950/60 border-red-800/80 text-red-300':'bg-emerald-950/60 border-emerald-800/80 text-emerald-300'}`;
@@ -82,109 +96,149 @@
             "unlimited": "Paket Unlimited"
         };
 
-        document.addEventListener("DOMContentLoaded", async () => {
+        // KETIKA HALAMAN DIBUKA
+        document.addEventListener("DOMContentLoaded", () => {
             const params = new URLSearchParams(window.location.search);
-            const planKey = params.get('plan'); 
+            selectedPlanKey = params.get('plan'); 
 
-            if (!planKey) return showNotification("Data paket tidak valid.", "error");
+            if (!selectedPlanKey) {
+                showNotification("Data paket tidak valid. Harap kembali ke halaman utama.", "error");
+                document.getElementById('btnLanjut').disabled = true;
+                return;
+            }
             
-            document.getElementById('invoicePlan').innerText = daftarPaket[planKey] || planKey;
-            document.getElementById('invoicePrice').innerText = 'Menghitung...';
+            // Cuma nampilin nama paket, belom nembak API
+            document.getElementById('invoicePlan').innerText = daftarPaket[selectedPlanKey] || selectedPlanKey;
+        });
 
+        // KETIKA TOMBOL LANJUTKAN PEMBAYARAN DIKLIK
+        document.getElementById('btnLanjut').addEventListener('click', async () => {
+            const user = document.getElementById('usernameInput').value;
+            const pass = document.getElementById('passwordInput').value;
+            const btn = document.getElementById('btnLanjut');
+
+            if (!user || !pass) {
+                return showNotification("Silakan isi Username dan Password terlebih dahulu!", "error");
+            }
+            if(user.length < 3) {
+                 return showNotification("Username minimal 3 karakter!", "error");
+            }
+
+            // Sembunyikan notifikasi error (kalau ada)
+            document.getElementById('uiAlert').classList.add('hidden');
+            
+            btn.innerHTML = "Memproses..."; 
+            btn.disabled = true;
+
+            // MANGGIL API QRIS BARU DI SINI
             try {
                 const res = await fetch(`/api/generate-qris`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan_key: planKey }) 
+                    body: JSON.stringify({ plan_key: selectedPlanKey }) 
                 });
                 const data = await res.json();
                 
                 if (data.success && data.qr_url) {
+                    // Pindah ke tampilan QRIS
+                    document.getElementById('formSection').classList.add('hidden');
+                    document.getElementById('qrisSection').classList.remove('hidden');
+                    
+                    // Tempel data ke HTML
                     const img = document.getElementById('qrisImage');
                     document.getElementById('qrisLoading').style.display = 'none';
-                    img.src = data.qr_url; img.classList.remove('hidden');
+                    img.src = data.qr_url; 
+                    img.classList.remove('hidden');
                     currentTopupId = data.topup_id; 
-                    if(data.real_price) document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(data.real_price).toLocaleString();
+                    
+                    if(data.real_price) {
+                        document.getElementById('invoicePrice').innerText = 'Rp ' + parseInt(data.real_price).toLocaleString('id-ID');
+                    }
                 } else {
-                    showNotification("Gagal memuat QRIS.", "error");
+                    showNotification(data.error || "Gagal memuat harga atau QRIS.", "error");
+                    btn.innerHTML = "Lanjutkan Pembayaran"; 
+                    btn.disabled = false;
                 }
-            } catch (err) { showNotification("Gangguan koneksi.", "error"); }
+            } catch (err) { 
+                showNotification("Gangguan koneksi ke server.", "error");
+                btn.innerHTML = "Lanjutkan Pembayaran"; 
+                btn.disabled = false;
+            }
+        });
+
+        // KETIKA TOMBOL "SAYA SUDAH BAYAR" DIKLIK (Logic sama kayak sebelumnya)
+        document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
+            const user = document.getElementById('usernameInput').value;
+            const pass = document.getElementById('passwordInput').value;
+            const btn = document.getElementById('btnKonfirmasi');
             
-            document.getElementById('btnKonfirmasi').addEventListener('click', async () => {
-                const user = document.getElementById('usernameInput').value;
-                const pass = document.getElementById('passwordInput').value;
-                const btn = document.getElementById('btnKonfirmasi');
-                if (!user || !pass) return showNotification("Isi Username & Password!", "error");
-                if (!currentTopupId) return showNotification("Sesi belum siap.", "error");
-                
-                btn.innerHTML = "Memeriksa..."; btn.disabled = true;
-                
-                try {
-                    const res = await fetch('/api/webhook', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ plan_key: planKey, username: user, password: pass, topup_id: currentTopupId })
-                    });
-                    const data = await res.json();
+            if (!currentTopupId) return showNotification("Sesi belum siap.", "error");
+            
+            btn.innerHTML = "Memeriksa..."; btn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan_key: selectedPlanKey, username: user, password: pass, topup_id: currentTopupId })
+                });
+                const data = await res.json();
 
-                    if (res.ok && data.success && data.data_akun) {
-                        // ROMBAKAN UI SUKSES YANG PROFESIONAL
-                        const cardContainer = document.getElementById('cardContainer');
-                        cardContainer.innerHTML = `
-                            <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
-                            <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                if (res.ok && data.success && data.data_akun) {
+                    // ROMBAKAN UI SUKSES
+                    const cardContainer = document.getElementById('cardContainer');
+                    cardContainer.innerHTML = `
+                        <div class="absolute -top-24 -right-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
-                            <div class="relative z-10 text-center animate-fade-in-up py-4">
-                                <!-- Ikon Sukses SVG -->
-                                <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-full mb-5 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-                                    <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                        <div class="relative z-10 text-center animate-fade-in-up py-4">
+                            <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-500/10 rounded-full mb-5 border border-emerald-500/30 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            
+                            <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Pembayaran Sukses!</h2>
+                            <p class="text-sm text-gray-400 mb-8">Server bot Anda telah aktif dan siap digunakan.</p>
+
+                            <div class="bg-[#0f172a]/90 p-5 rounded-2xl border border-gray-700/50 text-left space-y-4 mb-8 shadow-inner relative overflow-hidden">
+                                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+                                
+                                <div class="relative z-10">
+                                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔗 Panel URL</p>
+                                    <div class="bg-black/50 p-3 rounded-xl border border-gray-800/80">
+                                        <a href="${data.data_akun.login_url}" target="_blank" class="text-sm font-mono text-blue-400 hover:text-blue-300 break-all transition-colors">${data.data_akun.login_url}</a>
+                                    </div>
                                 </div>
                                 
-                                <h2 class="text-2xl sm:text-3xl font-black text-white mb-2 tracking-tight">Pembayaran Sukses!</h2>
-                                <p class="text-sm text-gray-400 mb-8">Server bot Anda telah aktif dan siap digunakan.</p>
-
-                                <!-- Box Kredensial Ala Struk Digital -->
-                                <div class="bg-[#0f172a]/90 p-5 rounded-2xl border border-gray-700/50 text-left space-y-4 mb-8 shadow-inner relative overflow-hidden">
-                                    <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
-                                    
-                                    <div class="relative z-10">
-                                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔗 Panel URL</p>
-                                        <div class="bg-black/50 p-3 rounded-xl border border-gray-800/80">
-                                            <a href="${data.data_akun.login_url}" target="_blank" class="text-sm font-mono text-blue-400 hover:text-blue-300 break-all transition-colors">${data.data_akun.login_url}</a>
+                                <div class="flex flex-col sm:flex-row gap-4 relative z-10">
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">👤 Username</p>
+                                        <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
+                                            ${data.data_akun.username}
                                         </div>
                                     </div>
-                                    
-                                    <div class="flex flex-col sm:flex-row gap-4 relative z-10">
-                                        <div class="flex-1">
-                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">👤 Username</p>
-                                            <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
-                                                ${data.data_akun.username}
-                                            </div>
-                                        </div>
-                                        <div class="flex-1">
-                                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔑 Password</p>
-                                            <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
-                                                ${data.data_akun.password}
-                                            </div>
+                                    <div class="flex-1">
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">🔑 Password</p>
+                                        <div class="bg-black/50 px-4 py-2.5 rounded-xl border border-gray-800/80 text-sm font-mono text-white">
+                                            ${data.data_akun.password}
                                         </div>
                                     </div>
                                 </div>
-
-                                <button onclick="window.open('${data.data_akun.login_url}', '_blank')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
-                                    Masuk ke Panel Sekarang
-                                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                                </button>
                             </div>
-                        `;
-                    } else {
-                        showNotification(data.error || "Belum lunas.", "error");
-                        btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
-                    }
-                } catch(e) {
-                    showNotification("Error jaringan.", "error");
+
+                            <button onclick="window.open('${data.data_akun.login_url}', '_blank')" class="w-full bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-2 group">
+                                Masuk ke Panel Sekarang
+                                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    showNotification(data.error || "Belum lunas.", "error");
                     btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
                 }
-            });
+            } catch(e) {
+                showNotification("Error jaringan.", "error");
+                btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
+            }
         });
     </script>
 </body>
