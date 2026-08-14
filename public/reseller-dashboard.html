@@ -30,6 +30,7 @@
     <script>
         // SCRIPT PROTEKSI DAN LOAD DATA UI
         if (localStorage.getItem('isLoggedIn') !== 'true') {
+            // Kalau maksa masuk, lempar ke nama file login lu yang BENAR
             window.location.replace('reseller-login.html'); 
         } else {
             document.addEventListener("DOMContentLoaded", function() {
@@ -78,7 +79,7 @@
             <!-- DASHBOARD -->
             <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
                 
-                <!-- KARTU PROFIL USER (Mengatasi layar melompong) -->
+                <!-- KARTU PROFIL USER -->
                 <div class="glass rounded-2xl p-6 md:p-8 border border-white/5 bg-gradient-to-br from-dark-800 to-dark-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-white mb-1" id="uiResellerName">Loading...</h3>
@@ -129,7 +130,6 @@
                             </div>
                         </div>
 
-                        <!-- ROMBAK: Tambah data-plan-id -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="nominalContainer">
                             <button data-plan-id="DEP_10K" onclick="selectNominal(this, 10000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 10.000</button>
                             <button data-plan-id="DEP_25K" onclick="selectNominal(this, 25000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 25.000</button>
@@ -176,11 +176,11 @@
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <script>
-        // Fungsi Logout
+        // Fungsi Logout (Udah diarahin bener ke reseller-login.html)
         function logoutReseller() {
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userData'); // Bersihin data juga
-            window.location.replace('reseller-login_2.html');
+            window.location.href = 'reseller-login.html';
         }
 
         // Logic Generate Link DB
@@ -256,7 +256,7 @@
             document.getElementById('qrisAmountDisplay').innerText = `Rp ${customAmount.toLocaleString('id-ID')}`;
             
             try {
-                const res = await fetch(`/api/generate-qris-secure`, {
+                const res = await fetch(`/api/generate-qris`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan_id: selectedPlan, custom_amount: customAmount })
@@ -274,5 +274,5 @@
                 }
             } catch (err) { showNotification("Gangguan koneksi.", "error"); }
         }
-        function cancelDeposit() {
-   
+        
+     
