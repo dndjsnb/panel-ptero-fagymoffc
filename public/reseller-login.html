@@ -62,8 +62,13 @@
                 if (res.ok && result.verified) {
                     alertBox.classList.add('bg-blue-500/20', 'text-blue-400');
                     alertBox.innerText = "Login Berhasil!"; 
+                    
+                    // ROMBAK: Simpan status & data ke browser
                     localStorage.setItem('isLoggedIn', 'true'); 
-                    setTimeout(() => { window.location.href = 'reseller-dashboard.html'; }, 1500);
+                    localStorage.setItem('userData', JSON.stringify(result.userData)); 
+                    
+                    // Pindah ke dashboard (sesuaikan nama filenya jika berbeda)
+                    setTimeout(() => { window.location.href = 'reseller-dashboard_2.html'; }, 1500);
                 } else if (res.ok && !result.verified) {
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
                     alertBox.innerText = "Akun belum diverifikasi oleh Admin via WA!";

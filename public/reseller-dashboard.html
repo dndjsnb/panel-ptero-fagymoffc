@@ -16,9 +16,8 @@
         }
     </script>
     <style>
-        /* Tameng pertama: Body disembunyiin dulu biar data gak bocor */
+        /* Body dikasih display:none biar layarnya nutup dlu sebelum dicek aksesnya */
         body { display: none; background-color: #09090b; color: #e4e4e7; }
-        
         .glass { background: rgba(28, 28, 36, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page-section.active { display: block; }
@@ -29,20 +28,28 @@
     </style>
 
     <script>
-        // SCRIPT PENENDANG OTOMATIS
-        // Mengecek apakah user punya kunci akses dari halaman login
+        // SCRIPT PROTEKSI DAN LOAD DATA UI
         if (localStorage.getItem('isLoggedIn') !== 'true') {
-            // Kalau maksa masuk, langsung tendang ke login sebelum web sempat loading
             window.location.replace('reseller-login.html'); 
         } else {
-            // Kalau dia resmi login, buka layarnya biar dia bisa lihat datanya
             document.addEventListener("DOMContentLoaded", function() {
+                // Tampilkan body
                 document.body.style.display = "flex"; 
+                
+                // Ambil data profil
+                const rawData = localStorage.getItem('userData');
+                if (rawData) {
+                    const user = JSON.parse(rawData);
+                    document.getElementById('uiResellerName').innerText = user.name;
+                    document.getElementById('uiResellerEmail').innerText = user.email;
+                    document.getElementById('uiResellerWa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${user.whatsapp}`;
+                    document.getElementById('uiResellerStatus').innerText = `Status: ${user.status}`;
+                }
             });
         }
     </script>
 </head>
-<body class="antialiased min-h-screen flex-col md:flex-row overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
         <div class="p-6 flex items-center gap-3 border-b border-white/5">
@@ -56,7 +63,6 @@
             <button onclick="switchPage('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening</button>
             <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-server w-5"></i> Kelola Server</button>
             
-            <!-- Tambahan Tombol Logout Biar Reseller Bisa Keluar -->
             <button onclick="logoutReseller()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 mt-8"><i class="fa-solid fa-right-from-bracket w-5"></i> Keluar</button>
         </nav>
     </aside>
@@ -71,7 +77,24 @@
             
             <!-- DASHBOARD -->
             <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
-                <!-- ROMBAK: Fitur Link Database -->
+                
+                <!-- KARTU PROFIL USER (Mengatasi layar melompong) -->
+                <div class="glass rounded-2xl p-6 md:p-8 border border-white/5 bg-gradient-to-br from-dark-800 to-dark-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-1" id="uiResellerName">Loading...</h3>
+                        <p class="text-sm text-gray-400" id="uiResellerEmail">loading@mail.com</p>
+                        <div class="flex flex-wrap gap-2 mt-3">
+                            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30 font-semibold tracking-wide uppercase" id="uiResellerStatus">Status: AKTIF</span>
+                            <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 font-semibold tracking-wide" id="uiResellerWa"><i class="fa-brands fa-whatsapp"></i> Loading...</span>
+                        </div>
+                    </div>
+                    <div class="text-left md:text-right bg-black/20 p-4 rounded-xl border border-white/5">
+                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Saldo Anda</p>
+                        <h3 class="text-2xl font-black text-emerald-400" id="uiResellerSaldo">Rp 0</h3>
+                    </div>
+                </div>
+
+                <!-- Fitur Link Database -->
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
@@ -143,7 +166,7 @@
                 </div>
             </div>
 
-            <!-- HALAMAN LAIN (Withdraw, Settings, Servers biarin sama kayak ori) -->
+            <!-- HALAMAN LAIN -->
             <div id="page-withdraw" class="page-section max-w-6xl mx-auto space-y-6"></div>
             <div id="page-settings" class="page-section max-w-6xl mx-auto space-y-6"></div>
             <div id="page-servers" class="page-section max-w-6xl mx-auto space-y-6"></div>
@@ -156,10 +179,11 @@
         // Fungsi Logout
         function logoutReseller() {
             localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userData'); // Bersihin data juga
             window.location.replace('reseller-login_2.html');
         }
 
-        // ROMBAK: Logic Generate Link DB
+        // Logic Generate Link DB
         async function generateLinkDariServer() {
             const btn = document.getElementById('btnGenLink');
             const inputLink = document.getElementById('secureOrderLinkInput');
@@ -203,7 +227,7 @@
         }
         function hideNotification() { document.getElementById('uiAlert').classList.add('hidden'); }
 
-        // ROMBAK: Logic Deposit Anti 1 Perak
+        // Logic Deposit
         let currentTopupId = null;
         function selectNominal(btnElement, amount) {
             document.getElementById('customAmount').value = amount;
@@ -232,7 +256,6 @@
             document.getElementById('qrisAmountDisplay').innerText = `Rp ${customAmount.toLocaleString('id-ID')}`;
             
             try {
-                // Tembak pake POST dan plan_id, harganya dipastiin server lu!
                 const res = await fetch(`/api/generate-qris-secure`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -252,36 +275,4 @@
             } catch (err) { showNotification("Gangguan koneksi.", "error"); }
         }
         function cancelDeposit() {
-            currentTopupId = null;
-            document.getElementById('qrisCheckoutWrapper').classList.add('hidden');
-            document.getElementById('depositFormWrapper').classList.remove('hidden');
-        }
-
-        // Logic Check Payment
-        async function checkPaymentStatus() {
-            if (!currentTopupId) return showNotification("Sesi belum siap.", "error");
-            const btn = document.getElementById('btnKonfirmasi');
-            btn.innerHTML = "Memeriksa..."; btn.disabled = true;
-            
-            try {
-                const res = await fetch('/api/webhook', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan_key: "deposit_saldo", topup_id: currentTopupId })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    showNotification("Berhasil deposit!", "success");
-                    setTimeout(cancelDeposit, 2000);
-                } else {
-                    showNotification(data.error || "Belum lunas.", "error");
-                    btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
-                }
-            } catch(e) {
-                showNotification("Error jaringan.", "error");
-                btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
-            }
-        }
-    </script>
-</body>
-</html>
+   
