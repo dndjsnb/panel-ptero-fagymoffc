@@ -18,7 +18,7 @@ const resellerSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     whatsapp: { type: String, required: true },
-    telegram: { type: String, required: true }, // Field Telegram ditambahkan
+    telegram: { type: String, required: true },
     status: { type: String, default: 'pending' }
 });
 
@@ -42,9 +42,9 @@ const zakki = new ZakkiStore({
     autoWithdraw: true
 });
 
-// FUNGSI PTERODACTYL API DIRECT
-async function createPteroUser(email, username) { /* Sesuaikan kode lu */ }
-async function createPteroServer(userId, plan) { /* Sesuaikan kode lu */ }
+// FUNGSI PTERODACTYL API DIRECT (Biarin sesuai script lu)
+async function createPteroUser(email, username) { /* ... */ }
+async function createPteroServer(userId, plan) { /* ... */ }
 
 
 // --- API REGISTER RESELLER ---
@@ -55,7 +55,6 @@ app.post('/api/register', async (req, res) => {
         const isExist = await Reseller.findOne({ email });
         if(isExist) return res.status(400).json({ message: 'Email sudah terdaftar, Cok!' });
 
-        // Simpan ke DB, telegram di-default ke Belum Terhubung
         const newReseller = new Reseller({ 
             name, email, whatsapp, password, 
             telegram: 'Belum Terhubung', 
@@ -63,11 +62,10 @@ app.post('/api/register', async (req, res) => {
         });
         const savedUser = await newReseller.save();
 
-        // BALIKIN ID DATABASE & USERNAME BOT KE FRONTEND
         res.status(201).json({ 
             message: 'Akun terdaftar.', 
             userId: savedUser._id.toString(),
-            botUsername: process.env.BOT_USERNAME // Aman ditarik dari env Vercel
+            botUsername: process.env.BOT_USERNAME 
         });
     } catch (error) {
         res.status(500).json({ message: 'Gagal daftar! Server error.' });
@@ -95,7 +93,18 @@ app.post('/api/login', async (req, res) => {
             return res.status(400).json({ message: 'Pendaftaran akun ditolak oleh Admin.' });
         }
         
-        res.status(200).json({ verified: true, message: 'Login sukses! Mengalihkan...' });
+        // ROMBAK: Ngirim data profil ke frontend
+        res.status(200).json({ 
+            verified: true, 
+            message: 'Login sukses! Mengalihkan...',
+            userData: {
+                name: user.name,
+                email: user.email,
+                whatsapp: user.whatsapp,
+                telegram: user.telegram,
+                status: user.status
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server error pas login!' });
     }
@@ -108,11 +117,10 @@ app.post('/api/tele-webhook', async (req, res) => {
     const VERIF_TOKEN = process.env.VERIF_BOT_TOKEN;
     const ADMIN_CHAT_ID = process.env.VERIF_CHAT_ID;
 
-    // 1. TANGKAP KLIK "START" DARI USER RESELLER
     if (message && message.text && message.text.startsWith('/start')) {
         const chatId = message.chat.id;
         const username = message.chat.username ? `@${message.chat.username}` : 'Tidak Ada Username';
-        const userId = message.text.split(' ')[1]; // Ngambil ID dari link web ?start=ID
+        const userId = message.text.split(' ')[1]; 
 
         if (userId) {
             try {
@@ -121,39 +129,26 @@ app.post('/api/tele-webhook', async (req, res) => {
                     const dataTele = `ID: ${chatId} | ${username}`;
                     await Reseller.findByIdAndUpdate(userId, { telegram: dataTele });
 
-                    // Kasih balasan ke user di Bot
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, {
                         chat_id: chatId,
                         text: `✅ *Berhasil Terhubung!*\n\nHalo ${user.name}, pengajuan akun kamu sedang di-review Admin. Mohon tunggu ya!`,
                         parse_mode: 'Markdown'
                     });
 
-                    // KIRIM NOTIFIKASI KE ADMIN BESERTA TOMBOL ACC/TOLAK
                     const pesanAdmin = `🚨 *PENDAFTARAN RESELLER BARU* 🚨\n\n👤 *Nama:* ${user.name}\n📧 *Email:* ${user.email}\n📱 *WA:* ${user.whatsapp}\n✈️ *Telegram:* ${dataTele}\n\nSilakan verifikasi akun ini.`;
                     
                     const replyMarkup = {
-                        inline_keyboard: [
-                            [
-                                { text: "✅ ACC", callback_data: `ACC_${user.email}` }, 
-                                { text: "❌ TOLAK", callback_data: `TOLAK_${user.email}` }
-                            ]
-                        ]
+                        inline_keyboard: [[{ text: "✅ ACC", callback_data: `ACC_${user.email}` }, { text: "❌ TOLAK", callback_data: `TOLAK_${user.email}` }]]
                     };
 
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, {
-                        chat_id: ADMIN_CHAT_ID, 
-                        text: pesanAdmin, 
-                        parse_mode: 'Markdown', 
-                        reply_markup: replyMarkup
+                        chat_id: ADMIN_CHAT_ID, text: pesanAdmin, parse_mode: 'Markdown', reply_markup: replyMarkup
                     });
                 }
-            } catch (err) { 
-                console.error("Error start bot:", err); 
-            }
+            } catch (err) { console.error("Error start bot:", err); }
         }
     }
 
-    // 2. TANGKAP TOMBOL ACC/TOLAK DARI ADMIN
     if (callback_query) {
         const actionData = callback_query.data; 
         const adminChatId = callback_query.message.chat.id;
@@ -166,13 +161,10 @@ app.post('/api/tele-webhook', async (req, res) => {
                 const userUpdated = await Reseller.findOneAndUpdate({ email: emailTarget }, { status: 'verified' }, { new: true });
                 responseText = `✅ Akun ${emailTarget} berhasil di-ACC.`;
                 
-                // Kasih tau reseller kalo akunnya udah di-ACC lewat Bot
                 if (userUpdated && userUpdated.telegram !== 'Belum Terhubung') {
                     const userTeleId = userUpdated.telegram.split(' | ')[0].replace('ID: ', '');
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, {
-                        chat_id: userTeleId, 
-                        text: `🎉 *SELAMAT!* Akun Reseller kamu telah di-ACC Admin. Silakan login ke Dashboard.`, 
-                        parse_mode: 'Markdown'
+                        chat_id: userTeleId, text: `🎉 *SELAMAT!* Akun Reseller kamu telah di-ACC Admin. Silakan login ke Dashboard.`, parse_mode: 'Markdown'
                     });
                 }
             } else if (action === 'TOLAK') {
@@ -180,27 +172,16 @@ app.post('/api/tele-webhook', async (req, res) => {
                 responseText = `❌ Pendaftaran ${emailTarget} ditolak.`;
             }
 
-            // Hapus tombol loading di chat admin
-            await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/answerCallbackQuery`, { 
-                callback_query_id: callback_query.id, 
-                text: responseText 
-            });
-            // Update teks pesan di chat admin
+            await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/answerCallbackQuery`, { callback_query_id: callback_query.id, text: responseText });
             await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/editMessageText`, {
-                chat_id: adminChatId, 
-                message_id: messageId, 
-                text: `${callback_query.message.text}\n\n*STATUS:* ${responseText}`, 
-                parse_mode: 'Markdown'
+                chat_id: adminChatId, message_id: messageId, text: `${callback_query.message.text}\n\n*STATUS:* ${responseText}`, parse_mode: 'Markdown'
             });
-        } catch (error) { 
-            console.error('Webhook error:', error); 
-        }
+        } catch (error) { console.error('Webhook error:', error); }
     }
     res.status(200).send('OK');
 });
 
-// ENDPOINT LAMA 
-app.post('/api/generate-qris', async (req, res) => { /* ... Kode lu ... */ });
-app.post('/api/webhook', async (req, res) => { /* ... Kode lu ... */ });
+app.post('/api/generate-qris', async (req, res) => { /* Kode lu */ });
+app.post('/api/webhook', async (req, res) => { /* Kode lu */ });
 
 module.exports = app;
