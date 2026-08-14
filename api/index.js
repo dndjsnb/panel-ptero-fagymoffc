@@ -42,9 +42,9 @@ const zakki = new ZakkiStore({
     autoWithdraw: true
 });
 
-// FUNGSI PTERODACTYL API DIRECT (Biarin sesuai script lu yang lama)
-async function createPteroUser(email, username) { /* ... Kode lama lu biarin sama ... */ }
-async function createPteroServer(userId, plan) { /* ... Kode lama lu biarin sama ... */ }
+// FUNGSI PTERODACTYL API DIRECT
+async function createPteroUser(email, username) { /* Sesuaikan kode lu */ }
+async function createPteroServer(userId, plan) { /* Sesuaikan kode lu */ }
 
 
 // --- API REGISTER RESELLER ---
@@ -67,7 +67,7 @@ app.post('/api/register', async (req, res) => {
         res.status(201).json({ 
             message: 'Akun terdaftar.', 
             userId: savedUser._id.toString(),
-            botUsername: process.env.BOT_USERNAME || 'FahmiHost_bot' // Pastikan BOT_USERNAME diset di Vercel
+            botUsername: process.env.BOT_USERNAME // Aman ditarik dari env Vercel
         });
     } catch (error) {
         res.status(500).json({ message: 'Gagal daftar! Server error.' });
@@ -129,7 +129,7 @@ app.post('/api/tele-webhook', async (req, res) => {
                     });
 
                     // KIRIM NOTIFIKASI KE ADMIN BESERTA TOMBOL ACC/TOLAK
-                    const pesanAdmin = `✨ *PENDAFTARAN RESELLER BARU* ✨\n\n👤 *Nama:* ${user.name}\n📧 *Email:* ${user.email}\n📱 *WA:* ${user.whatsapp}\n✈️ *Telegram:* ${dataTele}\n\nSilakan verifikasi akun ini.`;
+                    const pesanAdmin = `🚨 *PENDAFTARAN RESELLER BARU* 🚨\n\n👤 *Nama:* ${user.name}\n📧 *Email:* ${user.email}\n📱 *WA:* ${user.whatsapp}\n✈️ *Telegram:* ${dataTele}\n\nSilakan verifikasi akun ini.`;
                     
                     const replyMarkup = {
                         inline_keyboard: [
@@ -199,7 +199,7 @@ app.post('/api/tele-webhook', async (req, res) => {
     res.status(200).send('OK');
 });
 
-// ENDPOINT LAMA (Tinggal sesuain sama kode lu buat QRIS di bawah ini)
+// ENDPOINT LAMA 
 app.post('/api/generate-qris', async (req, res) => { /* ... Kode lu ... */ });
 app.post('/api/webhook', async (req, res) => { /* ... Kode lu ... */ });
 
