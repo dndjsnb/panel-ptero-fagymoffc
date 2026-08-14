@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Reseller - Fahmi Hosting</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
         .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
@@ -13,10 +14,13 @@
 <body class="text-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="glass-card p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-800 relative overflow-hidden">
         <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="text-center mb-8 relative z-10">
+        
+        <div class="text-center mb-8 relative z-10" id="headerText">
             <h2 class="text-2xl font-extrabold text-white mb-1">Gabung Reseller</h2>
             <p class="text-xs text-gray-400">Jual kembali layanan Fahmi Hosting</p>
         </div>
+
+        <!-- Form Pendaftaran -->
         <form id="registerForm" class="space-y-4 relative z-10">
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Nama Lengkap</label>
@@ -34,11 +38,47 @@
                 <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
                 <input type="password" id="password" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="••••••••" required>
             </div>
-            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Daftar & Verifikasi WA</button>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Daftar Akun</button>
             
             <div id="alertBox" class="hidden mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
         </form>
-        <p class="text-center text-xs text-gray-400 mt-6 relative z-10">Sudah punya akun? <a href="reseller-login.html" class="text-emerald-400 hover:underline">Masuk disini</a></p>
+
+        <p id="loginText" class="text-center text-xs text-gray-400 mt-6 relative z-10">Sudah punya akun? <a href="reseller-login.html" class="text-emerald-400 hover:underline">Masuk disini</a></p>
+
+        <!-- Container Verifikasi 2 Langkah -->
+        <div id="verificationStep" class="hidden relative z-10 space-y-4">
+            <div class="bg-emerald-500/20 text-emerald-400 p-3 rounded-xl text-sm font-semibold mb-4 border border-emerald-500/30 text-center">
+                🎉 Pendaftaran Berhasil!<br>Selesaikan 2 Langkah Wajib Berikut:
+            </div>
+            
+            <!-- Langkah 1: WA -->
+            <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
+                <h4 class="text-sm font-bold text-white mb-2"><span class="bg-green-600 text-white px-2 py-0.5 rounded-md mr-1">1</span> Konfirmasi WhatsApp</h4>
+                <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
+                    Klik tombol WA di bawah. <b>PENTING: Gunakan nomor WA yang SAMA PERSIS dengan yang Anda isi di form!</b> Jika Anda mengirim pesan dengan nomor berbeda, akun otomatis <b>DITOLAK</b>. Jangan ubah teks pesannya.
+                </p>
+                <a id="btnWa" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-500 text-white font-semibold text-sm py-2.5 px-4 rounded-xl shadow-lg transition-all">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Kirim Pesan WA
+                </a>
+            </div>
+
+            <!-- Langkah 2: Telegram -->
+            <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
+                <h4 class="text-sm font-bold text-white mb-2"><span class="bg-blue-600 text-white px-2 py-0.5 rounded-md mr-1">2</span> Hubungkan Telegram</h4>
+                <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
+                    Buka Bot Telegram kami melalui tombol di bawah. Setelah bot terbuka, <b>WAJIB KLIK TOMBOL "START"</b> (atau ketik <code class="bg-gray-800 px-1 rounded text-blue-300">/start</code>) agar notifikasi akun masuk ke sistem Admin.
+                </p>
+                <a id="btnTele" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-2.5 px-4 rounded-xl shadow-lg transition-all">
+                    <i class="fa-brands fa-telegram text-lg"></i> Buka Bot Telegram
+                </a>
+            </div>
+            
+            <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl mt-4">
+                <p class="text-[10px] text-red-400 leading-relaxed font-semibold text-center">
+                    ⚠️ PERHATIAN: Admin TIDAK AKAN meng-ACC akun Anda jika salah satu dari 2 langkah di atas tidak dilakukan dengan benar.
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -66,28 +106,34 @@
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400');
 
                 if (response.ok) {
-                    alertBox.classList.add('bg-emerald-500/20', 'text-emerald-400');
-                    alertBox.innerText = "Berhasil! Mengalihkan ke WhatsApp..."; 
+                    // Sembunyikan form dan teks login
+                    document.getElementById('registerForm').classList.add('hidden');
+                    document.getElementById('loginText').classList.add('hidden');
+                    document.getElementById('headerText').classList.add('hidden'); 
+
+                    // Munculkan instruksi verifikasi 2 langkah
+                    document.getElementById('verificationStep').classList.remove('hidden');
                     
-                    // GANTI NOMOR INI PAKE NOMOR LU
+                    // --- SETUP LINK WA (Sesuai Nomor Admin & Template Peringatan) ---
                     const nomorAdmin = "6283175993830"; 
-                    const pesanWa = `Halo Admin FahmiHost, saya sudah daftar akun Reseller dan ingin meminta aktivasi.%0A%0ANama: ${name}%0AEmail: ${email}%0AWA: ${whatsapp}`;
-                    
-                    setTimeout(() => {
-                        window.location.href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
-                    }, 1500);
+                    const pesanWa = `Halo Admin FahmiHost, saya sudah daftar akun Reseller dan ingin meminta aktivasi.%0A%0ANama: ${name}%0AEmail: ${email}%0ANo. WA Terdaftar: ${whatsapp}%0A%0A*Saya mengerti jika nomor pengirim ini berbeda dengan nomor WA Terdaftar di atas, maka pendaftaran saya otomatis DITOLAK.*`;
+                    document.getElementById('btnWa').href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
+
+                    // --- SETUP LINK BOT TELEGRAM (Otomatis dari backend Vercel) ---
+                    const botUsername = result.botUsername; 
+                    document.getElementById('btnTele').href = `https://t.me/${botUsername}?start=${result.userId}`;
 
                 } else {
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
                     alertBox.innerText = result.message || 'Gagal mendaftar.'; 
-                    submitBtn.innerText = "Daftar & Verifikasi WA";
+                    submitBtn.innerText = "Daftar Akun";
                     submitBtn.disabled = false;
                 }
             } catch (error) {
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400');
                 alertBox.classList.add('bg-red-500/20', 'text-red-400');
                 alertBox.innerText = 'Server error/gagal dihubungi, Cok!';
-                submitBtn.innerText = "Daftar & Verifikasi WA";
+                submitBtn.innerText = "Daftar Akun";
                 submitBtn.disabled = false;
             }
         });
