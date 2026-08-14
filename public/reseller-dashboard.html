@@ -244,7 +244,7 @@
             document.getElementById('qrisAmountDisplay').innerText = `Rp ${customAmount.toLocaleString('id-ID')}`;
             
             try {
-                const res = await fetch(`/api/generate-qris-secure`, {
+                const res = await fetch(`/api/generate-qris`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan_id: selectedPlan, custom_amount: customAmount })
