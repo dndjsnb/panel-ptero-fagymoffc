@@ -10,7 +10,8 @@
     "BOT_TOKEN": "8303835874:AAEIgzkMKlv3MqsDzwgi1PPNVdn1S52TCVA",
     "TESTI_CHAT_ID": "-1001003953704694",
     "VERIF_BOT_TOKEN": "8951152336:AAG0LhdVGMO-jIRMN620bbXQGK8Eb0fRqwE",
-    "VERIF_CHAT_ID": "8521019587"
+    "VERIF_CHAT_ID": "8521019587",
+    "BOT_USERNAME": "botverif_resseler_bot"
   },
   "rewrites": [
     {
