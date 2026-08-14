@@ -16,7 +16,9 @@
         }
     </script>
     <style>
-        body { background-color: #09090b; color: #e4e4e7; }
+        /* Tameng pertama: Body disembunyiin dulu biar data gak bocor */
+        body { display: none; background-color: #09090b; color: #e4e4e7; }
+        
         .glass { background: rgba(28, 28, 36, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page-section.active { display: block; }
@@ -25,8 +27,22 @@
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
     </style>
+
+    <script>
+        // SCRIPT PENENDANG OTOMATIS
+        // Mengecek apakah user punya kunci akses dari halaman login
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            // Kalau maksa masuk, langsung tendang ke login sebelum web sempat loading
+            window.location.replace('reseller-login.html'); 
+        } else {
+            // Kalau dia resmi login, buka layarnya biar dia bisa lihat datanya
+            document.addEventListener("DOMContentLoaded", function() {
+                document.body.style.display = "flex"; 
+            });
+        }
+    </script>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="antialiased min-h-screen flex-col md:flex-row overflow-hidden">
 
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
         <div class="p-6 flex items-center gap-3 border-b border-white/5">
@@ -39,6 +55,9 @@
             <button onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana</button>
             <button onclick="switchPage('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening</button>
             <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-server w-5"></i> Kelola Server</button>
+            
+            <!-- Tambahan Tombol Logout Biar Reseller Bisa Keluar -->
+            <button onclick="logoutReseller()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 mt-8"><i class="fa-solid fa-right-from-bracket w-5"></i> Keluar</button>
         </nav>
     </aside>
 
@@ -134,6 +153,12 @@
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
 
     <script>
+        // Fungsi Logout
+        function logoutReseller() {
+            localStorage.removeItem('isLoggedIn');
+            window.location.replace('reseller-login_2.html');
+        }
+
         // ROMBAK: Logic Generate Link DB
         async function generateLinkDariServer() {
             const btn = document.getElementById('btnGenLink');
