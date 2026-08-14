@@ -2,22 +2,15 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FahmiHost - Reseller Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { dark: { 900: '#09090b', 800: '#121217', 700: '#1c1c24', 600: '#272735' }, brand: { primary: '#6366f1' } } }
-            }
-        }
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { primary: '#6366f1' }, dark: { 800: '#121217', 900: '#09090b' } } } } }
     </script>
     <style>
-        /* Body dikasih display:none biar layarnya nutup dlu sebelum dicek aksesnya */
-        body { display: none; background-color: #09090b; color: #e4e4e7; }
+        body { background-color: #09090b; color: #e4e4e7; }
         .glass { background: rgba(28, 28, 36, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
         .page-section.active { display: block; }
@@ -25,68 +18,67 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #09090b; }
         ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
+        #initLoader { position: fixed; inset: 0; z-index: 99999; background-color: #09090b; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 
     <script>
-        // SCRIPT PROTEKSI DAN LOAD DATA UI
         if (localStorage.getItem('isLoggedIn') !== 'true') {
-            // Kalau maksa masuk, lempar ke nama file login lu yang BENAR
             window.location.replace('reseller-login.html'); 
         } else {
             document.addEventListener("DOMContentLoaded", function() {
-                // Tampilkan body
-                document.body.style.display = "flex"; 
-                
-                // Ambil data profil
                 const rawData = localStorage.getItem('userData');
                 if (rawData) {
-                    const user = JSON.parse(rawData);
-                    document.getElementById('uiResellerName').innerText = user.name;
-                    document.getElementById('uiResellerEmail').innerText = user.email;
-                    document.getElementById('uiResellerWa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${user.whatsapp}`;
-                    document.getElementById('uiResellerStatus').innerText = `Status: ${user.status}`;
+                    try {
+                        const user = JSON.parse(rawData);
+                        document.getElementById('uiResellerName').innerText = user.name || 'User';
+                        document.getElementById('uiResellerEmail').innerText = user.email || '-';
+                        document.getElementById('uiResellerWa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${user.whatsapp || '-'}`;
+                        document.getElementById('uiResellerStatus').innerText = `Status: ${user.status || 'AKTIF'}`;
+                    } catch(e) {}
                 }
+                setTimeout(() => { document.getElementById('initLoader').style.display = 'none'; }, 300);
             });
         }
     </script>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden relative">
 
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
+    <div id="initLoader">
+        <div class="w-12 h-12 rounded-xl bg-brand-primary flex items-center justify-center text-white text-2xl font-bold animate-pulse mb-4 shadow-[0_0_20px_rgba(99,102,241,0.6)]">F</div>
+        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase animate-pulse">Menyiapkan Data...</p>
+    </div>
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-[60] w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
         <div class="p-6 flex items-center gap-3 border-b border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold shadow-[0_0_15px_rgba(99,102,241,0.5)]">F</div>
+            <div class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold">F</div>
             <h1 class="text-xl font-bold text-white tracking-tight">Fahmi<span class="text-brand-primary">Host</span></h1>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <button onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active-nav w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</button>
-            <button onclick="switchPage('topup')" id="nav-topup" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-wallet w-5"></i> Deposit Saldo</button>
-            <button onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana</button>
-            <button onclick="switchPage('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening</button>
-            <button onclick="switchPage('servers')" id="nav-servers" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-server w-5"></i> Kelola Server</button>
+        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <a href="javascript:void(0)" onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active-nav cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
+            <a href="javascript:void(0)" onclick="switchPage('topup')" id="nav-topup" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-wallet w-5"></i> Deposit Saldo</a>
+            <a href="javascript:void(0)" onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana</a>
+            <a href="javascript:void(0)" onclick="switchPage('settings')" id="nav-settings" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening</a>
+            <a href="javascript:void(0)" onclick="switchPage('servers')" id="nav-servers" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-server w-5"></i> Kelola Server</a>
             
-            <button onclick="logoutReseller()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 mt-8"><i class="fa-solid fa-right-from-bracket w-5"></i> Keluar</button>
+            <a href="javascript:void(0)" onclick="logoutReseller()" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 mt-8"><i class="fa-solid fa-right-from-bracket w-5"></i> Keluar</a>
         </nav>
     </aside>
-
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64">
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64 z-10">
         <header class="sticky top-0 z-40 glass border-b border-white/5 px-6 py-4 flex items-center justify-between shrink-0">
-            <button onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2"><i class="fa-solid fa-bars text-xl"></i></button>
+            <button type="button" onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2 cursor-pointer"><i class="fa-solid fa-bars text-xl"></i></button>
             <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard Overview</h2>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
-            
+        <div class="flex-1 overflow-y-auto p-6 scroll-smooth relative z-10">
             <!-- DASHBOARD -->
             <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
-                
-                <!-- KARTU PROFIL USER -->
                 <div class="glass rounded-2xl p-6 md:p-8 border border-white/5 bg-gradient-to-br from-dark-800 to-dark-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="text-xl font-bold text-white mb-1" id="uiResellerName">Loading...</h3>
                         <p class="text-sm text-gray-400" id="uiResellerEmail">loading@mail.com</p>
                         <div class="flex flex-wrap gap-2 mt-3">
-                            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30 font-semibold tracking-wide uppercase" id="uiResellerStatus">Status: AKTIF</span>
-                            <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 font-semibold tracking-wide" id="uiResellerWa"><i class="fa-brands fa-whatsapp"></i> Loading...</span>
+                            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30 font-semibold uppercase" id="uiResellerStatus">Status: AKTIF</span>
+                            <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 font-semibold" id="uiResellerWa"><i class="fa-brands fa-whatsapp"></i> Loading...</span>
                         </div>
                     </div>
                     <div class="text-left md:text-right bg-black/20 p-4 rounded-xl border border-white/5">
@@ -95,22 +87,16 @@
                     </div>
                 </div>
 
-                <!-- Fitur Link Database -->
                 <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
                     <div class="flex items-center justify-between mb-6">
                         <div>
                             <h3 class="text-lg font-bold text-white">Link Order Customer</h3>
-                            <p class="text-xs text-gray-400 mt-1">Generate link aman untuk pembeli. Link tersimpan di database dan tidak bisa diakali.</p>
+                            <p class="text-xs text-gray-400 mt-1">Generate link aman untuk pembeli. Link tersimpan di database.</p>
                         </div>
                     </div>
-                    <div class="space-y-4">
-                        <div class="flex gap-2 bg-black/30 p-2 rounded-lg border border-white/5">
-                            <input type="text" readonly id="secureOrderLinkInput" placeholder="Klik Generate untuk membuat link..."
-                                   class="flex-1 bg-transparent text-sm text-gray-200 outline-none font-mono truncate">
-                            <button onclick="generateLinkDariServer()" id="btnGenLink" class="bg-brand-primary hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-xs font-bold transition">
-                                GENERATE
-                            </button>
-                        </div>
+                    <div class="flex gap-2 bg-black/30 p-2 rounded-lg border border-white/5">
+                        <input type="text" readonly id="secureOrderLinkInput" placeholder="Klik Generate..." class="flex-1 bg-transparent text-sm text-gray-200 outline-none font-mono truncate">
+                        <button onclick="generateLinkDariServer()" id="btnGenLink" class="bg-brand-primary hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-xs font-bold transition cursor-pointer">GENERATE</button>
                     </div>
                 </div>
             </div>
@@ -119,48 +105,46 @@
             <div id="page-topup" class="page-section max-w-6xl mx-auto space-y-6">
                 <div class="glass rounded-2xl p-6 md:p-8 relative overflow-hidden">
                     <h3 class="text-lg font-bold text-white mb-6 relative z-10">Deposit Saldo Reseller</h3>
-                    <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all duration-300 shadow-lg"></div>
+                    <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center"></div>
 
-                    <div id="depositFormWrapper" class="relative z-10 transition-all duration-300">
+                    <div id="depositFormWrapper" class="relative z-10">
                         <div class="space-y-1.5 mb-6">
                             <label class="text-xs font-medium text-gray-400 ml-1">Nominal Deposit Manual (Minimal Rp 1.000)</label>
                             <div class="relative">
                                 <span class="absolute left-4 top-3.5 text-gray-400 font-medium">Rp</span>
-                                <input type="number" id="customAmount" placeholder="1000" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-brand-primary transition-all" oninput="resetNominalButtons()">
+                                <input type="number" id="customAmount" placeholder="1000" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-brand-primary" oninput="resetNominalButtons()">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="nominalContainer">
-                            <button data-plan-id="DEP_10K" onclick="selectNominal(this, 10000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 10.000</button>
-                            <button data-plan-id="DEP_25K" onclick="selectNominal(this, 25000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 25.000</button>
-                            <button data-plan-id="DEP_50K" onclick="selectNominal(this, 50000)" class="nominal-btn bg-brand-primary/20 border border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm active-nominal">Rp 50.000</button>
-                            <button data-plan-id="DEP_100K" onclick="selectNominal(this, 100000)" class="nominal-btn bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold transition-all text-sm">Rp 100.000</button>
+                            <button type="button" data-plan-id="DEP_10K" onclick="selectNominal(this, 10000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 10.000</button>
+                            <button type="button" data-plan-id="DEP_25K" onclick="selectNominal(this, 25000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 25.000</button>
+                            <button type="button" data-plan-id="DEP_50K" onclick="selectNominal(this, 50000)" class="nominal-btn cursor-pointer bg-brand-primary/20 border border-brand-primary rounded-xl py-3 text-white font-semibold text-sm active-nominal">Rp 50.000</button>
+                            <button type="button" data-plan-id="DEP_100K" onclick="selectNominal(this, 100000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 100.000</button>
                         </div>
                         
                         <div class="space-y-4">
                             <div class="space-y-1.5">
                                 <label class="text-xs font-medium text-gray-400 ml-1">Metode Pembayaran</label>
-                                <select id="paymentMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none">
-                                    <option value="QRIS">QRIS (Otomatis)</option>
-                                </select>
+                                <select id="paymentMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none"><option value="QRIS">QRIS (Otomatis)</option></select>
                             </div>
-                            <button onclick="processDeposit()" type="button" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl transition-all text-sm mt-4 shadow-[0_0_15px_rgba(16,185,129,0.3)]">Lanjutkan Pembayaran</button>
+                            <button type="button" onclick="processDeposit()" class="cursor-pointer w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl text-sm mt-4">Lanjutkan Pembayaran</button>
                         </div>
                     </div>
 
                     <!-- WRAPPER QRIS CHECKOUT -->
-                    <div id="qrisCheckoutWrapper" class="hidden relative z-10 text-center py-2 transition-all duration-300">
+                    <div id="qrisCheckoutWrapper" class="hidden relative z-10 text-center py-2">
                         <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800/80 flex items-center justify-between mb-6">
-                            <div class="text-left"><span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Tipe Transaksi</span><h3 class="text-sm font-bold text-gray-100">Deposit Saldo</h3></div>
-                            <div class="text-right"><span class="text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Total Tagihan</span><h3 id="qrisAmountDisplay" class="text-lg font-black text-emerald-400">Rp 0</h3></div>
+                            <div class="text-left"><span class="text-[11px] text-gray-500 font-semibold">Tipe Transaksi</span><h3 class="text-sm font-bold text-gray-100">Deposit Saldo</h3></div>
+                            <div class="text-right"><span class="text-[11px] text-gray-500 font-semibold">Total Tagihan</span><h3 id="qrisAmountDisplay" class="text-lg font-black text-emerald-400">Rp 0</h3></div>
                         </div>
-                        <div class="bg-white p-3 rounded-xl inline-block w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center mx-auto shadow-md relative overflow-hidden mb-6 border-4 border-dark-700">
-                            <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 gap-2"><span class="text-[10px] font-bold tracking-wider">MEMBUAT QR...</span></div>
+                        <div class="bg-white p-3 rounded-xl inline-block w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center mx-auto relative mb-6">
+                            <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 gap-2"><span class="text-[10px] font-bold">MEMBUAT QR...</span></div>
                             <img id="qrisImage" src="" alt="QRIS" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
                         </div>
                         <div class="space-y-3 max-w-sm mx-auto">
-                            <button id="btnKonfirmasi" onclick="checkPaymentStatus()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all">Saya Sudah Bayar</button>
-                            <button onclick="cancelDeposit()" class="w-full bg-transparent hover:bg-white/5 border border-white/10 text-gray-400 hover:text-white font-semibold py-3.5 rounded-xl transition-all text-sm">Batalkan Topup</button>
+                            <button type="button" id="btnKonfirmasi" onclick="checkPaymentStatus()" class="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg">Saya Sudah Bayar</button>
+                            <button type="button" onclick="cancelDeposit()" class="cursor-pointer w-full bg-transparent border border-white/10 text-gray-400 hover:text-white font-semibold py-3.5 rounded-xl text-sm">Batalkan Topup</button>
                         </div>
                     </div>
                 </div>
@@ -173,26 +157,23 @@
         </div>
     </main>
 
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden md:hidden transition-opacity"></div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden md:hidden cursor-pointer"></div>
 
     <script>
-        // Fungsi Logout (Udah diarahin bener ke reseller-login.html)
+        // FUNGSI JAVASCRIPT UTAMA
         function logoutReseller() {
             localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userData'); // Bersihin data juga
+            localStorage.removeItem('userData');
             window.location.href = 'reseller-login.html';
         }
 
-        // Logic Generate Link DB
         async function generateLinkDariServer() {
             const btn = document.getElementById('btnGenLink');
             const inputLink = document.getElementById('secureOrderLinkInput');
             btn.innerText = "WAIT..."; btn.disabled = true;
-
             try {
                 const res = await fetch('/api/generate-link-database', { method: 'POST' });
                 const data = await res.json();
-                
                 if(data.success) {
                     inputLink.value = `https://fahmihost.com/pay/${data.short_id}`;
                     btn.innerText = "COPY";
@@ -200,34 +181,40 @@
                     btn.disabled = false;
                 }
             } catch (err) {
-                showNotification("Gagal ke database.", "error");
+                showNotification("Gagal", "error");
                 btn.innerText = "GENERATE"; btn.disabled = false;
             }
         }
+        
         function copyLinkBaru() {
             const input = document.getElementById('secureOrderLinkInput');
             input.select(); document.execCommand('copy'); alert('Link aman disalin!');
         }
 
-        // SPA Navigation & UI
         function switchPage(pageId) {
             document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
             const target = document.getElementById('page-' + pageId);
             if(target) target.classList.add('active');
-            if(window.innerWidth < 768) toggleSidebar();
+            
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-overlay').classList.add('hidden');
+            }
         }
+        
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.toggle('hidden');
         }
+        
         function showNotification(msg, type='error') {
             const box = document.getElementById('uiAlert');
-            box.className = `relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center transition-all ${type==='error'?'bg-red-950/60 border-red-800/80 text-red-300':'bg-blue-950/60 border-blue-800/80 text-blue-300'}`;
+            box.className = `relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center ${type==='error'?'bg-red-950/60 border-red-800/80 text-red-300':'bg-blue-950/60 border-blue-800/80 text-blue-300'}`;
             box.innerText = msg; box.classList.remove('hidden');
         }
+        
         function hideNotification() { document.getElementById('uiAlert').classList.add('hidden'); }
 
-        // Logic Deposit
         let currentTopupId = null;
         function selectNominal(btnElement, amount) {
             document.getElementById('customAmount').value = amount;
@@ -238,6 +225,7 @@
                 btnElement.classList.add('active-nominal', 'bg-brand-primary/20', 'border-brand-primary');
             }
         }
+        
         function resetNominalButtons() { selectNominal(null, document.getElementById('customAmount').value); }
 
         async function processDeposit() {
@@ -256,7 +244,7 @@
             document.getElementById('qrisAmountDisplay').innerText = `Rp ${customAmount.toLocaleString('id-ID')}`;
             
             try {
-                const res = await fetch(`/api/generate-qris`, {
+                const res = await fetch(`/api/generate-qris-secure`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ plan_id: selectedPlan, custom_amount: customAmount })
@@ -275,4 +263,36 @@
             } catch (err) { showNotification("Gangguan koneksi.", "error"); }
         }
         
-     
+        function cancelDeposit() {
+            currentTopupId = null;
+            document.getElementById('qrisCheckoutWrapper').classList.add('hidden');
+            document.getElementById('depositFormWrapper').classList.remove('hidden');
+        }
+
+        async function checkPaymentStatus() {
+            if (!currentTopupId) return showNotification("Sesi belum siap.", "error");
+            const btn = document.getElementById('btnKonfirmasi');
+            btn.innerHTML = "Memeriksa..."; btn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ plan_key: "deposit_saldo", topup_id: currentTopupId })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showNotification("Berhasil deposit!", "success");
+                    setTimeout(cancelDeposit, 2000);
+                } else {
+                    showNotification(data.error || "Belum lunas.", "error");
+                    btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
+                }
+            } catch(e) {
+                showNotification("Error jaringan.", "error");
+                btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
