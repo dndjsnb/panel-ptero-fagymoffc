@@ -1,191 +1,367 @@
 <!DOCTYPE html>
-<html lang="id" class="bg-[#030712]">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fahmi Hosting - Server Pterodactyl Otomatis</title>
+    <title>Dashboard - Bot Hosting</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Inter agar sama dengan index.html -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        html {
-            background-color: #030712;
-        }
         body {
-            background: radial-gradient(circle at top, #111827, #030712);
-            background-color: #030712;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-attachment: fixed;
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb; /* bg-gray-50 */
         }
-        .glass-card {
-            background: rgba(17, 24, 39, 0.4);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(75, 85, 99, 0.4);
-            transition: all 0.3s ease;
+        /* Animasi loading sederhana */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #2563eb;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
         }
-        .glass-card:hover {
-            background: rgba(17, 24, 39, 0.7);
-            border-color: rgba(59, 130, 246, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2);
-        }
-        .glass-card-favorite {
-            background: rgba(17, 24, 39, 0.6);
-            border-color: rgba(59, 130, 246, 0.5);
-            box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.15);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="text-gray-100 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white bg-[#030712]">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <main class="flex-grow flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12 sm:space-y-16">
-        
-        <!-- Header -->
-        <div class="text-center relative w-full max-w-2xl">
-            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 sm:w-96 sm:h-96 bg-blue-600/20 rounded-full blur-[80px] pointer-events-none"></div>
-            
-            <div class="relative z-10 mb-6">
-                <span class="inline-flex items-center gap-1.5 bg-blue-500/10 text-blue-400 text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full border border-blue-500/20 shadow-lg">
-                    <span class="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
-                    Otomatis 24/7 & Instan
-                </span>
-            </div>
-            
-            <h1 class="relative z-10 text-4xl sm:text-6xl font-black tracking-tight text-white mb-4">
-                Fahmi <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Hosting</span>
-            </h1>
-            
-            <p class="relative z-10 text-sm sm:text-base text-gray-400 leading-relaxed px-4">
-                Sewa server Pterodactyl performa tinggi khusus Bot WhatsApp Node.js. Bayar via QRIS, server langsung aktif detik itu juga!
-            </p>
-
-            
-
-        <!-- Pricing Grid -->
-        <div class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 relative z-10">
-            
-            <!-- Paket 1GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 1GB Basic</h3>
-                    <p class="text-xs text-gray-400 mb-5">Cocok untuk bot pemula.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 5.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 1GB</li><li>Disk 5GB</li><li>CPU 100%</li></ul>
+    <!-- Navbar Sederhana (Opsional, agar konsisten dengan index) -->
+    <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">B</div>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">BotHost</span>
                 </div>
-                <a href="checkout.html?plan=basic" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 2GB -->
-            <div class="glass-card glass-card-favorite p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-blue-600 text-[10px] font-bold text-white px-3 py-1.5 rounded-bl-xl rounded-tr-2xl uppercase">Favorit</div>
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 2GB Standar</h3>
-                    <p class="text-xs text-gray-400 mb-5">Ideal untuk bot public.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 8.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 2GB</li><li>Disk 10GB</li><li>CPU 150%</li></ul>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="text-gray-500 hover:text-blue-600 transition">Beranda</a>
+                    <a href="#" class="text-blue-600 font-semibold">Dashboard</a>
+                    <a href="#faq" class="text-gray-500 hover:text-blue-600 transition">Bantuan</a>
                 </div>
-                <a href="checkout.html?plan=standar" class="block text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl shadow-lg transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 3GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
                 <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 3GB Pro</h3>
-                    <p class="text-xs text-gray-400 mb-5">Performa tinggi rilis.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 11.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 3GB</li><li>Disk 15GB</li><li>CPU 200%</li></ul>
+                    <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700 font-medium transition">
+                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
+                    </button>
                 </div>
-                <a href="checkout.html?plan=pro" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
             </div>
-
-            <!-- Paket 4GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 4GB Advance</h3>
-                    <p class="text-xs text-gray-400 mb-5">Bebas lag multi-sesi.</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 14.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 4GB</li><li>Disk 20GB</li><li>CPU 250%</li></ul>
-                </div>
-                <a href="checkout.html?plan=advance" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 5GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 5GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 17.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 5GB</li><li>Disk 25GB</li><li>CPU 300%</li></ul>
-                </div>
-                <a href="checkout.html?plan=5gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 6GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 6GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 20.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 6GB</li><li>Disk 30GB</li><li>CPU 350%</li></ul>
-                </div>
-                <a href="checkout.html?plan=6gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 7GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 7GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 23.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 7GB</li><li>Disk 35GB</li><li>CPU 400%</li></ul>
-                </div>
-                <a href="checkout.html?plan=7gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 8GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 8GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 26.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 8GB</li><li>Disk 40GB</li><li>CPU 450%</li></ul>
-                </div>
-                <a href="checkout.html?plan=8gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 9GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 9GB</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 29.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 9GB</li><li>Disk 45GB</li><li>CPU 500%</li></ul>
-                </div>
-                <a href="checkout.html?plan=9gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket 10GB -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket 10GB Max</h3>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 32.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM 10GB</li><li>Disk 50GB</li><li>CPU 550%</li></ul>
-                </div>
-                <a href="checkout.html?plan=10gb" class="block text-center bg-gray-800 hover:bg-blue-600 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
-            <!-- Paket Unlimited -->
-            <div class="glass-card p-6 rounded-2xl flex flex-col justify-between border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <div>
-                    <h3 class="text-base font-bold text-white mb-1">Paket Unlimited</h3>
-                    <p class="text-xs text-emerald-400 mb-5 font-bold">Tanpa Batasan (Anti Limit)</p>
-                    <div class="mb-6"><span class="text-2xl sm:text-3xl font-black text-emerald-400">Rp 50.000</span></div>
-                    <ul class="text-xs text-gray-300 space-y-3 mb-6"><li>RAM Unlimited</li><li>Disk Unlimited</li><li>CPU Unlimited</li></ul>
-                </div>
-                <a href="checkout.html?plan=unlimited" class="block text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs sm:text-sm py-3 px-4 rounded-xl transition-all">Beli Sekarang</a>
-            </div>
-
         </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        
+        <!-- Header Dashboard -->
+        <div class="mb-10 text-center md:text-left">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Pilih Paket Hosting</h1>
+            <p class="text-gray-500">Upgrade performa bot Anda dengan spesifikasi terbaik.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden flex justify-center items-center py-20">
+            <div class="loader"></div>
+        </div>
+
+        <!-- Grid Produk -->
+        <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Produk akan di-render di sini oleh JS -->
+        </div>
+
     </main>
 
-    <footer class="text-center text-[11px] text-gray-500 py-6 border-t border-gray-800/60 w-full mt-auto bg-[#030712]">
-        &copy; 2026 Fahmi Hosting. All rights reserved. Powered by Pterodactyl Panel.
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-100 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-400 text-sm">&copy; 2026 BotHost. All rights reserved.</p>
+            <div class="flex space-x-6 text-gray-400">
+                <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-discord"></i></a>
+                <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
     </footer>
 
+    <!-- Modal Checkout (UI Baru) -->
+    <div id="checkoutModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Pembelian</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                    <p class="text-sm text-blue-600 font-semibold mb-1">Paket Dipilih:</p>
+                    <p id="modalPlanName" class="text-xl font-bold text-gray-900">-</p>
+                    <p id="modalPlanPrice" class="text-lg text-gray-600">-</p>
+                </div>
+
+                <form id="checkoutForm" class="space-y-4">
+                    <input type="hidden" id="planIdInput">
+                    
+                    <!-- Input Custom Plan (Hanya Muncul Jika Pilih Custom) -->
+                    <div id="customSpecs" class="hidden space-y-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <p class="text-xs font-bold text-gray-500 uppercase">Atur Spesifikasi</p>
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm text-gray-600">RAM (Min 256MB)</label>
+                            <input type="number" id="customRam" value="256" min="256" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm text-gray-600">Disk (Min 1GB)</label>
+                            <input type="number" id="customDisk" value="1" min="1" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm text-gray-600">CPU (Min 25%)</label>
+                            <input type="number" id="customCpu" value="25" min="25" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Server/Bot</label>
+                        <input type="text" id="serverName" required placeholder="Contoh: Bot WA Jualan" 
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran</label>
+                        <select id="paymentMethod" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
+                            <option value="qris">QRIS (All E-Wallet)</option>
+                            <option value="dana">DANA</option>
+                            <option value="gopay">GoPay</option>
+                            <option value="ovo">OVO</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-0.5 mt-4 flex justify-center items-center gap-2">
+                        <span>Buat Pesanan</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toastMessage">Notifikasi</span>
+    </div>
+
+    <script>
+        // --- KONFIGURASI API (JANGAN DIUBAH LOGIKANYA, HANYA PASTIKAN URL BENAR) ---
+        const API_BASE_URL = 'https://api.bothosting.id'; // Ganti dengan URL API Anda
+        const WEBHOOK_URL = 'https://webhook.site/your-unique-id'; // Ganti dengan Webhook Anda
+
+        // --- STATE MANAGEMENT ---
+        let products = [];
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProducts();
+            setupEventListeners();
+        });
+
+        // --- FETCH PRODUCTS ---
+        async function fetchProducts() {
+            const loadingEl = document.getElementById('loadingState');
+            const gridEl = document.getElementById('productGrid');
+            
+            loadingEl.classList.remove('hidden');
+            gridEl.innerHTML = '';
+
+            try {
+                // Simulasi fetch jika API belum siap (Hapus blok ini jika API sudah live)
+                /* 
+                const response = await fetch(`${API_BASE_URL}/products`);
+                if (!response.ok) throw new Error('Gagal mengambil data');
+                products = await response.json();
+                */
+                
+                // Data Dummy untuk Preview UI (Ganti dengan fetch asli nanti)
+                await new Promise(r => setTimeout(r, 800)); // Fake delay
+                products = [
+                    { id: 'basic', name: '1GB Basic', price: 5000, ram: '1GB', disk: '5GB', cpu: '100%', popular: false },
+                    { id: 'standard', name: '2GB Standard', price: 10000, ram: '2GB', disk: '10GB', cpu: '150%', popular: true },
+                    { id: 'pro', name: '4GB Pro', price: 20000, ram: '4GB', disk: '20GB', cpu: '200%', popular: false },
+                    { id: 'elite', name: '8GB Elite', price: 35000, ram: '8GB', disk: '40GB', cpu: '300%', popular: false },
+                    { id: 'ultimate', name: '16GB Ultimate', price: 60000, ram: '16GB', disk: '80GB', cpu: '400%', popular: false },
+                    { id: 'custom', name: 'Custom Plan', price: 0, ram: 'Flexible', disk: 'Flexible', cpu: 'Flexible', popular: false }
+                ];
+
+                renderProducts();
+            } catch (error) {
+                console.error('Error:', error);
+                gridEl.innerHTML = `<div class="col-span-full text-center text-red-500">Gagal memuat produk. Silakan refresh.</div>`;
+            } finally {
+                loadingEl.classList.add('hidden');
+            }
+        }
+
+        // --- RENDER PRODUCTS (UI BARU) ---
+        function renderProducts() {
+            const gridEl = document.getElementById('productGrid');
+            gridEl.innerHTML = products.map(product => {
+                const isPopular = product.popular;
+                const priceDisplay = product.price === 0 ? 'Hubungi Admin' : `Rp ${product.price.toLocaleString('id-ID')}`;
+                
+                return `
+                <div class="group bg-white border ${isPopular ? 'border-blue-200 ring-1 ring-blue-100' : 'border-gray-100'} rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
+                    
+                    ${isPopular ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">POPULER</div>' : ''}
+                    
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">${product.name}</h3>
+                            <p class="text-sm text-gray-500 mt-1">Performa stabil & uptime tinggi.</p>
+                        </div>
+                        
+                        <div class="mb-6">
+                            <span class="text-3xl font-black text-gray-900">${priceDisplay}</span>
+                            ${product.price !== 0 ? '<span class="text-gray-400 text-sm font-medium">/bulan</span>' : ''}
+                        </div>
+
+                        <ul class="space-y-3 mb-8">
+                            <li class="flex items-center text-sm text-gray-600">
+                                <i class="fa-solid fa-memory text-blue-500 w-6"></i> RAM ${product.ram}
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <i class="fa-solid fa-hard-drive text-blue-500 w-6"></i> Disk ${product.disk}
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <i class="fa-solid fa-microchip text-blue-500 w-6"></i> CPU ${product.cpu}
+                            </li>
+                            <li class="flex items-center text-sm text-gray-600">
+                                <i class="fa-solid fa-shield-halved text-blue-500 w-6"></i> DDoS Protection
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button onclick="openCheckout('${product.id}')" 
+                        class="w-full py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2
+                        ${isPopular 
+                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20' 
+                            : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'}">
+                        Pilih Paket
+                    </button>
+                </div>
+                `;
+            }).join('');
+        }
+
+        // --- MODAL FUNCTIONS ---
+        function openCheckout(planId) {
+            const product = products.find(p => p.id === planId);
+            if (!product) return;
+
+            document.getElementById('planIdInput').value = planId;
+            document.getElementById('modalPlanName').textContent = product.name;
+            document.getElementById('modalPlanPrice').textContent = product.price === 0 ? 'Negosiasi' : `Rp ${product.price.toLocaleString('id-ID')}`;
+            
+            // Tampilkan input custom jika pilih custom plan
+            const customSpecsDiv = document.getElementById('customSpecs');
+            if (planId === 'custom') {
+                customSpecsDiv.classList.remove('hidden');
+            } else {
+                customSpecsDiv.classList.add('hidden');
+            }
+
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('checkoutModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('checkoutForm').reset();
+        }
+
+        // --- EVENT LISTENERS ---
+        function setupEventListeners() {
+            // Close modal on outside click
+            document.getElementById('checkoutModal').addEventListener('click', (e) => {
+                if (e.target.id === 'checkoutModal') closeModal();
+            });
+
+            // Handle Checkout Form Submit
+            document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const btn = e.target.querySelector('button[type="submit"]');
+                const originalText = btn.innerHTML;
+                
+                // Loading state button
+                btn.disabled = true;
+                btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mr-2"></div> Memproses...`;
+
+                const planId = document.getElementById('planIdInput').value;
+                
+                // Siapkan data dasar
+                const data = {
+                    plan_id: planId,
+                    server_name: document.getElementById('serverName').value,
+                    payment_method: document.getElementById('paymentMethod').value,
+                    timestamp: new Date().toISOString()
+                };
+
+                // Jika custom plan, tambahkan detail spek ke dalam data (tanpa mengubah struktur webhook utama)
+                if (planId === 'custom') {
+                    data.custom_ram = document.getElementById('customRam').value;
+                    data.custom_disk = document.getElementById('customDisk').value;
+                    data.custom_cpu = document.getElementById('customCpu').value;
+                }
+
+                try {
+                    // Kirim ke Webhook/API (URL Tetap Sesuai Asli)
+                    await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify(data) });
+                    
+                    showToast('Pesanan berhasil dibuat! Cek WhatsApp Anda.');
+                    closeModal();
+                } catch (error) {
+                    showToast('Gagal membuat pesanan. Coba lagi.', true);
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            });
+
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', () => {
+                if(confirm('Yakin ingin keluar?')) {
+                    window.location.href = 'index.html';
+                }
+            });
+        }
+
+        // --- UTILS ---
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMessage');
+            const icon = toast.querySelector('i');
+
+            msgEl.textContent = message;
+            if (isError) {
+                icon.className = 'fa-solid fa-circle-exclamation text-red-400';
+            } else {
+                icon.className = 'fa-solid fa-circle-check text-green-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
