@@ -4,53 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Bot Hosting</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Inter agar sama dengan index.html -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb; /* bg-gray-50 */
-        }
-        /* Animasi loading sederhana */
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 3px solid #2563eb;
-            width: 20px;
-            height: 20px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
+        .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #2563eb; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .qr-container img { max-width: 100%; height: auto; border-radius: 8px; }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <!-- Navbar Sederhana (Opsional, agar konsisten dengan index) -->
+    <!-- Navbar -->
     <nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <div class="flex items-center gap-2">
                     <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">B</div>
-                    <span class="font-bold text-xl tracking-tight text-gray-900">BotHost</span>
+                    <span class="font-bold text-xl tracking-tight text-gray-900">PteroHost</span>
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="index.html" class="text-gray-500 hover:text-blue-600 transition">Beranda</a>
                     <a href="#" class="text-blue-600 font-semibold">Dashboard</a>
-                    <a href="#faq" class="text-gray-500 hover:text-blue-600 transition">Bantuan</a>
-                </div>
-                <div>
-                    <button id="logoutBtn" class="text-sm text-red-500 hover:text-red-700 font-medium transition">
-                        <i class="fa-solid fa-right-from-bracket mr-1"></i> Keluar
-                    </button>
                 </div>
             </div>
         </div>
@@ -58,94 +34,108 @@
 
     <!-- Main Content -->
     <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-        
-        <!-- Header Dashboard -->
         <div class="mb-10 text-center md:text-left">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Pilih Paket Hosting</h1>
             <p class="text-gray-500">Upgrade performa bot Anda dengan spesifikasi terbaik.</p>
         </div>
 
-        <!-- Loading State -->
-        <div id="loadingState" class="hidden flex justify-center items-center py-20">
-            <div class="loader"></div>
-        </div>
-
-        <!-- Grid Produk -->
         <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <!-- Produk akan di-render di sini oleh JS -->
         </div>
-
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-white border-t border-gray-100 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-gray-400 text-sm">&copy; 2026 BotHost. All rights reserved.</p>
-            <div class="flex space-x-6 text-gray-400">
-                <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-discord"></i></a>
-                <a href="#" class="hover:text-blue-600 transition"><i class="fa-brands fa-instagram"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Modal Checkout (UI Baru) -->
+    <!-- Modal Checkout / Pembayaran -->
     <div id="checkoutModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+            
+            <!-- Header Modal -->
             <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Pembelian</h3>
+                <h3 class="text-lg font-bold text-gray-900" id="modalTitle">Konfirmasi Pembelian</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
             
             <div class="p-6">
-                <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                    <p class="text-sm text-blue-600 font-semibold mb-1">Paket Dipilih:</p>
-                    <p id="modalPlanName" class="text-xl font-bold text-gray-900">-</p>
-                    <p id="modalPlanPrice" class="text-lg text-gray-600">-</p>
+                <!-- Tahap 1: Form Input Data -->
+                <div id="stepForm">
+                    <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                        <p class="text-sm text-blue-600 font-semibold mb-1">Ringkasan Pesanan:</p>
+                        <p id="modalSummary" class="text-lg font-bold text-gray-900">-</p>
+                    </div>
+
+                    <form id="checkoutForm" class="space-y-4">
+                        <input type="hidden" id="planIdInput">
+                        
+                        <!-- Input Custom Plan -->
+                        <div id="customSpecs" class="hidden space-y-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <p class="text-xs font-bold text-gray-500 uppercase">Atur Spesifikasi</p>
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm text-gray-600">RAM (Min 256MB)</label>
+                                <input type="number" id="customRam" value="256" min="256" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm text-gray-600">Disk (Min 1GB)</label>
+                                <input type="number" id="customDisk" value="1" min="1" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <label class="text-sm text-gray-600">CPU (Min 25%)</label>
+                                <input type="number" id="customCpu" value="25" min="25" class="w-24 px-2 py-1 border rounded text-right text-sm">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Server/Bot</label>
+                            <input type="text" id="serverName" required placeholder="Contoh: Bot WA Jualan" 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran</label>
+                            <select id="paymentMethod" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
+                                <option value="qris">QRIS (All E-Wallet)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-0.5 mt-4 flex justify-center items-center gap-2">
+                            <span>Buat Pesanan & Bayar</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </form>
                 </div>
 
-                <form id="checkoutForm" class="space-y-4">
-                    <input type="hidden" id="planIdInput">
+                <!-- Tahap 2: Tampilan QRIS (Awalnya Hidden) -->
+                <div id="stepPayment" class="hidden text-center">
+                    <div class="mb-4">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-3">
+                            <i class="fa-solid fa-check text-xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-gray-900">Pesanan Dibuat!</h4>
+                        <p class="text-sm text-gray-500 mt-1">Silakan scan QRIS di bawah ini untuk menyelesaikan pembayaran.</p>
+                    </div>
+
+                    <div class="qr-container bg-white p-4 rounded-xl border border-gray-200 mb-4 inline-block">
+                        <img id="qrisImage" src="" alt="QR Code Pembayaran" class="mx-auto">
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left">
+                        <p class="text-xs text-gray-500 uppercase font-bold mb-2">Detail Pembayaran</p>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-gray-600">Invoice:</span>
+                            <span id="payInvoice" class="font-mono font-bold text-gray-900">-</span>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-600">Total:</span>
+                            <span id="payPrice" class="font-bold text-blue-600">-</span>
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-gray-400 mb-4">Server akan otomatis aktif setelah pembayaran terverifikasi.</p>
                     
-                    <!-- Input Custom Plan (Hanya Muncul Jika Pilih Custom) -->
-                    <div id="customSpecs" class="hidden space-y-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                        <p class="text-xs font-bold text-gray-500 uppercase">Atur Spesifikasi</p>
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm text-gray-600">RAM (Min 256MB)</label>
-                            <input type="number" id="customRam" value="256" min="256" class="w-24 px-2 py-1 border rounded text-right text-sm">
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm text-gray-600">Disk (Min 1GB)</label>
-                            <input type="number" id="customDisk" value="1" min="1" class="w-24 px-2 py-1 border rounded text-right text-sm">
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <label class="text-sm text-gray-600">CPU (Min 25%)</label>
-                            <input type="number" id="customCpu" value="25" min="25" class="w-24 px-2 py-1 border rounded text-right text-sm">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Server/Bot</label>
-                        <input type="text" id="serverName" required placeholder="Contoh: Bot WA Jualan" 
-                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran</label>
-                        <select id="paymentMethod" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
-                            <option value="qris">QRIS (All E-Wallet)</option>
-                            <option value="dana">DANA</option>
-                            <option value="gopay">GoPay</option>
-                            <option value="ovo">OVO</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-0.5 mt-4 flex justify-center items-center gap-2">
-                        <span>Buat Pesanan</span>
-                        <i class="fa-solid fa-arrow-right"></i>
+                    <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition">
+                        Tutup
                     </button>
-                </form>
+                </div>
             </div>
         </div>
     </div>
@@ -157,123 +147,128 @@
     </div>
 
     <script>
-        // --- KONFIGURASI API (JANGAN DIUBAH LOGIKANYA, HANYA PASTIKAN URL BENAR) ---
-        const API_BASE_URL = 'https://api.bothosting.id'; // Ganti dengan URL API Anda
-        const WEBHOOK_URL = 'https://webhook.site/your-unique-id'; // Ganti dengan Webhook Anda
-
-        // --- STATE MANAGEMENT ---
-        let products = [];
-
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchProducts();
-            setupEventListeners();
-        });
-
-        // --- FETCH PRODUCTS ---
-        async function fetchProducts() {
-            const loadingEl = document.getElementById('loadingState');
-            const gridEl = document.getElementById('productGrid');
-            
-            loadingEl.classList.remove('hidden');
-            gridEl.innerHTML = '';
-
-            try {
-                // Simulasi fetch jika API belum siap (Hapus blok ini jika API sudah live)
-                /* 
-                const response = await fetch(`${API_BASE_URL}/products`);
-                if (!response.ok) throw new Error('Gagal mengambil data');
-                products = await response.json();
-                */
-                
-                // Data Dummy untuk Preview UI (Ganti dengan fetch asli nanti)
-                await new Promise(r => setTimeout(r, 800)); // Fake delay
-                products = [
-                    { id: 'basic', name: '1GB Basic', price: 5000, ram: '1GB', disk: '5GB', cpu: '100%', popular: false },
-                    { id: 'standard', name: '2GB Standard', price: 10000, ram: '2GB', disk: '10GB', cpu: '150%', popular: true },
-                    { id: 'pro', name: '4GB Pro', price: 20000, ram: '4GB', disk: '20GB', cpu: '200%', popular: false },
-                    { id: 'elite', name: '8GB Elite', price: 35000, ram: '8GB', disk: '40GB', cpu: '300%', popular: false },
-                    { id: 'ultimate', name: '16GB Ultimate', price: 60000, ram: '16GB', disk: '80GB', cpu: '400%', popular: false },
-                    { id: 'custom', name: 'Custom Plan', price: 0, ram: 'Flexible', disk: 'Flexible', cpu: 'Flexible', popular: false }
-                ];
-
-                renderProducts();
-            } catch (error) {
-                console.error('Error:', error);
-                gridEl.innerHTML = `<div class="col-span-full text-center text-red-500">Gagal memuat produk. Silakan refresh.</div>`;
-            } finally {
-                loadingEl.classList.add('hidden');
+        // --- DATA PRODUK ---
+        const products = [
+            { id: 'basic', name: '1GB Basic', price: 5000, ram: '1GB', disk: '5GB', cpu: '100%', popular: false },
+            { id: 'standar', name: '2GB Standard', price: 10000, ram: '2GB', disk: '10GB', cpu: '150%', popular: true },
+            { id: 'pro', name: '4GB Pro', price: 20000, ram: '4GB', disk: '20GB', cpu: '200%', popular: false },
+            { 
+                id: 'custom', 
+                name: 'Custom Plan', 
+                price: 0, 
+                ram: 'Bebas', 
+                disk: 'Bebas', 
+                cpu: 'Bebas', 
+                popular: false,
+                isCustom: true 
             }
-        }
+        ];
 
-        // --- RENDER PRODUCTS (UI BARU) ---
+        // --- RENDER PRODUK ---
         function renderProducts() {
             const gridEl = document.getElementById('productGrid');
             gridEl.innerHTML = products.map(product => {
-                const isPopular = product.popular;
-                const priceDisplay = product.price === 0 ? 'Hubungi Admin' : `Rp ${product.price.toLocaleString('id-ID')}`;
+                if (product.isCustom) {
+                    return `
+                    <div class="bg-white border border-gray-200 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-lg transition-all duration-300 relative">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">${product.name}</h3>
+                            <p class="text-sm text-gray-500 mb-4">Atur spesifikasi sesuai kebutuhan botmu.</p>
+                            
+                            <div class="space-y-3 mb-6">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600">RAM (Min 256MB)</span>
+                                    <input type="number" id="customRam" value="256" min="256" step="128" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600">Disk (Min 1GB)</span>
+                                    <input type="number" id="customDisk" value="1" min="1" step="1" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-600">CPU (Min 25%)</span>
+                                    <input type="number" id="customCpu" value="25" min="25" step="25" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                </div>
+                            </div>
+
+                            <div class="mb-6 p-3 bg-blue-50 rounded-xl text-center border border-blue-100">
+                                <span class="text-xs text-blue-600 font-semibold">Estimasi Harga:</span>
+                                <div id="customPriceDisplay" class="text-2xl font-black text-blue-700">Rp 5.565</div>
+                            </div>
+                        </div>
+                        
+                        <button onclick="openCheckout('${product.id}')" class="w-full py-3 px-4 rounded-xl font-semibold bg-gray-900 hover:bg-gray-800 text-white transition">
+                            Buat Paket Ini
+                        </button>
+                    </div>
+                    `;
+                }
                 
+                const isPopular = product.popular;
+                const priceDisplay = `Rp ${product.price.toLocaleString('id-ID')}`;
                 return `
                 <div class="group bg-white border ${isPopular ? 'border-blue-200 ring-1 ring-blue-100' : 'border-gray-100'} rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
-                    
                     ${isPopular ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">POPULER</div>' : ''}
-                    
                     <div>
                         <div class="mb-4">
                             <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">${product.name}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Performa stabil & uptime tinggi.</p>
                         </div>
-                        
-                        <div class="mb-6">
-                            <span class="text-3xl font-black text-gray-900">${priceDisplay}</span>
-                            ${product.price !== 0 ? '<span class="text-gray-400 text-sm font-medium">/bulan</span>' : ''}
-                        </div>
-
+                        <div class="mb-6"><span class="text-3xl font-black text-gray-900">${priceDisplay}</span><span class="text-gray-400 text-sm font-medium">/bulan</span></div>
                         <ul class="space-y-3 mb-8">
-                            <li class="flex items-center text-sm text-gray-600">
-                                <i class="fa-solid fa-memory text-blue-500 w-6"></i> RAM ${product.ram}
-                            </li>
-                            <li class="flex items-center text-sm text-gray-600">
-                                <i class="fa-solid fa-hard-drive text-blue-500 w-6"></i> Disk ${product.disk}
-                            </li>
-                            <li class="flex items-center text-sm text-gray-600">
-                                <i class="fa-solid fa-microchip text-blue-500 w-6"></i> CPU ${product.cpu}
-                            </li>
-                            <li class="flex items-center text-sm text-gray-600">
-                                <i class="fa-solid fa-shield-halved text-blue-500 w-6"></i> DDoS Protection
-                            </li>
+                            <li class="flex items-center text-sm text-gray-600"><i class="fa-solid fa-memory text-blue-500 w-6"></i> RAM ${product.ram}</li>
+                            <li class="flex items-center text-sm text-gray-600"><i class="fa-solid fa-hard-drive text-blue-500 w-6"></i> Disk ${product.disk}</li>
+                            <li class="flex items-center text-sm text-gray-600"><i class="fa-solid fa-microchip text-blue-500 w-6"></i> CPU ${product.cpu}</li>
                         </ul>
                     </div>
-
-                    <button onclick="openCheckout('${product.id}')" 
-                        class="w-full py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2
-                        ${isPopular 
-                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20' 
-                            : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'}">
+                    <button onclick="openCheckout('${product.id}')" class="w-full py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${isPopular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'}">
                         Pilih Paket
                     </button>
                 </div>
                 `;
             }).join('');
+            calculateCustomPrice();
+        }
+
+        // --- LOGIKA CUSTOM PLAN ---
+        function calculateCustomPrice() {
+            const ram = parseInt(document.getElementById('customRam')?.value) || 256;
+            const disk = parseInt(document.getElementById('customDisk')?.value) || 1;
+            const cpu = parseInt(document.getElementById('customCpu')?.value) || 25;
+
+            if (ram < 256) document.getElementById('customRam').value = 256;
+            if (disk < 1) document.getElementById('customDisk').value = 1;
+            if (cpu < 25) document.getElementById('customCpu').value = 25;
+
+            const price = 2000 + (ram * 10) + (disk * 500) + (cpu * 50);
+            if(document.getElementById('customPriceDisplay')) {
+                document.getElementById('customPriceDisplay').innerText = `Rp ${price.toLocaleString('id-ID')}`;
+            }
+            return price;
         }
 
         // --- MODAL FUNCTIONS ---
         function openCheckout(planId) {
+            // Reset ke tahap form
+            document.getElementById('stepForm').classList.remove('hidden');
+            document.getElementById('stepPayment').classList.add('hidden');
+            document.getElementById('modalTitle').textContent = 'Konfirmasi Pembelian';
+            document.getElementById('checkoutForm').reset();
+
             const product = products.find(p => p.id === planId);
-            if (!product) return;
-
             document.getElementById('planIdInput').value = planId;
-            document.getElementById('modalPlanName').textContent = product.name;
-            document.getElementById('modalPlanPrice').textContent = product.price === 0 ? 'Negosiasi' : `Rp ${product.price.toLocaleString('id-ID')}`;
             
-            // Tampilkan input custom jika pilih custom plan
-            const customSpecsDiv = document.getElementById('customSpecs');
+            let summaryText = `${product.name} - Rp ${product.price.toLocaleString('id-ID')}`;
             if (planId === 'custom') {
-                customSpecsDiv.classList.remove('hidden');
+                const price = calculateCustomPrice();
+                const r = document.getElementById('customRam').value;
+                const d = document.getElementById('customDisk').value;
+                const c = document.getElementById('customCpu').value;
+                summaryText = `Custom (${r}MB RAM, ${d}GB Disk, ${c}% CPU) - Rp ${price.toLocaleString('id-ID')}`;
+                document.getElementById('customSpecs').classList.remove('hidden');
             } else {
-                customSpecsDiv.classList.add('hidden');
+                document.getElementById('customSpecs').classList.add('hidden');
             }
-
+            
+            document.getElementById('modalSummary').textContent = summaryText;
             const modal = document.getElementById('checkoutModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -283,85 +278,83 @@
             const modal = document.getElementById('checkoutModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
-            document.getElementById('checkoutForm').reset();
         }
 
-        // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            // Close modal on outside click
-            document.getElementById('checkoutModal').addEventListener('click', (e) => {
-                if (e.target.id === 'checkoutModal') closeModal();
-            });
+        // --- HANDLE SUBMIT & SHOW QRIS ---
+        document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mr-2"></div> Memproses...`;
 
-            // Handle Checkout Form Submit
-            document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
+            const planId = document.getElementById('planIdInput').value;
+            const payload = {
+                plan_key: planId,
+                server_name: document.getElementById('serverName').value,
+                payment_method: document.getElementById('paymentMethod').value,
+            };
+
+            if (planId === 'custom') {
+                payload.custom_ram = parseInt(document.getElementById('customRam').value);
+                payload.custom_disk = parseInt(document.getElementById('customDisk').value);
+                payload.custom_cpu = parseInt(document.getElementById('customCpu').value);
+            }
+
+            try {
+                // GANTI URL INI DENGAN ENDPOINT WEBHOOK LU YANG SEBENARNYA
+                const response = await fetch('/api/webhook', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload) 
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.error || 'Gagal memproses pesanan');
+
+                // SUKSES! Tampilkan QRIS di dalam modal
+                document.getElementById('stepForm').classList.add('hidden');
+                document.getElementById('stepPayment').classList.remove('hidden');
+                document.getElementById('modalTitle').textContent = 'Selesaikan Pembayaran';
                 
-                const btn = e.target.querySelector('button[type="submit"]');
-                const originalText = btn.innerHTML;
+                // Set data QRIS (sesuaikan field name dengan response webhook lu)
+                // Biasanya Zakkistore mengembalikan 'qr_string' atau 'qr_image_url'
+                // Jika qr_string, kita perlu generate gambar QR di frontend pakai library qrcode.js
+                // Atau jika webhook lu sudah return base64 image/url, tinggal set src-nya
                 
-                // Loading state button
-                btn.disabled = true;
-                btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mr-2"></div> Memproses...`;
-
-                const planId = document.getElementById('planIdInput').value;
+                // Contoh asumsi webhook return qr_image_url:
+                document.getElementById('qrisImage').src = data.qr_image_url || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.qr_string)}`;
                 
-                // Siapkan data dasar
-                const data = {
-                    plan_id: planId,
-                    server_name: document.getElementById('serverName').value,
-                    payment_method: document.getElementById('paymentMethod').value,
-                    timestamp: new Date().toISOString()
-                };
+                document.getElementById('payInvoice').textContent = data.invoice;
+                document.getElementById('payPrice').textContent = `Rp ${data.final_price?.toLocaleString('id-ID') || '-'}`;
 
-                // Jika custom plan, tambahkan detail spek ke dalam data (tanpa mengubah struktur webhook utama)
-                if (planId === 'custom') {
-                    data.custom_ram = document.getElementById('customRam').value;
-                    data.custom_disk = document.getElementById('customDisk').value;
-                    data.custom_cpu = document.getElementById('customCpu').value;
-                }
+            } catch (error) {
+                showToast(error.message, true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
 
-                try {
-                    // Kirim ke Webhook/API (URL Tetap Sesuai Asli)
-                    await fetch(WEBHOOK_URL, { method: 'POST', body: JSON.stringify(data) });
-                    
-                    showToast('Pesanan berhasil dibuat! Cek WhatsApp Anda.');
-                    closeModal();
-                } catch (error) {
-                    showToast('Gagal membuat pesanan. Coba lagi.', true);
-                } finally {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }
-            });
-
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                if(confirm('Yakin ingin keluar?')) {
-                    window.location.href = 'index.html';
-                }
-            });
-        }
-
-        // --- UTILS ---
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toastMessage');
             const icon = toast.querySelector('i');
-
             msgEl.textContent = message;
             if (isError) {
                 icon.className = 'fa-solid fa-circle-exclamation text-red-400';
             } else {
                 icon.className = 'fa-solid fa-circle-check text-green-400';
             }
-
             toast.classList.remove('translate-y-20', 'opacity-0');
-            
             setTimeout(() => {
                 toast.classList.add('translate-y-20', 'opacity-0');
             }, 3000);
         }
+
+        renderProducts();
     </script>
 </body>
 </html>
