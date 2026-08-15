@@ -120,7 +120,7 @@ app.post('/api/generate-qris', async (req, res) => {
     }
 });
 
-// --- API WEBHOOK CEK PEMBAYARAN ---
+// --- API WEBHOOK CEK PEMBAYARAN & KIRIM TESTIMONI ---
 app.post('/api/webhook', async (req, res) => {
     const { plan_key, topup_id, user_id, username, password } = req.body;
 
@@ -128,6 +128,46 @@ app.post('/api/webhook', async (req, res) => {
         const checkPayment = await zakki.cekStatus(topup_id); 
 
         if (checkPayment.status === "LUNAS" || checkPayment.status === "PAID") {
+            
+            // =========================================================
+            // 1. KIRIM NOTIFIKASI TELEGRAM
+            // =========================================================
+            const BOT_TOKEN = process.env.BOT_TOKEN;
+            const TESTI_CHAT_ID = process.env.TESTI_CHAT_ID;
+            
+            if (BOT_TOKEN && TESTI_CHAT_ID) {
+                const teleMessage = `🚀 *Pesanan Berhasil!*\n\n👤 *User:* ${username || 'Fahmi'}\n📦 *Paket:* ${plan_key || 'Custom'}\n⚡ *Status:* LUNAS / Aktif`;
+                try {
+                    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        chat_id: TESTI_CHAT_ID,
+                        text: teleMessage,
+                        parse_mode: 'Markdown'
+                    });
+                } catch (teleErr) {
+                    console.error("Gagal kirim Telegram:", teleErr.message);
+                }
+            }
+
+            // =========================================================
+            // 2. KIRIM NOTIFIKASI WHATSAPP (TEMBAK HTTP KE BOT PTERO)
+            // =========================================================
+            const PTERO_BOT_URL = process.env.PTERO_BOT_URL;
+            if (PTERO_BOT_URL) {
+                try {
+                    await axios.post(PTERO_BOT_URL, {
+                        username: username || 'Fahmi',
+                        plan_key: plan_key || 'Custom',
+                        topup_id: topup_id,
+                        status: 'LUNAS'
+                    });
+                } catch (waErr) {
+                    console.error("Gagal nembak HTTP ke bot WA Pterodactyl:", waErr.message);
+                }
+            }
+
+            // =========================================================
+            // PROSES LANJUTAN DEPOSIT / PTERODACTYL
+            // =========================================================
             // Kalau ini webhook dari deposit
             if (plan_key === "deposit_saldo" || plan_key.startsWith("DEP_")) {
                 if (user_id) {
