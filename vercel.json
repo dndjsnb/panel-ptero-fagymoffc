@@ -5,13 +5,14 @@
     "ZAKKI_EMAIL": "faaahhmii@gmail.com",
     "ZAKKI_PIN": "081006",
     "PTERO_URL": "https://cabangdua.lilyss.xyz",
-    "PTERO_PTLA_KEY": "ptla_12rUBtUEWkKjg0Fvhnuv2G2UWYx3wYQNHdXBGZ0evPb",
-    "PTERO_PTLC_KEY": "ptlc_66xq7fPutNZ6Wr7CMO79Ym6nxBT9wPlq1mfJST9JVLH",
-    "BOT_TOKEN": "8303835874:AAFzO-weYLSmKA4H6G_nFLOE4QMFh1JABWY",
-    "TESTI_CHAT_ID": "-1004448983151",
+    "PTERO_PTLA_KEY": "ptla_QyKIKYsYHkIyMGkUNNKAeeqWHYTMzdpG59i03L43qTn",
+    "PTERO_PTLC_KEY": "ptlc_emgwitULUBsSFoxrgbhixncmH6owGCaRMsQvv6d61yl",
+    "BOT_TOKEN": "8303835874:AAEIgzkMKlv3MqsDzwgi1PPNVdn1S52TCVA",
+    "TESTI_CHAT_ID": "-1001003953704694",
     "VERIF_BOT_TOKEN": "8951152336:AAG0LhdVGMO-jIRMN620bbXQGK8Eb0fRqwE",
     "VERIF_CHAT_ID": "8521019587",
-    "BOT_USERNAME": "botverif_resseler_bot"
+    "BOT_USERNAME": "botverif_resseler_bot",
+    "PTERO_BOT_URL": "http://cabangdua.lilyss.xyz:2019"
   },
   "rewrites": [
     {
