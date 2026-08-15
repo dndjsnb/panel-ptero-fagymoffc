@@ -319,9 +319,23 @@
             btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mx-auto"></div>`;
 
             try {
-                let payload = { plan_id: planId };
-                if (planId === 'custom') payload.custom_amount = calculateCustomPrice();
+                // DI SINI PAYLOAD UDAH DILENGKAPIN BIAR BACKEND NGGAK ERROR LAGI
+                let payload = { 
+                    plan_id: planId,       
+                    plan_key: planId,      
+                    server_name: currentUsername, 
+                    username: currentUsername,
+                    password: currentPassword
+                };
+                
+                if (planId === 'custom') {
+                    payload.custom_amount = calculateCustomPrice();
+                    payload.custom_ram = document.getElementById('customRam').value;
+                    payload.custom_disk = document.getElementById('customDisk').value;
+                    payload.custom_cpu = document.getElementById('customCpu').value;
+                }
 
+                // Nembak ke backend
                 const response = await fetch('/api/generate-qris', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
