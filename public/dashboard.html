@@ -11,9 +11,13 @@
         body { font-family: 'Inter', sans-serif; background-color: #f9fafb; }
         .loader { border: 3px solid #f3f3f3; border-radius: 50%; border-top: 3px solid #2563eb; width: 20px; height: 20px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        /* Hide arrows on number input for cleaner look */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
@@ -40,18 +44,17 @@
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Pilih Paket Hosting</h1>
             <p class="text-gray-500">Upgrade performa bot Anda dengan spesifikasi terbaik.</p>
         </div>
-
         <div id="productGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- Produk akan di-render di sini oleh JS -->
+            <!-- Produk di-render JS -->
         </div>
     </main>
 
-    <!-- Modal Checkout / Pembayaran -->
+    <!-- Modal Checkout Terintegrasi -->
     <div id="checkoutModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100" id="modalContainer">
             
             <!-- Header Modal -->
-            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 transition-all" id="modalHeader">
                 <h3 class="text-lg font-bold text-gray-900" id="modalTitle">Konfirmasi Pembelian</h3>
                 <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <i class="fa-solid fa-xmark text-xl"></i>
@@ -59,8 +62,8 @@
             </div>
             
             <div class="p-6">
-                <!-- Tahap 1: Form Input Data -->
-                <div id="stepForm">
+                <!-- TAHAP 1: FORM INPUT -->
+                <div id="stepForm" class="animate-fade-in-up">
                     <div class="mb-6 p-4 bg-blue-50 rounded-xl border border-blue-100">
                         <p class="text-sm text-blue-600 font-semibold mb-1">Ringkasan Pesanan:</p>
                         <p id="modalSummary" class="text-lg font-bold text-gray-900">-</p>
@@ -71,73 +74,87 @@
                         
                         <!-- Input Custom Plan -->
                         <div id="customSpecs" class="hidden space-y-3 mb-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Atur Spesifikasi (0 = Unlimited)</p>
-                            
+                            <p class="text-xs font-bold text-gray-500 uppercase mb-2">Atur Spesifikasi</p>
                             <div class="flex justify-between items-center">
-                                <label class="text-sm text-gray-600">RAM (Min 256MB)</label>
-                                <input type="number" id="customRam" value="256" min="0" step="128" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm focus:ring-2 focus:ring-blue-200 outline-none">
+                                <label class="text-sm text-gray-600">RAM (MB)</label>
+                                <input type="number" id="customRam" value="256" min="0" step="128" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm outline-none focus:ring-2 focus:ring-blue-200">
                             </div>
                             <div class="flex justify-between items-center">
-                                <label class="text-sm text-gray-600">Disk (Min 1GB)</label>
-                                <input type="number" id="customDisk" value="1" min="0" step="1" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm focus:ring-2 focus:ring-blue-200 outline-none">
+                                <label class="text-sm text-gray-600">Disk (GB)</label>
+                                <input type="number" id="customDisk" value="1" min="0" step="1" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm outline-none focus:ring-2 focus:ring-blue-200">
                             </div>
                             <div class="flex justify-between items-center">
-                                <label class="text-sm text-gray-600">CPU (Min 25%)</label>
-                                <input type="number" id="customCpu" value="25" min="0" step="25" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm focus:ring-2 focus:ring-blue-200 outline-none">
+                                <label class="text-sm text-gray-600">CPU (%)</label>
+                                <input type="number" id="customCpu" value="25" min="0" step="25" onchange="calculateCustomPrice()" class="w-24 px-2 py-1 border rounded text-right text-sm outline-none focus:ring-2 focus:ring-blue-200">
                             </div>
-                            <p class="text-xs text-gray-400 mt-2 italic">*Masukkan 0 untuk unlimited resource</p>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Server/Bot</label>
-                            <input type="text" id="serverName" required placeholder="Contoh: Bot WA Jualan" 
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username Panel</label>
+                            <input type="text" id="usernameInput" required placeholder="fagem" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Metode Pembayaran</label>
-                            <select id="paymentMethod" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
-                                <option value="qris">QRIS (All E-Wallet)</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Password Panel</label>
+                            <input type="password" id="passwordInput" required placeholder="Buat password login Anda" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition bg-gray-50 focus:bg-white">
                         </div>
 
-                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-0.5 mt-4 flex justify-center items-center gap-2">
-                            <span>Buat Pesanan & Bayar</span>
-                            <i class="fa-solid fa-arrow-right"></i>
+                        <button type="submit" id="btnSubmitPesanan" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-0.5 mt-4">
+                            Lanjutkan Pembayaran
                         </button>
                     </form>
                 </div>
 
-                <!-- Tahap 2: Tampilan QRIS (Awalnya Hidden) -->
-                <div id="stepPayment" class="hidden text-center">
+                <!-- TAHAP 2: QRIS -->
+                <div id="stepPayment" class="hidden text-center animate-fade-in-up">
                     <div class="mb-4">
-                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 text-green-600 mb-3">
-                            <i class="fa-solid fa-check text-xl"></i>
-                        </div>
-                        <h4 class="text-xl font-bold text-gray-900">Pesanan Dibuat!</h4>
-                        <p class="text-sm text-gray-500 mt-1">Silakan scan QRIS di bawah ini.</p>
+                        <h4 class="text-xl font-bold text-gray-900">Total: <span id="payPrice" class="text-blue-600">-</span></h4>
+                        <p class="text-sm text-gray-500 mt-1">Scan QRIS di bawah ini untuk membayar.</p>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl border border-gray-200 mb-4 inline-block shadow-sm">
-                        <img id="qrisImage" src="" alt="QR Code Pembayaran" class="mx-auto w-48 h-48 object-contain">
+                    <div class="bg-white p-3 rounded-xl border border-gray-200 mb-5 inline-block shadow-sm">
+                        <img id="qrisImage" src="" alt="Loading QR..." class="mx-auto w-48 h-48 object-contain">
                     </div>
-
-                    <div class="bg-gray-50 rounded-xl p-4 mb-6 text-left">
-                        <p class="text-xs text-gray-500 uppercase font-bold mb-2">Detail Pembayaran</p>
-                        <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Invoice:</span>
-                            <span id="payInvoice" class="font-mono font-bold text-gray-900">-</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Total:</span>
-                            <span id="payPrice" class="font-bold text-blue-600">-</span>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-gray-400 mb-4">Server akan otomatis aktif setelah pembayaran terverifikasi.</p>
+                    
+                    <button id="btnCekPembayaran" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2 mb-3">
+                        <i class="fa-solid fa-check-circle"></i> Saya Sudah Bayar
+                    </button>
                     
                     <button onclick="closeModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition">
-                        Tutup
+                        Batal
+                    </button>
+                </div>
+
+                <!-- TAHAP 3: SUKSES -->
+                <div id="stepSuccess" class="hidden text-center py-2 animate-fade-in-up">
+                    <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-full mb-4 text-emerald-500 border-4 border-emerald-50">
+                        <i class="fa-solid fa-check text-3xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-gray-900 mb-2">Pembayaran Sukses!</h2>
+                    <p class="text-sm text-gray-500 mb-6">Server bot Anda telah aktif.</p>
+
+                    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-left space-y-4 mb-6 shadow-inner">
+                        <div>
+                            <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">🔗 Panel URL</p>
+                            <div class="bg-white p-2.5 rounded-lg border border-gray-200">
+                                <a href="#" id="succUrl" target="_blank" class="text-sm font-mono text-blue-600 font-bold break-all hover:underline">-</a>
+                            </div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <div class="flex-1">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">👤 Username</p>
+                                <div class="bg-white p-2.5 rounded-lg border border-gray-200 text-sm font-mono text-gray-900 font-bold" id="succUser">-</div>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">🔑 Password</p>
+                                <div class="bg-white p-2.5 rounded-lg border border-gray-200 text-sm font-mono text-gray-900 font-bold" id="succPass">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btnMasukPanel" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 group">
+                        Masuk ke Panel Sekarang
+                        <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
                     </button>
                 </div>
             </div>
@@ -149,23 +166,13 @@
         <i class="fa-solid fa-circle-check text-green-400"></i>
         <span id="toastMessage">Notifikasi</span>
     </div>
-
     <script>
         // --- DATA PRODUK ---
         const products = [
             { id: 'basic', name: '1GB Basic', price: 5000, ram: '1GB', disk: '5GB', cpu: '100%', popular: false },
             { id: 'standar', name: '2GB Standard', price: 10000, ram: '2GB', disk: '10GB', cpu: '150%', popular: true },
             { id: 'pro', name: '4GB Pro', price: 20000, ram: '4GB', disk: '20GB', cpu: '200%', popular: false },
-            { 
-                id: 'custom', 
-                name: 'Custom Plan', 
-                price: 0, 
-                ram: 'Bebas', 
-                disk: 'Bebas', 
-                cpu: 'Bebas', 
-                popular: false,
-                isCustom: true 
-            }
+            { id: 'custom', name: 'Custom Plan', price: 0, ram: 'Bebas', disk: 'Bebas', cpu: 'Bebas', popular: false, isCustom: true }
         ];
 
         // --- RENDER PRODUK ---
@@ -181,16 +188,16 @@
                             
                             <div class="space-y-3 mb-6">
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-gray-600">RAM (0 = Unlimited)</span>
-                                    <input type="number" id="customRamCard" value="256" min="0" step="128" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                    <span class="text-gray-600">RAM (MB)</span>
+                                    <input type="number" id="customRamCard" value="256" min="0" step="128" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50 outline-none">
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-gray-600">Disk (0 = Unlimited)</span>
-                                    <input type="number" id="customDiskCard" value="1" min="0" step="1" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                    <span class="text-gray-600">Disk (GB)</span>
+                                    <input type="number" id="customDiskCard" value="1" min="0" step="1" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50 outline-none">
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-gray-600">CPU (0 = Unlimited)</span>
-                                    <input type="number" id="customCpuCard" value="25" min="0" step="25" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50">
+                                    <span class="text-gray-600">CPU (%)</span>
+                                    <input type="number" id="customCpuCard" value="25" min="0" step="25" onchange="updateCardPrice()" class="w-24 px-2 py-1 border rounded text-right bg-gray-50 outline-none">
                                 </div>
                             </div>
 
@@ -199,10 +206,7 @@
                                 <div id="customPriceDisplayCard" class="text-2xl font-black text-blue-700">Rp 5.565</div>
                             </div>
                         </div>
-                        
-                        <button onclick="openCheckoutFromCard()" class="w-full py-3 px-4 rounded-xl font-semibold bg-gray-900 hover:bg-gray-800 text-white transition">
-                            Buat Paket Ini
-                        </button>
+                        <button onclick="openCheckoutFromCard()" class="w-full py-3 px-4 rounded-xl font-semibold bg-gray-900 hover:bg-gray-800 text-white transition">Buat Paket Ini</button>
                     </div>
                     `;
                 }
@@ -213,9 +217,7 @@
                 <div class="group bg-white border ${isPopular ? 'border-blue-200 ring-1 ring-blue-100' : 'border-gray-100'} rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden">
                     ${isPopular ? '<div class="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-xl">POPULER</div>' : ''}
                     <div>
-                        <div class="mb-4">
-                            <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">${product.name}</h3>
-                        </div>
+                        <div class="mb-4"><h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">${product.name}</h3></div>
                         <div class="mb-6"><span class="text-3xl font-black text-gray-900">${priceDisplay}</span><span class="text-gray-400 text-sm font-medium">/bulan</span></div>
                         <ul class="space-y-3 mb-8">
                             <li class="flex items-center text-sm text-gray-600"><i class="fa-solid fa-memory text-blue-500 w-6"></i> RAM ${product.ram}</li>
@@ -223,70 +225,44 @@
                             <li class="flex items-center text-sm text-gray-600"><i class="fa-solid fa-microchip text-blue-500 w-6"></i> CPU ${product.cpu}</li>
                         </ul>
                     </div>
-                    <button onclick="openCheckout('${product.id}')" class="w-full py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${isPopular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'}">
-                        Pilih Paket
-                    </button>
+                    <button onclick="openCheckout('${product.id}')" class="w-full py-3 px-4 rounded-xl font-semibold transition flex items-center justify-center gap-2 ${isPopular ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20' : 'bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200'}">Pilih Paket</button>
                 </div>
                 `;
             }).join('');
             updateCardPrice();
         }
 
-        // --- LOGIKA CUSTOM PLAN (SUPPORT 0 = UNLIMITED) ---
+        // --- LOGIKA HARGA CUSTOM ---
         function calculateCustomPrice() {
-            // Ambil nilai, jika kosong atau invalid anggap 0
-            let ram = parseInt(document.getElementById('customRam')?.value);
-            let disk = parseInt(document.getElementById('customDisk')?.value);
-            let cpu = parseInt(document.getElementById('customCpu')?.value);
-
-            // Handle NaN atau negatif jadi 0
-            ram = (isNaN(ram) || ram < 0) ? 0 : ram;
-            disk = (isNaN(disk) || disk < 0) ? 0 : disk;
-            cpu = (isNaN(cpu) || cpu < 0) ? 0 : cpu;
-
-            // Rumus Harga: Base 2000 + Ram*10 + Disk*500 + Cpu*50
-            // Kalau 0 (unlimited), kita kasih harga premium misal 50000 atau sesuaikan logic lu
-            // Di sini gue asumsikan unlimited itu mahal, misal dikali 100x lipat dari base
-            const ramPrice = ram === 0 ? 50000 : (ram * 10);
-            const diskPrice = disk === 0 ? 50000 : (disk * 500);
-            const cpuPrice = cpu === 0 ? 50000 : (cpu * 50);
-            
-            const price = 2000 + ramPrice + diskPrice + cpuPrice;
-            
+            let ram = parseInt(document.getElementById('customRam')?.value) || 0;
+            let disk = parseInt(document.getElementById('customDisk')?.value) || 0;
+            let cpu = parseInt(document.getElementById('customCpu')?.value) || 0;
+            const price = 2000 + (ram * 10) + (disk * 500) + (cpu * 50);
             if(document.getElementById('customPriceDisplay')) {
                 document.getElementById('customPriceDisplay').innerText = `Rp ${price.toLocaleString('id-ID')}`;
             }
             return price;
         }
 
-        // Helper buat update harga di kartu produk (biar sinkron sama modal)
         function updateCardPrice() {
             const r = document.getElementById('customRamCard')?.value || 256;
             const d = document.getElementById('customDiskCard')?.value || 1;
             const c = document.getElementById('customCpuCard')?.value || 25;
             
-            // Sync ke input modal juga biar pas dibuka nilainya sama
             if(document.getElementById('customRam')) document.getElementById('customRam').value = r;
             if(document.getElementById('customDisk')) document.getElementById('customDisk').value = d;
             if(document.getElementById('customCpu')) document.getElementById('customCpu').value = c;
 
-            calculateCustomPrice();
+            const price = calculateCustomPrice();
+            if(document.getElementById('customPriceDisplayCard')) {
+                document.getElementById('customPriceDisplayCard').innerText = `Rp ${price.toLocaleString('id-ID')}`;
+            }
         }
 
-        function openCheckoutFromCard() {
-            openCheckout('custom');
-        }
+        function openCheckoutFromCard() { openCheckout('custom'); }
 
         // --- MODAL FUNCTIONS ---
         function openCheckout(planId) {
-            // Reset ke tahap form
-            document.getElementById('stepForm').classList.remove('hidden');
-            document.getElementById('stepPayment').classList.add('hidden');
-            document.getElementById('modalTitle').textContent = 'Konfirmasi Pembelian';
-            
-            // Jangan reset form sepenuhnya biar user gak ilang data kalau salah klik
-            // document.getElementById('checkoutForm').reset(); 
-
             const product = products.find(p => p.id === planId);
             document.getElementById('planIdInput').value = planId;
             
@@ -296,12 +272,7 @@
                 const r = document.getElementById('customRam').value;
                 const d = document.getElementById('customDisk').value;
                 const c = document.getElementById('customCpu').value;
-                
-                const rText = r == 0 ? "Unlimited" : `${r}MB`;
-                const dText = d == 0 ? "Unlimited" : `${d}GB`;
-                const cText = c == 0 ? "Unlimited" : `${c}%`;
-
-                summaryText = `Custom (${rText} RAM, ${dText} Disk, ${cText} CPU) - Rp ${price.toLocaleString('id-ID')}`;
+                summaryText = `Custom (${r}MB RAM, ${d}GB Disk, ${c}% CPU) - Rp ${price.toLocaleString('id-ID')}`;
                 document.getElementById('customSpecs').classList.remove('hidden');
             } else {
                 document.getElementById('customSpecs').classList.add('hidden');
@@ -317,85 +288,126 @@
             const modal = document.getElementById('checkoutModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            
+            setTimeout(() => {
+                document.getElementById('stepForm').classList.remove('hidden');
+                document.getElementById('stepPayment').classList.add('hidden');
+                document.getElementById('stepSuccess').classList.add('hidden');
+                document.getElementById('modalHeader').classList.remove('hidden');
+                document.getElementById('checkoutForm').reset();
+            }, 300);
         }
 
-        // --- HANDLE SUBMIT & SHOW QRIS ---
+        // --- STATE PEMBAYARAN ---
+        let currentTopupId = null;
+        let currentUsername = null;
+        let currentPassword = null;
+
+        // --- TAHAP 1: SUBMIT FORM -> DAPETIN QRIS ---
         document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button[type="submit"]');
+            const btn = document.getElementById('btnSubmitPesanan');
             const originalText = btn.innerHTML;
             
-            btn.disabled = true;
-            btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mr-2"></div> Memproses...`;
-
+            currentUsername = document.getElementById('usernameInput').value;
+            currentPassword = document.getElementById('passwordInput').value;
             const planId = document.getElementById('planIdInput').value;
-            const payload = {
-                plan_key: planId,
-                server_name: document.getElementById('serverName').value,
-                payment_method: document.getElementById('paymentMethod').value,
-            };
 
-            if (planId === 'custom') {
-                // Kirim 0 kalau user mau unlimited
-                payload.custom_ram = parseInt(document.getElementById('customRam').value) || 0;
-                payload.custom_disk = parseInt(document.getElementById('customDisk').value) || 0;
-                payload.custom_cpu = parseInt(document.getElementById('customCpu').value) || 0;
-            }
+            if (currentUsername.length < 3) return showToast("Username minimal 3 karakter!", true);
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="loader border-white border-t-transparent w-5 h-5 mx-auto"></div>`;
 
             try {
-                // GANTI URL INI DENGAN ENDPOINT WEBHOOK LU YANG SEBENARNYA
-                // Pastikan URL ini bener-bener ngembaliin JSON, bukan HTML error page
-                const response = await fetch('/api/webhook', { 
+                let payload = { plan_id: planId };
+                if (planId === 'custom') payload.custom_amount = calculateCustomPrice();
+
+                const response = await fetch('/api/generate-qris', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload) 
                 });
-
-                // Cek dulu apakah response OK sebelum parse JSON
-                if (!response.ok) {
-                    // Kalau error, coba baca text dulu biar gak crash pas parse JSON
-                    const errorText = await response.text();
-                    throw new Error(`Server Error (${response.status}): ${errorText.substring(0, 100)}...`);
-                }
-
+                
                 const data = await response.json();
 
-                // SUKSES! Tampilkan QRIS di dalam modal
-                document.getElementById('stepForm').classList.add('hidden');
-                document.getElementById('stepPayment').classList.remove('hidden');
-                document.getElementById('modalTitle').textContent = 'Selesaikan Pembayaran';
-                
-                // Set data QRIS
-                // Fallback pakai API qrserver kalau webhook cuma kirim string
-                const qrData = data.qr_string || data.qr_image_url || 'https://via.placeholder.com/200?text=QR+Error';
-                document.getElementById('qrisImage').src = data.qr_image_url || `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
-                
-                document.getElementById('payInvoice').textContent = data.invoice || 'INV-UNKNOWN';
-                document.getElementById('payPrice').textContent = `Rp ${(data.final_price || calculateCustomPrice()).toLocaleString('id-ID')}`;
-
+                if (data.success && data.qr_url) {
+                    currentTopupId = data.topup_id;
+                    document.getElementById('stepForm').classList.add('hidden');
+                    document.getElementById('stepPayment').classList.remove('hidden');
+                    document.getElementById('modalTitle').textContent = 'Selesaikan Pembayaran';
+                    document.getElementById('qrisImage').src = data.qr_url;
+                    document.getElementById('payPrice').textContent = `Rp ${parseInt(data.real_price).toLocaleString('id-ID')}`;
+                } else {
+                    showToast(data.error || 'Gagal membuat QRIS.', true);
+                }
             } catch (error) {
-                console.error(error);
-                showToast(error.message || 'Gagal menghubungi server. Cek konsol.', true);
+                showToast('Gagal menghubungi server.', true);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
         });
 
+        // --- TAHAP 2: CEK PEMBAYARAN LUNAS -> TAMPILKAN PANEL ---
+        document.getElementById('btnCekPembayaran').addEventListener('click', async () => {
+            if (!currentTopupId) return showToast("Data pembayaran tidak valid.", true);
+            
+            const btn = document.getElementById('btnCekPembayaran');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memeriksa...`;
+
+            try {
+                const response = await fetch('/api/webhook', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        plan_key: document.getElementById('planIdInput').value, 
+                        topup_id: currentTopupId,
+                        username: currentUsername,
+                        password: currentPassword
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success && data.data_akun) {
+                    document.getElementById('modalHeader').classList.add('hidden');
+                    document.getElementById('stepPayment').classList.add('hidden');
+                    document.getElementById('stepSuccess').classList.remove('hidden');
+
+                    document.getElementById('succUrl').href = data.data_akun.login_url;
+                    document.getElementById('succUrl').textContent = data.data_akun.login_url;
+                    document.getElementById('succUser').textContent = data.data_akun.username;
+                    document.getElementById('succPass').textContent = data.data_akun.password;
+
+                    document.getElementById('btnMasukPanel').onclick = () => { window.open(data.data_akun.login_url, '_blank'); };
+                } else {
+                    showToast(data.error || "Pembayaran belum lunas.", true);
+                }
+            } catch (error) {
+                showToast('Gangguan saat mengecek pembayaran.', true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        });
+
+        // --- TOAST NOTIFICATION ---
         function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toastMessage');
             const icon = toast.querySelector('i');
+            
             msgEl.textContent = message;
             if (isError) {
                 icon.className = 'fa-solid fa-circle-exclamation text-red-400';
             } else {
                 icon.className = 'fa-solid fa-circle-check text-green-400';
             }
+            
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3500);
         }
 
         renderProducts();
