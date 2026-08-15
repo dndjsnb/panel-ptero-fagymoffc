@@ -6,6 +6,7 @@ const PTERO_KEY = process.env.PTERO_PTLA_KEY;
 const ZAKKI_TOKEN = process.env.ZAKKI_TOKEN;
 const BOT_TOKEN = process.env.BOT_TOKEN;
 const CHAT_ID = process.env.TESTI_CHAT_ID;
+const PTERO_BOT_URL = process.env.PTERO_BOT_URL; // Tambahan buat port bot WA lu
 
 // --- SAKLAR DEMO MODE ---
 // true  = Langsung sukses / lunas otomatis tanpa bayar (buat testing)
@@ -41,7 +42,7 @@ module.exports = async (req, res) => {
             return res.status(400).json({ success: false, error: "Pembayaran belum lunas atau belum dideteksi." });
         }
 
-        // --- BUAT SERVER DI PTERODACTYL ---
+        // --- 1. BUAT SERVER DI PTERODACTYL ---
         const serverData = {
             name: username || 'Bot Server',
             user: 1, 
@@ -71,20 +72,39 @@ module.exports = async (req, res) => {
             console.error("Pterodactyl Error:", pteroErr.response?.data || pteroErr.message);
         }
 
-        // --- KIRIM NOTIFIKASI TELEGRAM ---
+        // --- 2. KIRIM NOTIFIKASI TELEGRAM (WAJIB PAKAI AWAIT) ---
         if (BOT_TOKEN && CHAT_ID) {
-            const teleMessage = `🚀 *Server Pterodactyl Berhasil Dibuat!*\n\n` +
-                                `👤 *User:* ${username || 'Fahmi'}\n` +
-                                `⚡ *Status:* Aktif`;
+            const teleMessage = ` *Server Pterodactyl Berhasil Dibuat!*\n\n` +
+                                ` *User:* ${username || 'Fahmi'}\n` +
+                                ` *Status:* Aktif`;
             
-            axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                chat_id: CHAT_ID,
-                text: teleMessage,
-                parse_mode: 'Markdown'
-            }).catch(() => {});
+            try {
+                await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    chat_id: CHAT_ID,
+                    text: teleMessage,
+                    parse_mode: 'Markdown'
+                });
+            } catch (teleErr) {
+                console.error("Gagal kirim Telegram:", teleErr.message);
+            }
         }
 
-        // --- KEMBALIKAN DATA AKUN KE FRONTEND ---
+        // --- 3. KIRIM NOTIFIKASI WHATSAPP (TEMBAK HTTP KE BOT PTERO, WAJIB PAKAI AWAIT) ---
+        if (PTERO_BOT_URL) {
+            try {
+                await axios.post(PTERO_BOT_URL, {
+                    username: username || 'Fahmi',
+                    plan_key: plan_key || 'Custom',
+                    topup_id: topup_id,
+                    status: 'LUNAS'
+                });
+            } catch (waErr) {
+                console.error("Gagal nembak HTTP ke bot WA Pterodactyl:", waErr.message);
+            }
+        }
+
+        // --- 4. KEMBALIKAN DATA AKUN KE FRONTEND ---
+        // Dieksekusi PALING AKHIR setelah semua notifikasi beres terkirim
         return res.status(200).json({
             success: true,
             data_akun: {
