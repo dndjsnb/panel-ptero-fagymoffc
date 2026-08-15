@@ -11,7 +11,7 @@ const PTERO_BOT_URL = process.env.PTERO_BOT_URL; // Tambahan buat port bot WA lu
 // --- SAKLAR DEMO MODE ---
 // true  = Langsung sukses / lunas otomatis tanpa bayar (buat testing)
 // false = Cek pembayaran asli via Zakkistore
-const IS_DEMO_MODE = false; 
+const IS_DEMO_MODE = true; 
 
 module.exports = async (req, res) => {
     // Pastikan hanya menerima method POST
