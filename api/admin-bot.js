@@ -1,5 +1,5 @@
 const { Telegraf } = require('telegraf');
-const { MongoClient } = require('mongoose');
+const { mongoose } = require('mongoose');
 
 // Narik URL Mongo dari index.js
 const { mongoURI } = require('./index.js'); 
