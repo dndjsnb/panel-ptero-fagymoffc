@@ -4,294 +4,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>FahmiHost - Reseller Dashboard</title>
+    <!-- Font: Inter for modern, highly readable typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
-        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { brand: { primary: '#6366f1' }, dark: { 800: '#121217', 900: '#09090b' } } } } }
-    </script>
-    <style>
-        body { background-color: #09090b; color: #e4e4e7; }
-        .glass { background: rgba(28, 28, 36, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .page-section { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .page-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #09090b; }
-        ::-webkit-scrollbar-thumb { background: #272735; border-radius: 10px; }
-        #initLoader { position: fixed; inset: 0; z-index: 99999; background-color: #09090b; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    </style>
-
-    <script>
-        if (localStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.replace('reseller-login.html'); 
-        } else {
-            document.addEventListener("DOMContentLoaded", function() {
-                const rawData = localStorage.getItem('userData');
-                if (rawData) {
-                    try {
-                        const user = JSON.parse(rawData);
-                        document.getElementById('uiResellerName').innerText = user.name || 'User';
-                        document.getElementById('uiResellerEmail').innerText = user.email || '-';
-                        document.getElementById('uiResellerWa').innerHTML = `<i class="fa-brands fa-whatsapp"></i> ${user.whatsapp || '-'}`;
-                        document.getElementById('uiResellerStatus').innerText = `Status: ${user.status || 'AKTIF'}`;
-                    } catch(e) {}
-                }
-                setTimeout(() => { document.getElementById('initLoader').style.display = 'none'; }, 300);
-            });
+        tailwind.config = { 
+            darkMode: 'class', 
+            theme: { 
+                extend: { 
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { 
+                        brand: { primary: '#4F46E5', primaryHover: '#4338CA' }, 
+                        surface: { 100: '#18181B', 200: '#27272A' },
+                        base: '#09090B'
+                    } 
+                } 
+            } 
         }
     </script>
+    <style>
+        body { background-color: #09090b; color: #A1A1AA; font-family: 'Inter', sans-serif; }
+        .page-section { display: none; }
+        .page-section.active { display: block; animation: fadeIn 0.2s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Minimalist Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #27272A; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3F3F46; }
+        
+        /* Remove default input arrows */
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden relative">
+<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <div id="initLoader">
-        <div class="w-12 h-12 rounded-xl bg-brand-primary flex items-center justify-center text-white text-2xl font-bold animate-pulse mb-4 shadow-[0_0_20px_rgba(99,102,241,0.6)]">F</div>
-        <p class="text-xs text-gray-400 font-bold tracking-widest uppercase animate-pulse">Menyiapkan Data...</p>
-    </div>
-
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-[60] w-64 glass border-r border-white/5 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col">
-        <div class="p-6 flex items-center gap-3 border-b border-white/5">
-            <div class="w-8 h-8 rounded-lg bg-brand-primary flex items-center justify-center text-white font-bold">F</div>
-            <h1 class="text-xl font-bold text-white tracking-tight">Fahmi<span class="text-brand-primary">Host</span></h1>
+    <!-- SIDEBAR: Solid background, subtle border, clear typography -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-base border-r border-surface-200 transform -translate-x-full md:translate-x-0 transition-transform duration-200 flex flex-col">
+        <div class="h-16 flex items-center px-6 border-b border-surface-200">
+            <div class="w-6 h-6 rounded bg-brand-primary flex items-center justify-center text-white text-xs font-bold mr-3">F</div>
+            <h1 class="text-sm font-semibold text-zinc-100 tracking-tight">FahmiHost</h1>
         </div>
-        <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            <a href="javascript:void(0)" onclick="switchPage('dashboard')" id="nav-dashboard" class="nav-item active-nav cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-brand-primary/10 text-brand-primary border border-brand-primary/20"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</a>
-            <a href="javascript:void(0)" onclick="switchPage('topup')" id="nav-topup" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-wallet w-5"></i> Deposit Saldo</a>
-            <a href="javascript:void(0)" onclick="switchPage('withdraw')" id="nav-withdraw" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-money-bill-transfer w-5"></i> Withdraw Dana</a>
-            <a href="javascript:void(0)" onclick="switchPage('settings')" id="nav-settings" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-gear w-5"></i> Pengaturan Rekening</a>
-            <a href="javascript:void(0)" onclick="switchPage('servers')" id="nav-servers" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:bg-white/5 hover:text-white transition-all duration-200"><i class="fa-solid fa-server w-5"></i> Kelola Server</a>
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            <!-- Active State: Subtle background, white text -->
+            <a href="javascript:void(0)" onclick="switchPage('dashboard')" class="nav-item active-nav flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-surface-200 text-zinc-100">
+                <i class="fa-solid fa-chart-pie w-4 text-zinc-400"></i> Dashboard
+            </a>
+            <a href="javascript:void(0)" onclick="switchPage('topup')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-surface-100 hover:text-zinc-100">
+                <i class="fa-solid fa-wallet w-4"></i> Deposit Saldo
+            </a>
+            <a href="javascript:void(0)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-surface-100 hover:text-zinc-100">
+                <i class="fa-solid fa-server w-4"></i> Kelola Server
+            </a>
             
-            <a href="javascript:void(0)" onclick="logoutReseller()" class="nav-item cursor-pointer w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 mt-8"><i class="fa-solid fa-right-from-bracket w-5"></i> Keluar</a>
+            <div class="pt-8">
+                <a href="javascript:void(0)" onclick="logoutReseller()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-red-400/80 hover:bg-red-500/10 hover:text-red-400">
+                    <i class="fa-solid fa-right-from-bracket w-4"></i> Keluar
+                </a>
+            </div>
         </nav>
     </aside>
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64 z-10">
-        <header class="sticky top-0 z-40 glass border-b border-white/5 px-6 py-4 flex items-center justify-between shrink-0">
-            <button type="button" onclick="toggleSidebar()" class="md:hidden text-gray-400 hover:text-white p-2 -ml-2 cursor-pointer"><i class="fa-solid fa-bars text-xl"></i></button>
-            <h2 id="page-title" class="text-lg font-semibold text-white">Dashboard Overview</h2>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64 bg-base">
+        <!-- HEADER: Clean, border-only separation -->
+        <header class="h-16 border-b border-surface-200 px-6 flex items-center justify-between shrink-0 bg-base">
+            <div class="flex items-center gap-4">
+                <button type="button" onclick="toggleSidebar()" class="md:hidden text-zinc-400 hover:text-zinc-100 transition-colors">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 class="text-sm font-medium text-zinc-100">Overview</h2>
+            </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 scroll-smooth relative z-10">
-            <!-- DASHBOARD -->
-            <div id="page-dashboard" class="page-section active max-w-6xl mx-auto space-y-6">
-                <div class="glass rounded-2xl p-6 md:p-8 border border-white/5 bg-gradient-to-br from-dark-800 to-dark-900 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex-1 overflow-y-auto p-6 md:p-8">
+            <!-- DASHBOARD SECTION -->
+            <div id="page-dashboard" class="page-section active max-w-4xl space-y-6">
+                <!-- User Card: Flat design, strict alignment -->
+                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h3 class="text-xl font-bold text-white mb-1" id="uiResellerName">Loading...</h3>
-                        <p class="text-sm text-gray-400" id="uiResellerEmail">loading@mail.com</p>
-                        <div class="flex flex-wrap gap-2 mt-3">
-                            <span class="text-[11px] bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded border border-emerald-500/30 font-semibold uppercase" id="uiResellerStatus">Status: AKTIF</span>
-                            <span class="text-[11px] bg-blue-500/20 text-blue-400 px-2 py-1 rounded border border-blue-500/30 font-semibold" id="uiResellerWa"><i class="fa-brands fa-whatsapp"></i> Loading...</span>
+                        <h3 class="text-lg font-semibold text-zinc-100" id="uiResellerName">Fahmi</h3>
+                        <p class="text-sm text-zinc-400 mt-0.5" id="uiResellerEmail">admin@fahmihost.com</p>
+                        <div class="flex flex-wrap gap-2 mt-4">
+                            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md font-medium tracking-wide uppercase">Aktif</span>
+                            <span class="text-[11px] bg-surface-200 text-zinc-300 px-2 py-1 rounded-md font-medium"><i class="fa-brands fa-whatsapp mr-1"></i> Terhubung</span>
                         </div>
                     </div>
-                    <div class="text-left md:text-right bg-black/20 p-4 rounded-xl border border-white/5">
-                        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Saldo Anda</p>
-                        <h3 class="text-2xl font-black text-emerald-400" id="uiResellerSaldo">Rp 0</h3>
+                    <div class="text-left md:text-right">
+                        <p class="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-1">Total Saldo</p>
+                        <h3 class="text-2xl font-bold text-zinc-100" id="uiResellerSaldo">Rp 1.450.000</h3>
                     </div>
                 </div>
 
-                <div class="glass rounded-2xl p-6 md:p-8 border border-indigo-500/30 bg-gradient-to-br from-indigo-900/20 to-purple-900/10">
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-lg font-bold text-white">Link Order Customer</h3>
-                            <p class="text-xs text-gray-400 mt-1">Generate link aman untuk pembeli. Link tersimpan di database.</p>
-                        </div>
+                <!-- Action Card: Removed heavy gradient, focused on function -->
+                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200">
+                    <div class="mb-5">
+                        <h3 class="text-sm font-semibold text-zinc-100">Link Order Customer</h3>
+                        <p class="text-sm text-zinc-500 mt-1">Buat tautan pembayaran aman untuk pesanan baru.</p>
                     </div>
-                    <div class="flex gap-2 bg-black/30 p-2 rounded-lg border border-white/5">
-                        <input type="text" readonly id="secureOrderLinkInput" placeholder="Klik Generate..." class="flex-1 bg-transparent text-sm text-gray-200 outline-none font-mono truncate">
-                        <button onclick="generateLinkDariServer()" id="btnGenLink" class="bg-brand-primary hover:bg-indigo-500 text-white px-4 py-2 rounded-md text-xs font-bold transition cursor-pointer">GENERATE</button>
+                    <div class="flex gap-3">
+                        <input type="text" readonly id="secureOrderLinkInput" placeholder="Menunggu *generate*..." class="flex-1 bg-base border border-surface-200 rounded-lg px-4 py-2.5 text-sm text-zinc-300 font-mono focus:outline-none focus:border-brand-primary transition-colors">
+                        <button onclick="generateLinkDariServer()" id="btnGenLink" class="bg-zinc-100 hover:bg-white text-zinc-900 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">Generate</button>
                     </div>
                 </div>
             </div>
 
-            <!-- TOPUP -->
-            <div id="page-topup" class="page-section max-w-6xl mx-auto space-y-6">
-                <div class="glass rounded-2xl p-6 md:p-8 relative overflow-hidden">
-                    <h3 class="text-lg font-bold text-white mb-6 relative z-10">Deposit Saldo Reseller</h3>
-                    <div id="uiAlert" class="hidden relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center"></div>
+            <!-- TOPUP SECTION -->
+            <div id="page-topup" class="page-section max-w-2xl space-y-6">
+                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200">
+                    <h3 class="text-sm font-semibold text-zinc-100 mb-6">Deposit Saldo</h3>
+                    
+                    <div class="space-y-6">
+                        <!-- Nominal Selection -->
+                        <div class="space-y-3">
+                            <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Pilih Nominal</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <!-- Standardizing active state via border and bg -->
+                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">10.000</button>
+                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">25.000</button>
+                                <!-- Active Example -->
+                                <button type="button" class="border border-brand-primary bg-brand-primary/10 rounded-lg py-3 text-sm font-medium text-brand-primary transition-colors">50.000</button>
+                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">100.000</button>
+                            </div>
+                        </div>
 
-                    <div id="depositFormWrapper" class="relative z-10">
-                        <div class="space-y-1.5 mb-6">
-                            <label class="text-xs font-medium text-gray-400 ml-1">Nominal Deposit Manual (Minimal Rp 1.000)</label>
+                        <!-- Custom Input -->
+                        <div class="space-y-3">
+                            <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Nominal Khusus</label>
                             <div class="relative">
-                                <span class="absolute left-4 top-3.5 text-gray-400 font-medium">Rp</span>
-                                <input type="number" id="customAmount" placeholder="1000" class="w-full bg-dark-800 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-white outline-none focus:border-brand-primary" oninput="resetNominalButtons()">
+                                <span class="absolute left-4 top-3 text-zinc-500 text-sm font-medium">Rp</span>
+                                <input type="number" placeholder="0" value="50000" class="w-full bg-base border border-surface-200 rounded-lg pl-11 pr-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-brand-primary transition-colors">
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6" id="nominalContainer">
-                            <button type="button" data-plan-id="DEP_10K" onclick="selectNominal(this, 10000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 10.000</button>
-                            <button type="button" data-plan-id="DEP_25K" onclick="selectNominal(this, 25000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 25.000</button>
-                            <button type="button" data-plan-id="DEP_50K" onclick="selectNominal(this, 50000)" class="nominal-btn cursor-pointer bg-brand-primary/20 border border-brand-primary rounded-xl py-3 text-white font-semibold text-sm active-nominal">Rp 50.000</button>
-                            <button type="button" data-plan-id="DEP_100K" onclick="selectNominal(this, 100000)" class="nominal-btn cursor-pointer bg-dark-800 border border-white/10 hover:border-brand-primary rounded-xl py-3 text-white font-semibold text-sm">Rp 100.000</button>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div class="space-y-1.5">
-                                <label class="text-xs font-medium text-gray-400 ml-1">Metode Pembayaran</label>
-                                <select id="paymentMethod" class="w-full bg-dark-800 border border-white/10 rounded-xl px-4 py-3 text-sm text-white outline-none"><option value="QRIS">QRIS (Otomatis)</option></select>
-                            </div>
-                            <button type="button" onclick="processDeposit()" class="cursor-pointer w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3.5 rounded-xl text-sm mt-4">Lanjutkan Pembayaran</button>
-                        </div>
-                    </div>
-
-                    <!-- WRAPPER QRIS CHECKOUT -->
-                    <div id="qrisCheckoutWrapper" class="hidden relative z-10 text-center py-2">
-                        <div class="bg-gray-900/80 p-4 rounded-xl border border-gray-800/80 flex items-center justify-between mb-6">
-                            <div class="text-left"><span class="text-[11px] text-gray-500 font-semibold">Tipe Transaksi</span><h3 class="text-sm font-bold text-gray-100">Deposit Saldo</h3></div>
-                            <div class="text-right"><span class="text-[11px] text-gray-500 font-semibold">Total Tagihan</span><h3 id="qrisAmountDisplay" class="text-lg font-black text-emerald-400">Rp 0</h3></div>
-                        </div>
-                        <div class="bg-white p-3 rounded-xl inline-block w-48 h-48 sm:w-56 sm:h-56 flex items-center justify-center mx-auto relative mb-6">
-                            <div id="qrisLoading" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 text-gray-500 gap-2"><span class="text-[10px] font-bold">MEMBUAT QR...</span></div>
-                            <img id="qrisImage" src="" alt="QRIS" class="w-full h-full object-contain hidden relative z-10 rounded-lg">
-                        </div>
-                        <div class="space-y-3 max-w-sm mx-auto">
-                            <button type="button" id="btnKonfirmasi" onclick="checkPaymentStatus()" class="cursor-pointer w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg">Saya Sudah Bayar</button>
-                            <button type="button" onclick="cancelDeposit()" class="cursor-pointer w-full bg-transparent border border-white/10 text-gray-400 hover:text-white font-semibold py-3.5 rounded-xl text-sm">Batalkan Topup</button>
+                        <div class="pt-2">
+                            <!-- Primary CTA -->
+                            <button type="button" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-medium py-3 rounded-lg text-sm transition-colors">Lanjutkan via QRIS</button>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- HALAMAN LAIN -->
-            <div id="page-withdraw" class="page-section max-w-6xl mx-auto space-y-6"></div>
-            <div id="page-settings" class="page-section max-w-6xl mx-auto space-y-6"></div>
-            <div id="page-servers" class="page-section max-w-6xl mx-auto space-y-6"></div>
+            
         </div>
     </main>
 
-    <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden md:hidden cursor-pointer"></div>
-
     <script>
-        // FUNGSI JAVASCRIPT UTAMA
-        function logoutReseller() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userData');
-            window.location.href = 'reseller-login.html';
-        }
-
-        async function generateLinkDariServer() {
-            const btn = document.getElementById('btnGenLink');
-            const inputLink = document.getElementById('secureOrderLinkInput');
-            btn.innerText = "WAIT..."; btn.disabled = true;
-            try {
-                const res = await fetch('/api/generate-link-database', { method: 'POST' });
-                const data = await res.json();
-                if(data.success) {
-                    inputLink.value = `https://fahmihost.com/pay/${data.short_id}`;
-                    btn.innerText = "COPY";
-                    btn.setAttribute('onclick', 'copyLinkBaru()');
-                    btn.disabled = false;
-                }
-            } catch (err) {
-                showNotification("Gagal", "error");
-                btn.innerText = "GENERATE"; btn.disabled = false;
-            }
-        }
-        
-        function copyLinkBaru() {
-            const input = document.getElementById('secureOrderLinkInput');
-            input.select(); document.execCommand('copy'); alert('Link aman disalin!');
-        }
-
+        // Minimalist JS logic to switch views (Function over fashion)
         function switchPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(page => page.classList.remove('active'));
-            const target = document.getElementById('page-' + pageId);
-            if(target) target.classList.add('active');
+            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
             
-            if(window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.add('-translate-x-full');
-                document.getElementById('sidebar-overlay').classList.add('hidden');
-            }
-        }
-        
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebar-overlay').classList.toggle('hidden');
-        }
-        
-        function showNotification(msg, type='error') {
-            const box = document.getElementById('uiAlert');
-            box.className = `relative z-10 mb-6 p-3.5 rounded-xl border text-xs sm:text-sm font-medium text-center ${type==='error'?'bg-red-950/60 border-red-800/80 text-red-300':'bg-blue-950/60 border-blue-800/80 text-blue-300'}`;
-            box.innerText = msg; box.classList.remove('hidden');
-        }
-        
-        function hideNotification() { document.getElementById('uiAlert').classList.add('hidden'); }
-
-        let currentTopupId = null;
-        function selectNominal(btnElement, amount) {
-            document.getElementById('customAmount').value = amount;
-            document.querySelectorAll('.nominal-btn').forEach(btn => btn.classList.remove('active-nominal', 'bg-brand-primary/20', 'border-brand-primary'));
-            document.querySelectorAll('.nominal-btn').forEach(btn => btn.classList.add('bg-dark-800', 'border-white/10'));
-            if(btnElement) {
-                btnElement.classList.remove('bg-dark-800', 'border-white/10');
-                btnElement.classList.add('active-nominal', 'bg-brand-primary/20', 'border-brand-primary');
-            }
-        }
-        
-        function resetNominalButtons() { selectNominal(null, document.getElementById('customAmount').value); }
-
-        async function processDeposit() {
-            hideNotification();
-            const activeBtn = document.querySelector('.active-nominal');
-            const selectedPlan = activeBtn ? activeBtn.getAttribute('data-plan-id') : "DEP_CUSTOM";
-            const customAmount = parseInt(document.getElementById('customAmount').value);
-            
-            if (!customAmount || isNaN(customAmount) || customAmount < 1000) {
-                showNotification("Minimal deposit Rp 1.000!", "error"); return;
-            }
-
-            document.getElementById('depositFormWrapper').classList.add('hidden');
-            document.getElementById('qrisCheckoutWrapper').classList.remove('hidden');
-            document.getElementById('qrisLoading').style.display = 'flex';
-            document.getElementById('qrisAmountDisplay').innerText = `Rp ${customAmount.toLocaleString('id-ID')}`;
-            
-            try {
-                const res = await fetch(`/api/generate-qris`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan_id: selectedPlan, custom_amount: customAmount })
-                });
-                const data = await res.json();
-                
-                if (data.success && data.qr_url) {
-                    const qrisImg = document.getElementById('qrisImage');
-                    document.getElementById('qrisLoading').style.display = 'none';
-                    qrisImg.src = data.qr_url; qrisImg.classList.remove('hidden');
-                    currentTopupId = data.topup_id; 
-                    if(data.real_price) document.getElementById('qrisAmountDisplay').innerText = `Rp ${data.real_price.toLocaleString('id-ID')}`;
-                } else {
-                    showNotification(data.error || "Gagal memuat QRIS.", "error");
-                }
-            } catch (err) { showNotification("Gangguan koneksi.", "error"); }
-        }
-        
-        function cancelDeposit() {
-            currentTopupId = null;
-            document.getElementById('qrisCheckoutWrapper').classList.add('hidden');
-            document.getElementById('depositFormWrapper').classList.remove('hidden');
-        }
-
-        async function checkPaymentStatus() {
-            if (!currentTopupId) return showNotification("Sesi belum siap.", "error");
-            const btn = document.getElementById('btnKonfirmasi');
-            btn.innerHTML = "Memeriksa..."; btn.disabled = true;
-            
-            try {
-                const res = await fetch('/api/webhook', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ plan_key: "deposit_saldo", topup_id: currentTopupId })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    showNotification("Berhasil deposit!", "success");
-                    setTimeout(cancelDeposit, 2000);
-                } else {
-                    showNotification(data.error || "Belum lunas.", "error");
-                    btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
-                }
-            } catch(e) {
-                showNotification("Error jaringan.", "error");
-                btn.innerHTML = "Saya Sudah Bayar"; btn.disabled = false;
-            }
+            // Reset nav state
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-surface-200', 'text-zinc-100', 'active-nav');
+                el.classList.add('text-zinc-400');
+            });
+            event.currentTarget.classList.add('bg-surface-200', 'text-zinc-100', 'active-nav');
+            event.currentTarget.classList.remove('text-zinc-400');
         }
     </script>
 </body>
