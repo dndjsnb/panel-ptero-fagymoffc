@@ -13,7 +13,7 @@ const botToken = process.env.ADMIN_BOT_TOKEN || 'TARUH_TOKEN_BOT_ADMIN_DI_SINI';
 const bot = new Telegraf(botToken);
 
 // Setup MongoDB pakai settingan bawaan Mongoose lu
-const client = new MongoClient(mongoURI);
+const client = new Mongoose(mongoURI);
 const dbName = 'test'; 
 const collectionName = 'resellers'; 
 
