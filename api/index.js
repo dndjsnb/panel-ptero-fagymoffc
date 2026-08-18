@@ -20,7 +20,7 @@ const resellerSchema = new mongoose.Schema({
     whatsapp: { type: String, required: true },
     telegram: { type: String, required: true },
     status: { type: String, default: 'pending' },
-    saldo: { type: Number, default: 0 } // Database siap nampung duit
+    saldo: { type: Number, default: 0 } 
 });
 
 const Reseller = mongoose.model('Reseller', resellerSchema);
@@ -69,6 +69,10 @@ app.post('/api/login', async (req, res) => {
         const user = await Reseller.findOne({ email });
         
         if (!user) return res.status(400).json({ message: 'Email belum terdaftar, Cok!' });
+        
+        // FITUR BARU: Cek kalau akun dibekukan via Bot Admin
+        if (user.status === 'suspended') return res.status(403).json({ message: 'Akun lu lagi dibekukan sama Owner!' });
+        
         if (user.password !== password) return res.status(400).json({ message: 'Password salah, Cok!' });
         if (user.status === 'pending') return res.status(200).json({ verified: false, message: 'Akun belum diverifikasi oleh Admin via WA!' });
         if (user.status === 'rejected') return res.status(400).json({ message: 'Pendaftaran ditolak Admin.' });
@@ -84,40 +88,25 @@ app.post('/api/login', async (req, res) => {
     } catch (error) { res.status(500).json({ message: 'Server error pas login!' }); }
 });
 
-// --- API GENERATE QRIS SAKTI (UDAH GAK KAKU LAGI) ---
+// --- API GENERATE QRIS SAKTI ---
 app.post('/api/generate-qris', async (req, res) => {
     const plan_id = req.body.plan_id || req.body.plan_key || 'UNKNOWN'; 
     const customAmount = req.body.custom_amount;
 
     try {
         let nominal = 0;
-
-        // JALUR 1: Kalau ada nominal (Dari Deposit Dashboard), langsung gas buatin QRIS! Gak usah mikirin data paket.
         if (customAmount && parseInt(customAmount) >= 1000) {
             nominal = parseInt(customAmount);
-        } 
-        // JALUR 2: Kalau nominal gak ada (Dari Checkout), baru kita cek harga paketnya.
-        else {
-            if (!plans[plan_id]) {
-                return res.status(400).json({ success: false, error: "Paket tidak valid atau harga tidak ditemukan." });
-            }
+        } else {
+            if (!plans[plan_id]) return res.status(400).json({ success: false, error: "Paket tidak valid atau harga tidak ditemukan." });
             nominal = plans[plan_id].price;
         }
 
-        // Generate QRIS via SDK Zakkistore
         const qrisData = await zakki.createQris(nominal, 0); 
         const topup_id = Date.now().toString() + Math.floor(Math.random()*1000);
 
-        res.status(200).json({ 
-            success: true, 
-            qr_url: qrisData.qr_url, 
-            topup_id: topup_id, 
-            real_price: nominal 
-        });
-
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Gagal membuat QRIS dari server." });
-    }
+        res.status(200).json({ success: true, qr_url: qrisData.qr_url, topup_id: topup_id, real_price: nominal });
+    } catch (error) { res.status(500).json({ success: false, error: "Gagal membuat QRIS dari server." }); }
 });
 
 // --- API WEBHOOK CEK PEMBAYARAN & KIRIM TESTIMONI ---
@@ -128,66 +117,33 @@ app.post('/api/webhook', async (req, res) => {
         const checkPayment = await zakki.cekStatus(topup_id); 
 
         if (checkPayment.status === "LUNAS" || checkPayment.status === "PAID") {
-            
-            // =========================================================
-            // 1. KIRIM NOTIFIKASI TELEGRAM
-            // =========================================================
             const BOT_TOKEN = process.env.BOT_TOKEN;
             const TESTI_CHAT_ID = process.env.TESTI_CHAT_ID;
             
             if (BOT_TOKEN && TESTI_CHAT_ID) {
                 const teleMessage = `🚀 *Pesanan Berhasil!*\n\n👤 *User:* ${username || 'Fahmi'}\n📦 *Paket:* ${plan_key || 'Custom'}\n⚡ *Status:* LUNAS / Aktif`;
                 try {
-                    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                        chat_id: TESTI_CHAT_ID,
-                        text: teleMessage,
-                        parse_mode: 'Markdown'
-                    });
-                } catch (teleErr) {
-                    console.error("Gagal kirim Telegram:", teleErr.message);
-                }
+                    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { chat_id: TESTI_CHAT_ID, text: teleMessage, parse_mode: 'Markdown' });
+                } catch (teleErr) {}
             }
 
-            // =========================================================
-            // 2. KIRIM NOTIFIKASI WHATSAPP (TEMBAK HTTP KE BOT PTERO)
-            // =========================================================
             const PTERO_BOT_URL = process.env.PTERO_BOT_URL;
             if (PTERO_BOT_URL) {
                 try {
-                    await axios.post(PTERO_BOT_URL, {
-                        username: username || 'Fahmi',
-                        plan_key: plan_key || 'Custom',
-                        topup_id: topup_id,
-                        status: 'LUNAS'
-                    });
-                } catch (waErr) {
-                    console.error("Gagal nembak HTTP ke bot WA Pterodactyl:", waErr.message);
-                }
+                    await axios.post(PTERO_BOT_URL, { username: username || 'Fahmi', plan_key: plan_key || 'Custom', topup_id: topup_id, status: 'LUNAS' });
+                } catch (waErr) {}
             }
 
-            // =========================================================
-            // PROSES LANJUTAN DEPOSIT / PTERODACTYL
-            // =========================================================
-            // Kalau ini webhook dari deposit
             if (plan_key === "deposit_saldo" || plan_key.startsWith("DEP_")) {
-                if (user_id) {
-                    await Reseller.findByIdAndUpdate(user_id, { $inc: { saldo: 10000 } }); // Nominal bisa lu ubah dinamis nanti
-                }
+                if (user_id) await Reseller.findByIdAndUpdate(user_id, { $inc: { saldo: 10000 } }); 
                 return res.status(200).json({ success: true, message: "Saldo berhasil ditambahkan." });
-            }
-            // Kalau ini webhook dari beli Ptero
-            else {
-                return res.status(200).json({ 
-                    success: true, 
-                    data_akun: { username: username || "fagem", password: password || "123", login_url: "https://panel.fahmihost.com" } 
-                });
+            } else {
+                return res.status(200).json({ success: true, data_akun: { username: username || "fagem", password: password || "123", login_url: "https://panel.fahmihost.com" } });
             }
         } else {
             return res.status(400).json({ success: false, error: "Pembayaran belum lunas." });
         }
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Kesalahan sistem webhook." });
-    }
+    } catch (error) { res.status(500).json({ success: false, error: "Kesalahan sistem webhook." }); }
 });
 
 // --- WEBHOOK TELEGRAM UTAMA ---
@@ -243,4 +199,6 @@ app.post('/api/tele-webhook', async (req, res) => {
     res.status(200).send('OK');
 });
 
+// EXPORT APP VERCEL & URL MONGO
 module.exports = app;
+module.exports.mongoURI = mongoURI;
