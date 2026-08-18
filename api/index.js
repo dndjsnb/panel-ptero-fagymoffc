@@ -47,8 +47,14 @@ const zakki = new ZakkiStore({
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, whatsapp, password } = req.body; 
-        const isExist = await Reseller.findOne({ email });
-        if(isExist) return res.status(400).json({ message: 'Email sudah terdaftar, Cok!' });
+        
+        // [FITUR BARU]: Cek duplikat email ATAU nomor WA sekaligus
+        const isExist = await Reseller.findOne({ 
+            $or: [{ email: email }, { whatsapp: whatsapp }] 
+        });
+        
+        // Kalau udah pernah daftar (apapun statusnya), tolak pendaftaran
+        if(isExist) return res.status(400).json({ message: 'Email atau Nomor WA sudah pernah didaftarkan. Anda tidak bisa mendaftar lagi!' });
 
         const newReseller = new Reseller({ 
             name, email, whatsapp, password, 
@@ -153,6 +159,16 @@ app.post('/api/tele-webhook', async (req, res) => {
 
     if (message && message.text && message.text.startsWith('/start')) {
         const chatId = message.chat.id;
+
+        // [FITUR BARU]: Cek apakah ID Telegram ini udah pernah diverifikasi
+        // Karena data lu di-save dengan format "ID: <chatId> | @<username>", kita cari pakai RegEx
+        const existingTeleUser = await Reseller.findOne({ telegram: new RegExp(`ID: ${chatId}`) });
+        
+        // Kalau ketemu datanya (status pending/accepted/rejected), langsung dicuekin (return 200 OK)
+        if (existingTeleUser) {
+            return res.status(200).send('OK');
+        }
+
         const username = message.chat.username ? `@${message.chat.username}` : 'Tidak Ada Username';
         const userId = message.text.split(' ')[1]; 
 
