@@ -1,4 +1,4 @@
-const  mongoose = require('mongoose'); // Benerin import dari mongoose jadi mongodb murni
+import  mongoose = require('mongoose'); // Benerin import dari mongoose jadi mongodb murni
 
 // Narik URL Mongo dari index.js[span_4](start_span)[span_4](end_span)
 const mongoURI  = require('./index.js'); //[span_5](start_span)[span_5](end_span)
