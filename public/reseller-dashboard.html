@@ -2,170 +2,278 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FahmiHost - Reseller Dashboard</title>
-    <!-- Font: Inter for modern, highly readable typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pterodactyl Reseller Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
-        tailwind.config = { 
-            darkMode: 'class', 
-            theme: { 
-                extend: { 
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { 
-                        brand: { primary: '#4F46E5', primaryHover: '#4338CA' }, 
-                        surface: { 100: '#18181B', 200: '#27272A' },
-                        base: '#09090B'
-                    } 
-                } 
-            } 
+                    colors: {
+                        slate: { 750: '#243347', 850: '#151e2e', 900: '#0F172A' }
+                    }
+                }
+            }
         }
     </script>
     <style>
-        body { background-color: #09090b; color: #A1A1AA; font-family: 'Inter', sans-serif; }
-        .page-section { display: none; }
-        .page-section.active { display: block; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Minimalist Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
+        body { background-color: #0F172A; color: #94A3B8; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #27272A; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3F3F46; }
-        
-        /* Remove default input arrows */
-        input[type="number"]::-webkit-inner-spin-button, 
-        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="antialiased min-h-screen flex flex-col md:flex-row overflow-hidden">
+<body class="antialiased min-h-screen flex">
 
-    <!-- SIDEBAR: Solid background, subtle border, clear typography -->
-    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-base border-r border-surface-200 transform -translate-x-full md:translate-x-0 transition-transform duration-200 flex flex-col">
-        <div class="h-16 flex items-center px-6 border-b border-surface-200">
-            <div class="w-6 h-6 rounded bg-brand-primary flex items-center justify-center text-white text-xs font-bold mr-3">F</div>
-            <h1 class="text-sm font-semibold text-zinc-100 tracking-tight">FahmiHost</h1>
-        </div>
-        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            <!-- Active State: Subtle background, white text -->
-            <a href="javascript:void(0)" onclick="switchPage('dashboard')" class="nav-item active-nav flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-surface-200 text-zinc-100">
-                <i class="fa-solid fa-chart-pie w-4 text-zinc-400"></i> Dashboard
-            </a>
-            <a href="javascript:void(0)" onclick="switchPage('topup')" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-surface-100 hover:text-zinc-100">
-                <i class="fa-solid fa-wallet w-4"></i> Deposit Saldo
-            </a>
-            <a href="javascript:void(0)" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-zinc-400 hover:bg-surface-100 hover:text-zinc-100">
-                <i class="fa-solid fa-server w-4"></i> Kelola Server
-            </a>
-            
-            <div class="pt-8">
-                <a href="javascript:void(0)" onclick="logoutReseller()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-red-400/80 hover:bg-red-500/10 hover:text-red-400">
-                    <i class="fa-solid fa-right-from-bracket w-4"></i> Keluar
-                </a>
+    <!-- SIDEBAR -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-700/60 flex flex-col hidden md:flex sticky top-0 h-screen shrink-0">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700/60">
+            <div class="w-7 h-7 rounded bg-blue-600 flex items-center justify-center text-white text-sm font-bold mr-3 shadow-sm shadow-blue-900/50">
+                <i class="fa-solid fa-server text-[11px]"></i>
             </div>
+            <h1 class="text-sm font-bold text-slate-100 tracking-tight">FAGYM PANEL</h1>
+        </div>
+        <nav class="flex-1 px-3 py-6 space-y-1.5 overflow-y-auto">
+            <p class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-2">Main Menu</p>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium bg-slate-800 text-blue-400 border-l-2 border-blue-500">
+                <i class="fa-solid fa-chart-pie w-4"></i> Dashboard
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-box w-4"></i> Kelola Server
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-users w-4"></i> Users & Klien
+            </a>
+            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 transition-colors">
+                <i class="fa-solid fa-wallet w-4"></i> Keuangan
+            </a>
         </nav>
     </aside>
 
-    <main class="flex-1 flex flex-col h-screen overflow-hidden relative md:ml-64 bg-base">
-        <!-- HEADER: Clean, border-only separation -->
-        <header class="h-16 border-b border-surface-200 px-6 flex items-center justify-between shrink-0 bg-base">
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0 bg-[#0B1120]">
+        <!-- HEADER -->
+        <header class="h-16 border-b border-slate-700/60 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
             <div class="flex items-center gap-4">
-                <button type="button" onclick="toggleSidebar()" class="md:hidden text-zinc-400 hover:text-zinc-100 transition-colors">
-                    <i class="fa-solid fa-bars"></i>
+                <h2 class="text-sm font-semibold text-slate-200">Reseller Overview</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition">
+                    <i class="fa-regular fa-bell text-xs"></i>
                 </button>
-                <h2 class="text-sm font-medium text-zinc-100">Overview</h2>
+                <div class="h-5 w-px bg-slate-700"></div>
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=Fahmi&background=0D8ABC&color=fff&rounded=true" alt="User" class="w-8 h-8 rounded-full border border-slate-700">
+                    <div class="hidden sm:block text-left">
+                        <p class="text-xs font-semibold text-slate-200 leading-none">Fahmi</p>
+                        <p class="text-[10px] text-slate-500 mt-1">Super Reseller</p>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <div class="flex-1 overflow-y-auto p-6 md:p-8">
-            <!-- DASHBOARD SECTION -->
-            <div id="page-dashboard" class="page-section active max-w-4xl space-y-6">
-                <!-- User Card: Flat design, strict alignment -->
-                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <h3 class="text-lg font-semibold text-zinc-100" id="uiResellerName">Fahmi</h3>
-                        <p class="text-sm text-zinc-400 mt-0.5" id="uiResellerEmail">admin@fahmihost.com</p>
-                        <div class="flex flex-wrap gap-2 mt-4">
-                            <span class="text-[11px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-md font-medium tracking-wide uppercase">Aktif</span>
-                            <span class="text-[11px] bg-surface-200 text-zinc-300 px-2 py-1 rounded-md font-medium"><i class="fa-brands fa-whatsapp mr-1"></i> Terhubung</span>
-                        </div>
-                    </div>
-                    <div class="text-left md:text-right">
-                        <p class="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-1">Total Saldo</p>
-                        <h3 class="text-2xl font-bold text-zinc-100" id="uiResellerSaldo">Rp 1.450.000</h3>
-                    </div>
-                </div>
-
-                <!-- Action Card: Removed heavy gradient, focused on function -->
-                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200">
-                    <div class="mb-5">
-                        <h3 class="text-sm font-semibold text-zinc-100">Link Order Customer</h3>
-                        <p class="text-sm text-zinc-500 mt-1">Buat tautan pembayaran aman untuk pesanan baru.</p>
-                    </div>
-                    <div class="flex gap-3">
-                        <input type="text" readonly id="secureOrderLinkInput" placeholder="Menunggu *generate*..." class="flex-1 bg-base border border-surface-200 rounded-lg px-4 py-2.5 text-sm text-zinc-300 font-mono focus:outline-none focus:border-brand-primary transition-colors">
-                        <button onclick="generateLinkDariServer()" id="btnGenLink" class="bg-zinc-100 hover:bg-white text-zinc-900 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">Generate</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TOPUP SECTION -->
-            <div id="page-topup" class="page-section max-w-2xl space-y-6">
-                <div class="bg-surface-100 rounded-xl p-6 border border-surface-200">
-                    <h3 class="text-sm font-semibold text-zinc-100 mb-6">Deposit Saldo</h3>
+        <!-- DASHBOARD GRID -->
+        <div class="p-6 overflow-y-auto">
+            <div class="max-w-7xl mx-auto space-y-6">
+                
+                <!-- BENTO GRID: ROW 1 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     
-                    <div class="space-y-6">
-                        <!-- Nominal Selection -->
-                        <div class="space-y-3">
-                            <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Pilih Nominal</label>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                <!-- Standardizing active state via border and bg -->
-                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">10.000</button>
-                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">25.000</button>
-                                <!-- Active Example -->
-                                <button type="button" class="border border-brand-primary bg-brand-primary/10 rounded-lg py-3 text-sm font-medium text-brand-primary transition-colors">50.000</button>
-                                <button type="button" class="border border-surface-200 bg-base rounded-lg py-3 text-sm font-medium text-zinc-300 hover:border-zinc-500 transition-colors">100.000</button>
+                    <!-- Saldo Card (Col-span-4) -->
+                    <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
+                        <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+                        <div>
+                            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Saldo Aktif</p>
+                            <h3 class="text-3xl font-bold text-slate-100 tabular-nums">Rp 2.450.000</h3>
+                            <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pending: Rp 150.000
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-6">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center shadow-sm">
+                                <i class="fa-solid fa-plus mr-1"></i> Top Up
+                            </button>
+                            <button class="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center">
+                                Withdraw
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Server Status (Col-span-3) -->
+                    <div class="md:col-span-3 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col">
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Node Status</p>
+                        <div class="space-y-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                    <span class="text-sm font-medium text-slate-300">SGP-Premium 01</span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-500">98%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                                    <span class="text-sm font-medium text-slate-300">ID-Standard 02</span>
+                                </div>
+                                <span class="text-xs font-mono text-slate-500">45%</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2.5">
+                                    <div class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
+                                    <span class="text-sm font-medium text-slate-300">US-Backup 01</span>
+                                </div>
+                                <span class="text-xs text-amber-500/80 font-medium">Maint</span>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Custom Input -->
-                        <div class="space-y-3">
-                            <label class="text-xs font-medium text-zinc-400 uppercase tracking-wider">Nominal Khusus</label>
-                            <div class="relative">
-                                <span class="absolute left-4 top-3 text-zinc-500 text-sm font-medium">Rp</span>
-                                <input type="number" placeholder="0" value="50000" class="w-full bg-base border border-surface-200 rounded-lg pl-11 pr-4 py-3 text-sm text-zinc-100 focus:outline-none focus:border-brand-primary transition-colors">
-                            </div>
-                        </div>
-
-                        <div class="pt-2">
-                            <!-- Primary CTA -->
-                            <button type="button" class="w-full bg-brand-primary hover:bg-brand-primaryHover text-white font-medium py-3 rounded-lg text-sm transition-colors">Lanjutkan via QRIS</button>
+                    <!-- Quick Actions (Col-span-5) -->
+                    <div class="md:col-span-5 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                        <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Quick Actions</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
+                                <i class="fa-solid fa-server text-blue-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium">Buat Server</span>
+                            </button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
+                                <i class="fa-solid fa-file-invoice text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium">Gen Invoice</span>
+                            </button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
+                                <i class="fa-solid fa-tags text-amber-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium">Cek Harga</span>
+                            </button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
+                                <i class="fa-solid fa-code text-purple-400 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-xs font-medium">API Webhook</span>
+                            </button>
                         </div>
                     </div>
                 </div>
+
+                <!-- BENTO GRID: ROW 2 -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                    
+                    <!-- Transactions Table (Col-span-8) -->
+                    <div class="md:col-span-8 bg-slate-800 border border-slate-700/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
+                        <div class="p-5 border-b border-slate-700/60 flex justify-between items-center">
+                            <h3 class="text-sm font-bold text-slate-200">Riwayat Transaksi</h3>
+                            <a href="#" class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">Lihat Semua &rarr;</a>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-800/50 border-b border-slate-700/60">
+                                        <th class="px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">ID Ref</th>
+                                        <th class="px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Layanan</th>
+                                        <th class="px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Harga</th>
+                                        <th class="px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                                        <th class="px-5 py-3 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Waktu</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-sm text-slate-300 divide-y divide-slate-700/40">
+                                    <tr class="hover:bg-slate-750/50 transition-colors">
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9982</td>
+                                        <td class="px-5 py-3 font-medium">Pterodactyl 8GB (SGP)</td>
+                                        <td class="px-5 py-3 tabular-nums">Rp 45.000</td>
+                                        <td class="px-5 py-3">
+                                            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-xs text-slate-500">10 Menit lalu</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-750/50 transition-colors">
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9981</td>
+                                        <td class="px-5 py-3 font-medium">Pterodactyl 4GB (SGP)</td>
+                                        <td class="px-5 py-3 tabular-nums">Rp 25.000</td>
+                                        <td class="px-5 py-3">
+                                            <span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold uppercase tracking-wide border border-amber-500/20">Pending</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-xs text-slate-500">1 Jam lalu</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-750/50 transition-colors">
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9980</td>
+                                        <td class="px-5 py-3 font-medium">Deposit Saldo (QRIS)</td>
+                                        <td class="px-5 py-3 tabular-nums text-emerald-400">+ Rp 100.000</td>
+                                        <td class="px-5 py-3">
+                                            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-xs text-slate-500">Hari ini, 08:30</td>
+                                    </tr>
+                                    <tr class="hover:bg-slate-750/50 transition-colors">
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9979</td>
+                                        <td class="px-5 py-3 font-medium">Pterodactyl 2GB (ID)</td>
+                                        <td class="px-5 py-3 tabular-nums">Rp 15.000</td>
+                                        <td class="px-5 py-3">
+                                            <span class="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-bold uppercase tracking-wide border border-rose-500/20">Failed</span>
+                                        </td>
+                                        <td class="px-5 py-3 text-xs text-slate-500">Kemarin, 20:15</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Top Products (Col-span-4) -->
+                    <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="text-sm font-bold text-slate-200">Produk Terlaris</h3>
+                            <span class="text-xs text-slate-500">Bulan Ini</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 bg-slate-900/30">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center text-blue-400">
+                                        <i class="fa-solid fa-fire text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-200">Ptero 8GB</p>
+                                        <p class="text-xs text-slate-500">Server SGP</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-slate-200 tabular-nums">142</p>
+                                    <p class="text-[10px] text-emerald-400">Terjual</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 bg-slate-900/30">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-slate-700 flex items-center justify-center text-slate-300">
+                                        <span class="text-xs font-bold">4G</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-slate-200">Ptero 4GB</p>
+                                        <p class="text-xs text-slate-500">Server SGP</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm font-bold text-slate-200 tabular-nums">89</p>
+                                    <p class="text-[10px] text-emerald-400">Terjual</p>
+                                </div>
+                            </div>
+
+                            <!-- Input Example to fulfill requirements -->
+                            <div class="pt-2 mt-4 border-t border-slate-700/60">
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Cek Ketersediaan Port</label>
+                                <div class="flex gap-2">
+                                    <input type="text" placeholder="Port Num (e.g. 25565)" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono placeholder:text-slate-600">
+                                    <button class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm transition-colors border border-slate-600">
+                                        Cek
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            
         </div>
     </main>
 
-    <script>
-        // Minimalist JS logic to switch views (Function over fashion)
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            
-            // Reset nav state
-            document.querySelectorAll('.nav-item').forEach(el => {
-                el.classList.remove('bg-surface-200', 'text-zinc-100', 'active-nav');
-                el.classList.add('text-zinc-400');
-            });
-            event.currentTarget.classList.add('bg-surface-200', 'text-zinc-100', 'active-nav');
-            event.currentTarget.classList.remove('text-zinc-400');
-        }
-    </script>
 </body>
 </html>
