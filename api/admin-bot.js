@@ -1,7 +1,7 @@
-const { mongoose } = require('mongoose'); // Benerin import dari mongoose jadi mongodb murni
+const  mongoose = require('mongoose'); // Benerin import dari mongoose jadi mongodb murni
 
 // Narik URL Mongo dari index.js[span_4](start_span)[span_4](end_span)
-const { mongoURI } = require('./index.js'); //[span_5](start_span)[span_5](end_span)
+const mongoURI  = require('./index.js'); //[span_5](start_span)[span_5](end_span)
 
 // Setup Token Bot Admin (Taruh token lu di sini)[span_6](start_span)[span_6](end_span)
 const botToken = process.env.ADMIN_BOT_TOKEN || 'TARUH_TOKEN_BOT_ADMIN_DI_SINI'; //[span_7](start_span)[span_7](end_span)
