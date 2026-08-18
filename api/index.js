@@ -70,7 +70,6 @@ app.post('/api/login', async (req, res) => {
         
         if (!user) return res.status(400).json({ message: 'Email belum terdaftar, Cok!' });
         
-        // FITUR BARU: Cek kalau akun dibekukan via Bot Admin
         if (user.status === 'suspended') return res.status(403).json({ message: 'Akun lu lagi dibekukan sama Owner!' });
         
         if (user.password !== password) return res.status(400).json({ message: 'Password salah, Cok!' });
@@ -197,6 +196,116 @@ app.post('/api/tele-webhook', async (req, res) => {
         } catch (error) {}
     }
     res.status(200).send('OK');
+});
+
+// --- FITUR ADMIN BOT WEBHOOK (TERINTEGRASI) ---
+const botToken = process.env.ADMIN_BOT_TOKEN || 'TARUH_TOKEN_BOT_ADMIN_DI_SINI';
+const ADMIN_ID = 8521019587;
+
+const sendAdminMessage = async (chatId, text) => {
+    try {
+        await axios.post(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            chat_id: chatId,
+            text: text,
+            parse_mode: 'Markdown'
+        });
+    } catch (error) {
+        console.error('Gagal ngirim pesan admin bot:', error.message);
+    }
+};
+
+app.post('/api/admin-webhook', async (req, res) => {
+    try {
+        const update = req.body;
+
+        if (!update || !update.message || !update.message.text) {
+            return res.status(200).send('Bukan pesan teks');
+        }
+
+        const msg = update.message;
+        const chatId = msg.chat.id;
+        const fromId = msg.from.id;
+        const text = msg.text.trim();
+
+        if (fromId !== ADMIN_ID) {
+            await sendAdminMessage(chatId, '⛔ Akses ditolak! Bot ini khusus buat owner.');
+            return res.status(200).send('Akses ditolak');
+        }
+
+        const args = text.split(' ');
+        const command = args[0].toLowerCase();
+
+        if (['/start', '/menu', '/help'].includes(command)) {
+            const menu = `
+🛠️ *PANEL KONTROL RESELLER* 🛠️
+
+/list - Lihat semua akun reseller
+/cek <email> - Cek detail satu akun
+/suspend <email> - Bekukan akun (Non-aktif)
+/aktif <email> - Aktifkan kembali akun
+/del <email> - Hapus akun permanen
+            `;
+            await sendAdminMessage(chatId, menu);
+        } 
+        else if (command === '/list') {
+            const users = await Reseller.find({});
+            if (users.length === 0) {
+                await sendAdminMessage(chatId, '📂 Belum ada akun reseller yang terdaftar.');
+            } else {
+                let pesan = '📋 *DAFTAR AKUN RESELLER:*\n\n';
+                users.forEach((user, index) => {
+                    const status = user.status === 'suspended' ? '🔴 Suspended' : (user.status === 'verified' ? '🟢 Aktif' : '🟡 ' + user.status);
+                    pesan += `${index + 1}. *${user.name}* (${user.email}) | ${status}\n`;
+                });
+                await sendAdminMessage(chatId, pesan);
+            }
+        } 
+        else if (command === '/cek') {
+            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /cek <email>');
+            const user = await Reseller.findOne({ email: args[1] });
+            
+            if (!user) {
+                await sendAdminMessage(chatId, `❌ Akun dengan email *${args[1]}* tidak ditemukan.`);
+            } else {
+                const detail = `
+🔍 *DETAIL AKUN RESELLER* 🔍
+Nama: ${user.name}
+Email: ${user.email}
+WA: ${user.whatsapp}
+Saldo: ${user.saldo || 0}
+Status: ${user.status}
+Telegram: ${user.telegram}
+                `;
+                await sendAdminMessage(chatId, detail);
+            }
+        } 
+        else if (command === '/suspend') {
+            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /suspend <email>');
+            const result = await Reseller.updateOne({ email: args[1] }, { $set: { status: 'suspended' } });
+            
+            if (result.modifiedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* berhasil dibekukan.`);
+            else await sendAdminMessage(chatId, `❌ Gagal suspend. Akun tidak ditemukan atau sudah tersuspend.`);
+        } 
+        else if (command === '/aktif') {
+            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /aktif <email>');
+            const result = await Reseller.updateOne({ email: args[1] }, { $set: { status: 'verified' } });
+            
+            if (result.modifiedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* diaktifkan kembali.`);
+            else await sendAdminMessage(chatId, `❌ Gagal. Akun tidak ditemukan atau sudah aktif.`);
+        } 
+        else if (command === '/del') {
+            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /del <email>');
+            const result = await Reseller.deleteOne({ email: args[1] });
+            
+            if (result.deletedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* dihapus permanen.`);
+            else await sendAdminMessage(chatId, `❌ Gagal. Email *${args[1]}* tidak ditemukan.`);
+        }
+
+        res.status(200).send('Webhook Admin Bot OK');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Something went wrong');
+    }
 });
 
 // EXPORT APP VERCEL & URL MONGO
