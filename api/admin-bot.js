@@ -14,7 +14,7 @@ const dbName = 'test';
 const collectionName = 'resellers'; 
 
 // GANTI pakai ID Telegram lu sendiri
-const ADMIN_ID = 123456789; 
+const ADMIN_ID = 8521019587; 
 
 // Middleware: Keamanan
 bot.use(async (ctx, next) => {
