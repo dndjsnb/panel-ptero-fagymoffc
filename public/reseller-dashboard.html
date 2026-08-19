@@ -5,11 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pterodactyl Reseller Panel</title>
     
-    <!-- SCRIPT PENGHADANG HACKER -->
     <script>
-        // Cek apakah status login di browser bernilai 'true'
         if (localStorage.getItem('isLoggedIn') !== 'true') {
-            // Langsung tendang ke halaman jahil!
             window.location.href = 'pembuangan.html';
         }
     </script>
@@ -23,9 +20,7 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        slate: { 750: '#243347', 850: '#151e2e', 900: '#0F172A' }
-                    }
+                    colors: { slate: { 750: '#243347', 850: '#151e2e', 900: '#0F172A' } }
                 }
             }
         }
@@ -37,7 +32,6 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         
-        /* Animasi Modal & Dropdown */
         .fade-in { animation: fadeIn 0.2s ease-out forwards; }
         .fade-out { animation: fadeOut 0.2s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -46,7 +40,6 @@
 </head>
 <body class="antialiased min-h-screen flex">
 
-    <!-- SIDEBAR -->
     <aside class="w-64 bg-slate-900 border-r border-slate-700/60 flex flex-col hidden md:flex sticky top-0 h-screen shrink-0">
         <div class="h-16 flex items-center px-6 border-b border-slate-700/60">
             <div class="w-7 h-7 rounded bg-blue-600 flex items-center justify-center text-white text-sm font-bold mr-3 shadow-sm shadow-blue-900/50">
@@ -71,10 +64,7 @@
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0 bg-[#0B1120] relative">
-        
-        <!-- HEADER DENGAN USER DROPDOWN -->
         <header class="h-16 border-b border-slate-700/60 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-sm sticky top-0 z-40">
             <div class="flex items-center gap-4">
                 <h2 class="text-sm font-semibold text-slate-200">Reseller Overview</h2>
@@ -86,11 +76,8 @@
                 </button>
                 <div class="h-5 w-px bg-slate-700"></div>
                 
-                <!-- DROPDOWN TRIGGER -->
                 <button onclick="toggleDropdown(event)" class="flex items-center gap-3 cursor-pointer hover:bg-slate-800 p-1.5 rounded-lg transition-colors focus:outline-none">
-                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border border-blue-500 shadow-sm" id="ui-avatar">
-                        F
-                    </div>
+                    <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold border border-blue-500 shadow-sm" id="ui-avatar">F</div>
                     <div class="hidden sm:block text-left pr-1">
                         <p class="text-xs font-semibold text-slate-200 leading-none" id="ui-firstname">Fahmi</p>
                         <p class="text-[10px] text-slate-500 mt-1" id="ui-status">Verified</p>
@@ -98,106 +85,53 @@
                     <i id="dropdown-icon" class="fa-solid fa-chevron-down text-[10px] text-slate-500 transition-transform duration-200"></i>
                 </button>
 
-                <!-- DROPDOWN MENU -->
                 <div id="userDropdown" class="hidden absolute right-0 top-12 mt-2 w-56 origin-top-right bg-slate-800 border border-slate-700 rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 z-50">
                     <div class="py-1">
-                        <button onclick="openModal()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors">
-                            <i class="fa-regular fa-user w-4 text-center"></i> Profil Saya
-                        </button>
-                        <button class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors">
-                            <i class="fa-solid fa-gear w-4 text-center"></i> Pengaturan Akun
-                        </button>
+                        <button onclick="openModal()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"><i class="fa-regular fa-user w-4 text-center"></i> Profil Saya</button>
+                        <button class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white transition-colors"><i class="fa-solid fa-gear w-4 text-center"></i> Pengaturan Akun</button>
                         <div class="h-px bg-slate-700/60 my-1"></div>
-                        <button onclick="logout()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors">
-                            <i class="fa-solid fa-right-from-bracket w-4 text-center"></i> Keluar
-                        </button>
+                        <button onclick="logout()" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-colors"><i class="fa-solid fa-right-from-bracket w-4 text-center"></i> Keluar</button>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- DASHBOARD GRID -->
         <div class="p-6 overflow-y-auto">
             <div class="max-w-7xl mx-auto space-y-6">
-                
-                <!-- BENTO GRID: ROW 1 -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    
-                    <!-- Saldo Card -->
                     <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
                         <div>
                             <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Total Saldo Aktif</p>
                             <h3 class="text-3xl font-bold text-slate-100 tabular-nums">Rp 2.450.000</h3>
-                            <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pending: Rp 150.000
-                            </p>
+                            <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Pending: Rp 150.000</p>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mt-6">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center shadow-sm">
-                                <i class="fa-solid fa-plus mr-1"></i> Top Up
-                            </button>
-                            <button class="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center">
-                                Withdraw
-                            </button>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center shadow-sm"><i class="fa-solid fa-plus mr-1"></i> Top Up</button>
+                            <button class="bg-slate-700/50 hover:bg-slate-700 border border-slate-600 text-slate-200 text-xs font-semibold py-2 px-4 rounded-lg transition-colors text-center">Withdraw</button>
                         </div>
                     </div>
 
-                    <!-- Server Status -->
                     <div class="md:col-span-3 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Node Status</p>
                         <div class="space-y-4 flex-1">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                                    <span class="text-sm font-medium text-slate-300">SGP-Premium 01</span>
-                                </div>
-                                <span class="text-xs font-mono text-slate-500">98%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                                    <span class="text-sm font-medium text-slate-300">ID-Standard 02</span>
-                                </div>
-                                <span class="text-xs font-mono text-slate-500">45%</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2.5">
-                                    <div class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div>
-                                    <span class="text-sm font-medium text-slate-300">US-Backup 01</span>
-                                </div>
-                                <span class="text-xs text-amber-500/80 font-medium">Maint</span>
-                            </div>
+                            <div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div><span class="text-sm font-medium text-slate-300">SGP-Premium 01</span></div><span class="text-xs font-mono text-slate-500">98%</span></div>
+                            <div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div><span class="text-sm font-medium text-slate-300">ID-Standard 02</span></div><span class="text-xs font-mono text-slate-500">45%</span></div>
+                            <div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><div class="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"></div><span class="text-sm font-medium text-slate-300">US-Backup 01</span></div><span class="text-xs text-amber-500/80 font-medium">Maint</span></div>
                         </div>
                     </div>
 
-                    <!-- Quick Actions -->
                     <div class="md:col-span-5 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Quick Actions</p>
                         <div class="grid grid-cols-2 gap-3">
-                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
-                                <i class="fa-solid fa-server text-blue-400 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-xs font-medium">Buat Server</span>
-                            </button>
-                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
-                                <i class="fa-solid fa-file-invoice text-emerald-400 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-xs font-medium">Gen Invoice</span>
-                            </button>
-                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
-                                <i class="fa-solid fa-tags text-amber-400 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-xs font-medium">Cek Harga</span>
-                            </button>
-                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group">
-                                <i class="fa-solid fa-code text-purple-400 group-hover:scale-110 transition-transform"></i>
-                                <span class="text-xs font-medium">API Webhook</span>
-                            </button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group"><i class="fa-solid fa-server text-blue-400 group-hover:scale-110 transition-transform"></i><span class="text-xs font-medium">Buat Server</span></button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group"><i class="fa-solid fa-file-invoice text-emerald-400 group-hover:scale-110 transition-transform"></i><span class="text-xs font-medium">Gen Invoice</span></button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group"><i class="fa-solid fa-tags text-amber-400 group-hover:scale-110 transition-transform"></i><span class="text-xs font-medium">Cek Harga</span></button>
+                            <button class="flex items-center justify-center gap-2 bg-slate-750 hover:bg-slate-700 border border-slate-600/50 rounded-lg p-3 transition-colors text-slate-300 group"><i class="fa-solid fa-code text-purple-400 group-hover:scale-110 transition-transform"></i><span class="text-xs font-medium">API Webhook</span></button>
                         </div>
                     </div>
                 </div>
-                <!-- BENTO GRID: ROW 2 -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    
-                    <!-- Transactions Table -->
                     <div class="md:col-span-8 bg-slate-800 border border-slate-700/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
                         <div class="p-5 border-b border-slate-700/60 flex justify-between items-center">
                             <h3 class="text-sm font-bold text-slate-200">Riwayat Transaksi</h3>
@@ -216,303 +150,170 @@
                                 </thead>
                                 <tbody class="text-sm text-slate-300 divide-y divide-slate-700/40">
                                     <tr class="hover:bg-slate-750/50 transition-colors">
-                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9982</td>
-                                        <td class="px-5 py-3 font-medium">Pterodactyl 8GB (SGP)</td>
-                                        <td class="px-5 py-3 tabular-nums">Rp 45.000</td>
-                                        <td class="px-5 py-3">
-                                            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span>
-                                        </td>
-                                        <td class="px-5 py-3 text-xs text-slate-500">10 Menit lalu</td>
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9982</td><td class="px-5 py-3 font-medium">Pterodactyl 8GB (SGP)</td><td class="px-5 py-3 tabular-nums">Rp 45.000</td><td class="px-5 py-3"><span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span></td><td class="px-5 py-3 text-xs text-slate-500">10 Menit lalu</td>
                                     </tr>
                                     <tr class="hover:bg-slate-750/50 transition-colors">
-                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9981</td>
-                                        <td class="px-5 py-3 font-medium">Pterodactyl 4GB (SGP)</td>
-                                        <td class="px-5 py-3 tabular-nums">Rp 25.000</td>
-                                        <td class="px-5 py-3">
-                                            <span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold uppercase tracking-wide border border-amber-500/20">Pending</span>
-                                        </td>
-                                        <td class="px-5 py-3 text-xs text-slate-500">1 Jam lalu</td>
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9981</td><td class="px-5 py-3 font-medium">Pterodactyl 4GB (SGP)</td><td class="px-5 py-3 tabular-nums">Rp 25.000</td><td class="px-5 py-3"><span class="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[10px] font-bold uppercase tracking-wide border border-amber-500/20">Pending</span></td><td class="px-5 py-3 text-xs text-slate-500">1 Jam lalu</td>
                                     </tr>
                                     <tr class="hover:bg-slate-750/50 transition-colors">
-                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9980</td>
-                                        <td class="px-5 py-3 font-medium">Deposit Saldo (QRIS)</td>
-                                        <td class="px-5 py-3 tabular-nums text-emerald-400">+ Rp 100.000</td>
-                                        <td class="px-5 py-3">
-                                            <span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span>
-                                        </td>
-                                        <td class="px-5 py-3 text-xs text-slate-500">Hari ini, 08:30</td>
-                                    </tr>
-                                    <tr class="hover:bg-slate-750/50 transition-colors">
-                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9979</td>
-                                        <td class="px-5 py-3 font-medium">Pterodactyl 2GB (ID)</td>
-                                        <td class="px-5 py-3 tabular-nums">Rp 15.000</td>
-                                        <td class="px-5 py-3">
-                                            <span class="px-2.5 py-1 rounded-full bg-rose-500/10 text-rose-400 text-[10px] font-bold uppercase tracking-wide border border-rose-500/20">Failed</span>
-                                        </td>
-                                        <td class="px-5 py-3 text-xs text-slate-500">Kemarin, 20:15</td>
+                                        <td class="px-5 py-3 font-mono text-xs text-slate-400">#TRX-9980</td><td class="px-5 py-3 font-medium">Deposit Saldo (QRIS)</td><td class="px-5 py-3 tabular-nums text-emerald-400">+ Rp 100.000</td><td class="px-5 py-3"><span class="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold uppercase tracking-wide border border-emerald-500/20">Success</span></td><td class="px-5 py-3 text-xs text-slate-500">Hari ini, 08:30</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Top Products -->
                     <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
-                        <div class="flex justify-between items-center mb-5">
-                            <h3 class="text-sm font-bold text-slate-200">Produk Terlaris</h3>
-                            <span class="text-xs text-slate-500">Bulan Ini</span>
-                        </div>
+                        <div class="flex justify-between items-center mb-5"><h3 class="text-sm font-bold text-slate-200">Produk Terlaris</h3><span class="text-xs text-slate-500">Bulan Ini</span></div>
                         <div class="space-y-4">
                             <div class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 bg-slate-900/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center text-blue-400">
-                                        <i class="fa-solid fa-fire text-sm"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-slate-200">Ptero 8GB</p>
-                                        <p class="text-xs text-slate-500">Server SGP</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-bold text-slate-200 tabular-nums">142</p>
-                                    <p class="text-[10px] text-emerald-400">Terjual</p>
-                                </div>
+                                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded bg-blue-500/10 flex items-center justify-center text-blue-400"><i class="fa-solid fa-fire text-sm"></i></div><div><p class="text-sm font-medium text-slate-200">Ptero 8GB</p><p class="text-xs text-slate-500">Server SGP</p></div></div>
+                                <div class="text-right"><p class="text-sm font-bold text-slate-200 tabular-nums">142</p><p class="text-[10px] text-emerald-400">Terjual</p></div>
                             </div>
-                            
                             <div class="flex items-center justify-between p-3 rounded-lg border border-slate-700/50 bg-slate-900/30">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded bg-slate-700 flex items-center justify-center text-slate-300">
-                                        <span class="text-xs font-bold">4G</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-medium text-slate-200">Ptero 4GB</p>
-                                        <p class="text-xs text-slate-500">Server SGP</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-sm font-bold text-slate-200 tabular-nums">89</p>
-                                    <p class="text-[10px] text-emerald-400">Terjual</p>
-                                </div>
+                                <div class="flex items-center gap-3"><div class="w-8 h-8 rounded bg-slate-700 flex items-center justify-center text-slate-300"><span class="text-xs font-bold">4G</span></div><div><p class="text-sm font-medium text-slate-200">Ptero 4GB</p><p class="text-xs text-slate-500">Server SGP</p></div></div>
+                                <div class="text-right"><p class="text-sm font-bold text-slate-200 tabular-nums">89</p><p class="text-[10px] text-emerald-400">Terjual</p></div>
                             </div>
-
                             <div class="pt-2 mt-4 border-t border-slate-700/60">
                                 <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Cek Ketersediaan Port</label>
                                 <div class="flex gap-2">
                                     <input type="text" placeholder="Port Num (e.g. 25565)" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-blue-500 transition-colors font-mono placeholder:text-slate-600">
-                                    <button class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm transition-colors border border-slate-600">
-                                        Cek
-                                    </button>
+                                    <button class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-lg text-sm transition-colors border border-slate-600">Cek</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- MODAL PROFILE DETAIL -->
     <div id="profileModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity">
-        <!-- Modal Card -->
         <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden m-4 fade-in">
-            <!-- Header Modal -->
             <div class="flex justify-between items-center px-6 py-4 border-b border-slate-700/60 bg-slate-800/50">
                 <h3 class="text-lg font-bold text-slate-100">Detail Akun Reseller</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-700"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-
-            <!-- Body Modal -->
             <div class="p-6" id="edit-form-container">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <!-- Nama -->
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nama Lengkap</label>
-                        <p class="text-sm font-medium text-slate-100" id="modal-name"></p>
-                    </div>
-                    <!-- Email -->
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Email</label>
-                        <input type="email" id="edit-email" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly>
-                    </div>
-                    <!-- WhatsApp -->
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label>
-                        <input type="text" id="edit-wa" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly>
-                    </div>
-                    <!-- Telegram -->
-                    <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label>
-                        <div class="flex items-center gap-2 px-3 py-1.5">
-                            <i class="fa-brands fa-telegram text-blue-400"></i>
-                            <p class="text-sm font-medium text-slate-100" id="modal-tele"></p>
-                        </div>
-                    </div>
-                    <!-- Password Baru -->
-                    <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password Baru)</label>
-                        <input type="password" id="edit-password" placeholder="••••••••••••" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none transition-colors" readonly>
-                    </div>
-
-                    <!-- KOLOM OTP (Muncul otomatis pas minta kode) -->
-                    <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden">
-                        <label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label>
-                        <input type="text" id="edit-otp" placeholder="Contoh: 123456" class="w-full bg-slate-900 border border-blue-500 rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none">
-                        <p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram lu buat ambil kodenya.</p>
-                    </div>
+                    <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nama Lengkap</label><p class="text-sm font-medium text-slate-100" id="modal-name"></p></div>
+                    <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Email</label><input type="email" id="edit-email" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly></div>
+                    <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label><input type="text" id="edit-wa" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly></div>
+                    <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label><div class="flex items-center gap-2 px-3 py-1.5"><i class="fa-brands fa-telegram text-blue-400"></i><p class="text-sm font-medium text-slate-100" id="modal-tele"></p></div></div>
+                    <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password Baru)</label><input type="password" id="edit-password" placeholder="••••••••••••" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none transition-colors" readonly></div>
+                    <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden"><label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label><input type="text" id="edit-otp" placeholder="Contoh: 123456" class="w-full bg-slate-900 border border-blue-500 rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none"><p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram lu buat ambil kodenya.</p></div>
                 </div>
             </div>
-
-            <!-- Footer Modal -->
             <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-800/50 flex justify-end gap-3">
                 <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">Tutup</button>
-                <button id="btn-action-edit" onclick="toggleEditMode()" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">Edit Data</button>
+                <button id="btn-action-edit" onclick="toggleEditMode()" class="min-w-[120px] px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">Edit Data</button>
             </div>
         </div>
     </div>
-
-    <!-- JAVASCRIPT UNTUK INTERAKSI -->
-    <script>
+        <script>
         const dropdown = document.getElementById('userDropdown');
         const dropdownIcon = document.getElementById('dropdown-icon');
         const profileModal = document.getElementById('profileModal');
         const modalContent = profileModal.querySelector('div');
 
-        // Toggle Dropdown
         function toggleDropdown(event) {
             event.stopPropagation();
             const isHidden = dropdown.classList.contains('hidden');
-            
-            if (isHidden) {
-                dropdown.classList.remove('hidden');
-                dropdown.classList.add('fade-in');
-                dropdownIcon.style.transform = 'rotate(180deg)';
-            } else {
-                closeDropdown();
-            }
+            if (isHidden) { dropdown.classList.remove('hidden'); dropdown.classList.add('fade-in'); dropdownIcon.style.transform = 'rotate(180deg)'; } 
+            else { closeDropdown(); }
         }
 
-        function closeDropdown() {
-            dropdown.classList.add('hidden');
-            dropdown.classList.remove('fade-in');
-            dropdownIcon.style.transform = 'rotate(0deg)';
+        function closeDropdown() { dropdown.classList.add('hidden'); dropdown.classList.remove('fade-in'); dropdownIcon.style.transform = 'rotate(0deg)'; }
+        document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) closeDropdown(); });
+
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed top-5 right-5 z-[200] flex flex-col gap-3 pointer-events-none';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            const isSuccess = type === 'success';
+            const bgColor = isSuccess ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400';
+            const icon = isSuccess ? '<i class="fa-solid fa-circle-check text-lg"></i>' : '<i class="fa-solid fa-circle-exclamation text-lg"></i>';
+            toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-md ${bgColor} fade-in transition-all duration-300`;
+            toast.innerHTML = `${icon} <span class="text-sm font-medium tracking-wide">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.replace('fade-in', 'fade-out'); setTimeout(() => toast.remove(), 200); }, 3000);
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!dropdown.contains(event.target)) {
-                closeDropdown();
-            }
-        });
-
-        // Buka Modal Profil dan isi data
         function openModal(userData) {
             closeDropdown();
-            profileModal.classList.remove('hidden');
-            profileModal.classList.add('flex');
-            
-            // Animasi masuk
-            modalContent.classList.remove('fade-out');
-            modalContent.classList.add('fade-in');
-
-            if (!userData || !(userData instanceof Object)) {
-                userData = JSON.parse(localStorage.getItem('userData'));
-            }
-
+            profileModal.classList.remove('hidden'); profileModal.classList.add('flex');
+            modalContent.classList.remove('fade-out'); modalContent.classList.add('fade-in');
+            if (!userData || !(userData instanceof Object)) userData = JSON.parse(localStorage.getItem('userData'));
             document.getElementById('modal-name').textContent = userData.name;
             document.getElementById('edit-email').value = userData.email;
             document.getElementById('edit-wa').value = userData.whatsapp;
             document.getElementById('modal-tele').textContent = userData.telegram;
-            
-            // Reset mode read-only
             resetEditMode();
         }
 
-        // Tutup Modal Profil
         function closeModal() {
-            modalContent.classList.remove('fade-in');
-            modalContent.classList.add('fade-out');
-            
-            setTimeout(() => {
-                profileModal.classList.add('hidden');
-                profileModal.classList.remove('flex');
-            }, 200); 
+            modalContent.classList.remove('fade-in'); modalContent.classList.add('fade-out');
+            setTimeout(() => { profileModal.classList.add('hidden'); profileModal.classList.remove('flex'); }, 200); 
         }
 
-        // Fungsi reset mode form ke baca saja
         function resetEditMode() {
             const inputs = ['edit-email', 'edit-wa', 'edit-password'];
             inputs.forEach(id => {
                 const el = document.getElementById(id);
                 el.readOnly = true;
-                el.classList.add('border-transparent', 'bg-slate-900/50');
-                el.classList.remove('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
+                el.classList.add('border-transparent', 'bg-slate-900/50'); el.classList.remove('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
             });
-            
             document.getElementById('edit-password').value = '';
             document.getElementById('edit-password').placeholder = '••••••••••••';
             document.getElementById('otp-container').classList.add('hidden');
             document.getElementById('edit-otp').value = '';
-            
             const btn = document.getElementById('btn-action-edit');
-            btn.textContent = 'Edit Data';
+            btn.innerHTML = 'Edit Data';
             btn.setAttribute('onclick', 'toggleEditMode()');
         }
 
-        // Fungsi ubah mode form jadi bisa ngetik
         function toggleEditMode() {
             const inputs = ['edit-email', 'edit-wa', 'edit-password'];
             inputs.forEach(id => {
                 const el = document.getElementById(id);
                 el.readOnly = false;
-                el.classList.remove('border-transparent', 'bg-slate-900/50');
-                el.classList.add('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
+                el.classList.remove('border-transparent', 'bg-slate-900/50'); el.classList.add('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
             });
-            
             document.getElementById('edit-password').placeholder = 'Kosongkan jika tidak ubah password';
-            
             const btn = document.getElementById('btn-action-edit');
-            btn.textContent = 'Kirim OTP Verifikasi';
+            btn.innerHTML = 'Kirim OTP Verifikasi';
             btn.setAttribute('onclick', 'requestOtp()');
         }
 
-        // Request OTP ke backend
         async function requestOtp() {
             const userData = JSON.parse(localStorage.getItem('userData'));
             const btn = document.getElementById('btn-action-edit');
-            
-            btn.textContent = 'Mengirim...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Mengirim...';
             btn.disabled = true;
 
             try {
-                const res = await fetch('/api/request-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: userData.id })
-                });
+                const res = await fetch('/api/request-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: userData.id }) });
                 const data = await res.json();
-                
                 if (res.ok) {
-                    alert(data.message); 
-                    // Munculin kolom OTP
+                    showToast(data.message, 'success'); 
                     document.getElementById('otp-container').classList.remove('hidden');
-                    btn.textContent = 'Simpan Perubahan';
+                    btn.innerHTML = 'Simpan Perubahan';
                     btn.setAttribute('onclick', 'submitEditData()');
                 } else {
-                    alert("Gagal: " + data.message);
-                    btn.textContent = 'Kirim OTP Verifikasi';
+                    showToast(data.message, 'error');
+                    btn.innerHTML = 'Kirim OTP Verifikasi';
                 }
             } catch (err) {
-                alert("Server error bro!");
-                btn.textContent = 'Kirim OTP Verifikasi';
-            } finally {
-                btn.disabled = false;
-            }
+                showToast("Server error bro! Cek koneksi.", 'error');
+                btn.innerHTML = 'Kirim OTP Verifikasi';
+            } finally { btn.disabled = false; }
         }
 
-        // Submit OTP dan data baru ke backend
         async function submitEditData() {
             const userData = JSON.parse(localStorage.getItem('userData'));
             const newEmail = document.getElementById('edit-email').value;
@@ -521,53 +322,33 @@
             const otpCode = document.getElementById('edit-otp').value;
             const btn = document.getElementById('btn-action-edit');
 
-            if (!otpCode) {
-                alert("Masukin dulu kode OTP dari Telegram, Bro!");
-                return;
-            }
-                                btn.textContent = 'Memproses...';
+            if (!otpCode) { showToast("Masukin dulu kode OTP dari Telegram, Bro!", 'error'); return; }
+            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Memproses...';
             btn.disabled = true;
 
             try {
                 const res = await fetch('/api/verify-otp', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: userData.id,
-                        otp: otpCode,
-                        newEmail: newEmail !== userData.email ? newEmail : null,
-                        newWhatsapp: newWa !== userData.whatsapp ? newWa : null,
-                        newPassword: newPass ? newPass : null
-                    })
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userData.id, otp: otpCode, newEmail: newEmail !== userData.email ? newEmail : null, newWhatsapp: newWa !== userData.whatsapp ? newWa : null, newPassword: newPass ? newPass : null })
                 });
                 const data = await res.json();
-                
                 if (res.ok) {
-                    alert("Mantap: " + data.message);
+                    showToast(data.message, 'success');
                     if (newEmail) userData.email = newEmail;
                     if (newWa) userData.whatsapp = newWa;
                     localStorage.setItem('userData', JSON.stringify(userData));
                     closeModal();
                 } else {
-                    alert("Error: " + data.message);
-                    btn.textContent = 'Simpan Perubahan';
+                    showToast(data.message, 'error');
+                    btn.innerHTML = 'Simpan Perubahan';
                 }
             } catch (err) {
-                alert("Server error bro!");
-                btn.textContent = 'Simpan Perubahan';
-            } finally {
-                btn.disabled = false;
-            }
+                showToast("Server error bro!", 'error');
+                btn.innerHTML = 'Simpan Perubahan';
+            } finally { btn.disabled = false; }
         }
 
-        // Fungsi Logout
-        function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userData');
-            window.location.href = 'reseller-login.html';
-        }
+        function logout() { localStorage.removeItem('isLoggedIn'); localStorage.removeItem('userData'); window.location.href = 'reseller-login.html'; }
     </script>
 </body>
 </html>
-
-       
