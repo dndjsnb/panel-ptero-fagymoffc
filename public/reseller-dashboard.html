@@ -116,14 +116,14 @@
             </div>
         </header>
 
-        <!-- DASHBOARD GRID (KONTEN LENGKAP YANG DIKEMBALIKAN) -->
+        <!-- DASHBOARD GRID -->
         <div class="p-6 overflow-y-auto">
             <div class="max-w-7xl mx-auto space-y-6">
                 
                 <!-- BENTO GRID: ROW 1 -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     
-                    <!-- Saldo Card (Col-span-4) -->
+                    <!-- Saldo Card -->
                     <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
                         <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
                         <div>
@@ -143,7 +143,7 @@
                         </div>
                     </div>
 
-                    <!-- Server Status (Col-span-3) -->
+                    <!-- Server Status -->
                     <div class="md:col-span-3 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Node Status</p>
                         <div class="space-y-4 flex-1">
@@ -171,7 +171,7 @@
                         </div>
                     </div>
 
-                    <!-- Quick Actions (Col-span-5) -->
+                    <!-- Quick Actions -->
                     <div class="md:col-span-5 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-4">Quick Actions</p>
                         <div class="grid grid-cols-2 gap-3">
@@ -194,11 +194,10 @@
                         </div>
                     </div>
                 </div>
-
                 <!-- BENTO GRID: ROW 2 -->
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     
-                    <!-- Transactions Table (Col-span-8) -->
+                    <!-- Transactions Table -->
                     <div class="md:col-span-8 bg-slate-800 border border-slate-700/60 rounded-xl shadow-sm overflow-hidden flex flex-col">
                         <div class="p-5 border-b border-slate-700/60 flex justify-between items-center">
                             <h3 class="text-sm font-bold text-slate-200">Riwayat Transaksi</h3>
@@ -257,7 +256,7 @@
                         </div>
                     </div>
 
-                    <!-- Top Products (Col-span-4) -->
+                    <!-- Top Products -->
                     <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm">
                         <div class="flex justify-between items-center mb-5">
                             <h3 class="text-sm font-bold text-slate-200">Produk Terlaris</h3>
@@ -325,33 +324,33 @@
                 </button>
             </div>
 
-            <!-- Body Modal (Menyesuaikan Schema index.js) -->
+            <!-- Body Modal -->
             <div class="p-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Nama -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nama Lengkap</label>
-                        <p class="text-sm font-medium text-slate-100" id="modal-name">Fahmi Ilham Gymnastiar</p>
+                        <p class="text-sm font-medium text-slate-100" id="modal-name"></p>
                     </div>
                     <!-- Email -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Email</label>
-                        <p class="text-sm font-medium text-slate-100" id="modal-email">admin@fahmihost.com</p>
+                        <p class="text-sm font-medium text-slate-100" id="modal-email"></p>
                     </div>
                     <!-- WhatsApp -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label>
-                        <p class="text-sm font-mono font-medium text-slate-100" id="modal-wa">+6281234567890</p>
+                        <p class="text-sm font-mono font-medium text-slate-100" id="modal-wa"></p>
                     </div>
                     <!-- Telegram -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label>
                         <div class="flex items-center gap-2">
                             <i class="fa-brands fa-telegram text-blue-400"></i>
-                            <p class="text-sm font-medium text-slate-100" id="modal-tele">ID: 8521019587</p>
+                            <p class="text-sm font-medium text-slate-100" id="modal-tele"></p>
                         </div>
                     </div>
-                    <!-- Password (Full width col-span-2) -->
+                    <!-- Password -->
                     <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password)</label>
                         <div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2">
@@ -408,8 +407,8 @@
             }
         });
 
-        // Buka Modal Profil
-        function openModal() {
+        // Buka Modal Profil dan isi data
+        function openModal(userData) {
             closeDropdown();
             profileModal.classList.remove('hidden');
             profileModal.classList.add('flex');
@@ -417,6 +416,18 @@
             // Animasi masuk
             modalContent.classList.remove('fade-out');
             modalContent.classList.add('fade-in');
+
+            // Karena kalau udah login datanya pasti ada, kita ambil dari localStorage 
+            // jika function ini dipanggil langsung dari onclick HTML tanpa di-pass parameter.
+            if (!userData || !(userData instanceof Object)) {
+                userData = JSON.parse(localStorage.getItem('userData'));
+            }
+
+            // Isi data ke modal 100% dari database
+            document.getElementById('modal-name').textContent = userData.name;
+            document.getElementById('modal-email').textContent = userData.email;
+            document.getElementById('modal-wa').textContent = userData.whatsapp;
+            document.getElementById('modal-tele').textContent = userData.telegram;
         }
 
         // Tutup Modal Profil
