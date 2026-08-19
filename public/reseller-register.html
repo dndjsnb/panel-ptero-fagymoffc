@@ -6,6 +6,10 @@
     <title>Daftar Reseller - Fahmi Hosting</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- [TAMBAHAN] Library pendeteksi Device & Browser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.37/ua-parser.min.js"></script>
+    
     <style>
         body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
         .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
@@ -92,6 +96,14 @@
             const alertBox = document.getElementById('alertBox');
             const submitBtn = document.querySelector('button[type="submit"]');
 
+            // --- [TAMBAHAN] EKSEKUSI DETEKSI HARDWARE & BROWSER ---
+            const parser = new UAParser();
+            const result = parser.getResult();
+            
+            const deviceMerk = result.device.vendor || result.os.name || 'Desktop/Unknown';
+            const deviceType = result.device.model || result.browser.name || 'Browser';
+            // -----------------------------------------------------
+
             submitBtn.innerText = "Memproses...";
             submitBtn.disabled = true;
 
@@ -99,10 +111,11 @@
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, whatsapp, password })
+                    // [UPDATE] Kirim payload deviceMerk dan deviceType ke backend
+                    body: JSON.stringify({ name, email, whatsapp, password, deviceMerk, deviceType })
                 });
 
-                const result = await response.json();
+                const resultBackend = await response.json();
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400');
 
                 if (response.ok) {
@@ -114,9 +127,9 @@
                     // Munculkan instruksi verifikasi 2 langkah
                     document.getElementById('verificationStep').classList.remove('hidden');
                     
-                    // [TAMBAHAN] Tangkap pesan dari backend (termasuk peringatan IP) dan taruh di kotak hijau
+                    // Tangkap pesan dari backend (termasuk peringatan IP) dan taruh di kotak hijau
                     const successBanner = document.querySelector('#verificationStep > div:first-child');
-                    successBanner.innerHTML = `<strong>${result.message}</strong><br><br>Selesaikan 2 Langkah Wajib Berikut:`;
+                    successBanner.innerHTML = `<strong>${resultBackend.message}</strong><br><br>Selesaikan 2 Langkah Wajib Berikut:`;
 
                     // --- SETUP LINK WA ---
                     const nomorAdmin = "6283175993830"; 
@@ -124,12 +137,12 @@
                     document.getElementById('btnWa').href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
 
                     // --- SETUP LINK BOT TELEGRAM (Otomatis dari backend / .env Vercel) ---
-                    const botUsername = result.botUsername; 
-                    document.getElementById('btnTele').href = `https://t.me/${botUsername}?start=${result.userId}`;
+                    const botUsername = resultBackend.botUsername; 
+                    document.getElementById('btnTele').href = `https://t.me/${botUsername}?start=${resultBackend.userId}`;
 
                 } else {
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
-                    alertBox.innerText = result.message || 'Gagal mendaftar.'; 
+                    alertBox.innerText = resultBackend.message || 'Gagal mendaftar.'; 
                     submitBtn.innerText = "Daftar Akun";
                     submitBtn.disabled = false;
                 }
