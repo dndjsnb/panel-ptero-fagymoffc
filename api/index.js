@@ -25,6 +25,15 @@ const resellerSchema = new mongoose.Schema({
 
 const Reseller = mongoose.model('Reseller', resellerSchema);
 
+// --- SCHEMA IP TRACKER (ANTI SPAM) ---
+const ipSchema = new mongoose.Schema({
+    ipAddress: { type: String, required: true, unique: true },
+    registerCount: { type: Number, default: 0 },
+    isBanned: { type: Boolean, default: false }
+});
+
+const IpTracker = mongoose.model('IpTracker', ipSchema);
+
 // DATA PLANS UNTUK CHECKOUT PTERO
 const plans = {
     "basic": { price: 5000 }, "standar": { price: 10000 }, "pro": { price: 15000 }, "advance": { price: 20000 },
@@ -43,19 +52,34 @@ const zakki = new ZakkiStore({
     autoWithdraw: true
 });
 
-// --- API REGISTER ---
+// --- API REGISTER (WITH IP ANTI-SPAM) ---
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, whatsapp, password } = req.body; 
         
-        // [FITUR BARU]: Cek duplikat email ATAU nomor WA sekaligus
+        // 1. Dapatkan IP Address User
+        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'IP_TIDAK_DIKETAHUI';
+        
+        // 2. Cek Riwayat IP di Database
+        let ipRecord = await IpTracker.findOne({ ipAddress: clientIp });
+        
+        if (!ipRecord) {
+            ipRecord = new IpTracker({ ipAddress: clientIp, registerCount: 0, isBanned: false });
+        }
+
+        // 3. TOLAK MENTAH-MENTAH JIKA IP SUDAH BANNED (Data tidak akan masuk ke schema Reseller)
+        if (ipRecord.isBanned) {
+            return res.status(403).json({ message: 'Akses Ditolak! IP Jaringan ini telah diblokir permanen karena terindikasi spam.' });
+        }
+        
+        // Cek duplikat email ATAU nomor WA sekaligus
         const isExist = await Reseller.findOne({ 
             $or: [{ email: email }, { whatsapp: whatsapp }] 
         });
         
-        // Kalau udah pernah daftar (apapun statusnya), tolak pendaftaran
         if(isExist) return res.status(400).json({ message: 'Email atau Nomor WA sudah pernah didaftarkan. Anda tidak bisa mendaftar lagi!' });
 
+        // 4. Jika aman, simpan Reseller Baru
         const newReseller = new Reseller({ 
             name, email, whatsapp, password, 
             telegram: 'Belum Terhubung', 
@@ -64,7 +88,20 @@ app.post('/api/register', async (req, res) => {
         });
         const savedUser = await newReseller.save();
 
-        res.status(201).json({ message: 'Akun terdaftar.', userId: savedUser._id.toString(), botUsername: process.env.BOT_USERNAME });
+        // 5. Update Hitungan & Status IP
+        ipRecord.registerCount += 1;
+        let tambahanPesan = '';
+
+        if (ipRecord.registerCount === 2) {
+            tambahanPesan = ' (PERINGATAN: Sisa 1x pendaftaran lagi sebelum IP Anda diblokir!)';
+        } else if (ipRecord.registerCount >= 3) {
+            ipRecord.isBanned = true; // Eksekusi Banned untuk percobaan berikutnya
+            tambahanPesan = ' (BATAS MAKSIMAL! IP Anda sekarang diblokir permanen untuk pendaftaran berikutnya.)';
+        }
+        
+        await ipRecord.save();
+
+        res.status(201).json({ message: 'Akun terdaftar.' + tambahanPesan, userId: savedUser._id.toString(), botUsername: process.env.BOT_USERNAME });
     } catch (error) { res.status(500).json({ message: 'Gagal daftar! Server error.' }); }
 });
 
@@ -126,7 +163,7 @@ app.post('/api/webhook', async (req, res) => {
             const TESTI_CHAT_ID = process.env.TESTI_CHAT_ID;
             
             if (BOT_TOKEN && TESTI_CHAT_ID) {
-                const teleMessage = `🚀 *Pesanan Berhasil!*\n\n👤 *User:* ${username || 'Fahmi'}\n📦 *Paket:* ${plan_key || 'Custom'}\n⚡ *Status:* LUNAS / Aktif`;
+                const teleMessage = ` *Pesanan Berhasil!*\n\n *User:* ${username || 'Fahmi'}\n *Paket:* ${plan_key || 'Custom'}\n *Status:* LUNAS / Aktif`;
                 try {
                     await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, { chat_id: TESTI_CHAT_ID, text: teleMessage, parse_mode: 'Markdown' });
                 } catch (teleErr) {}
@@ -160,11 +197,8 @@ app.post('/api/tele-webhook', async (req, res) => {
     if (message && message.text && message.text.startsWith('/start')) {
         const chatId = message.chat.id;
 
-        // [FITUR BARU]: Cek apakah ID Telegram ini udah pernah diverifikasi
-        // Karena data lu di-save dengan format "ID: <chatId> | @<username>", kita cari pakai RegEx
         const existingTeleUser = await Reseller.findOne({ telegram: new RegExp(`ID: ${chatId}`) });
         
-        // Kalau ketemu datanya (status pending/accepted/rejected), langsung dicuekin (return 200 OK)
         if (existingTeleUser) {
             return res.status(200).send('OK');
         }
@@ -179,10 +213,10 @@ app.post('/api/tele-webhook', async (req, res) => {
                     const dataTele = `ID: ${chatId} | ${username}`;
                     await Reseller.findByIdAndUpdate(userId, { telegram: dataTele });
 
-                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: chatId, text: `✅ *Berhasil Terhubung!*\n\nHalo ${user.name}, pengajuan akun kamu sedang di-review Admin.`, parse_mode: 'Markdown' });
+                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: chatId, text: ` *Berhasil Terhubung!*\n\nHalo ${user.name}, pengajuan akun kamu sedang di-review Admin.`, parse_mode: 'Markdown' });
 
-                    const pesanAdmin = `🚨 *PENDAFTARAN RESELLER BARU* 🚨\n\n👤 *Nama:* ${user.name}\n📧 *Email:* ${user.email}\n📱 *WA:* ${user.whatsapp}\n✈️ *Telegram:* ${dataTele}`;
-                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: ADMIN_CHAT_ID, text: pesanAdmin, parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ text: "✅ ACC", callback_data: `ACC_${user.email}` }, { text: "❌ TOLAK", callback_data: `TOLAK_${user.email}` }]] } });
+                    const pesanAdmin = ` *PENDAFTARAN RESELLER BARU* \n\n *Nama:* ${user.name}\n *Email:* ${user.email}\n *WA:* ${user.whatsapp}\n *Telegram:* ${dataTele}`;
+                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: ADMIN_CHAT_ID, text: pesanAdmin, parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ text: " ACC", callback_data: `ACC_${user.email}` }, { text: " TOLAK", callback_data: `TOLAK_${user.email}` }]] } });
                 }
             } catch (err) {}
         }
@@ -198,14 +232,14 @@ app.post('/api/tele-webhook', async (req, res) => {
             let responseText = "";
             if (action === 'ACC') {
                 const userUpdated = await Reseller.findOneAndUpdate({ email: emailTarget }, { status: 'verified' }, { new: true });
-                responseText = `✅ Akun ${emailTarget} berhasil di-ACC.`;
+                responseText = ` Akun ${emailTarget} berhasil di-ACC.`;
                 if (userUpdated && userUpdated.telegram !== 'Belum Terhubung') {
                     const userTeleId = userUpdated.telegram.split(' | ')[0].replace('ID: ', '');
-                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: userTeleId, text: `🎉 *SELAMAT!* Akun Reseller kamu telah di-ACC Admin.`, parse_mode: 'Markdown' });
+                    await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: userTeleId, text: ` *SELAMAT!* Akun Reseller kamu telah di-ACC Admin.`, parse_mode: 'Markdown' });
                 }
             } else if (action === 'TOLAK') {
                 await Reseller.findOneAndUpdate({ email: emailTarget }, { status: 'rejected' });
-                responseText = `❌ Pendaftaran ${emailTarget} ditolak.`;
+                responseText = ` Pendaftaran ${emailTarget} ditolak.`;
             }
             await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/answerCallbackQuery`, { callback_query_id: callback_query.id, text: responseText });
             await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/editMessageText`, { chat_id: adminChatId, message_id: messageId, text: `${callback_query.message.text}\n\n*STATUS:* ${responseText}`, parse_mode: 'Markdown' });
@@ -244,7 +278,7 @@ app.post('/api/admin-webhook', async (req, res) => {
         const text = msg.text.trim();
 
         if (fromId !== ADMIN_ID) {
-            await sendAdminMessage(chatId, '⛔ Akses ditolak! Bot ini khusus buat owner.');
+            await sendAdminMessage(chatId, ' Akses ditolak! Bot ini khusus buat owner.');
             return res.status(200).send('Akses ditolak');
         }
 
@@ -253,7 +287,7 @@ app.post('/api/admin-webhook', async (req, res) => {
 
         if (['/start', '/menu', '/help'].includes(command)) {
             const menu = `
-🛠️ *PANEL KONTROL RESELLER* 🛠️
+ *PANEL KONTROL RESELLER* 
 
 /list - Lihat semua akun reseller
 /cek <email> - Cek detail satu akun
@@ -266,25 +300,25 @@ app.post('/api/admin-webhook', async (req, res) => {
         else if (command === '/list') {
             const users = await Reseller.find({});
             if (users.length === 0) {
-                await sendAdminMessage(chatId, '📂 Belum ada akun reseller yang terdaftar.');
+                await sendAdminMessage(chatId, ' Belum ada akun reseller yang terdaftar.');
             } else {
-                let pesan = '📋 *DAFTAR AKUN RESELLER:*\n\n';
+                let pesan = ' *DAFTAR AKUN RESELLER:*\n\n';
                 users.forEach((user, index) => {
-                    const status = user.status === 'suspended' ? '🔴 Suspended' : (user.status === 'verified' ? '🟢 Aktif' : '🟡 ' + user.status);
+                    const status = user.status === 'suspended' ? ' Suspended' : (user.status === 'verified' ? ' Aktif' : ' ' + user.status);
                     pesan += `${index + 1}. *${user.name}* (${user.email}) | ${status}\n`;
                 });
                 await sendAdminMessage(chatId, pesan);
             }
         } 
         else if (command === '/cek') {
-            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /cek <email>');
+            if (args.length < 2) return sendAdminMessage(chatId, ' Format: /cek <email>');
             const user = await Reseller.findOne({ email: args[1] });
             
             if (!user) {
-                await sendAdminMessage(chatId, `❌ Akun dengan email *${args[1]}* tidak ditemukan.`);
+                await sendAdminMessage(chatId, ` Akun dengan email *${args[1]}* tidak ditemukan.`);
             } else {
                 const detail = `
-🔍 *DETAIL AKUN RESELLER* 🔍
+ *DETAIL AKUN RESELLER* 
 Nama: ${user.name}
 Email: ${user.email}
 WA: ${user.whatsapp}
@@ -296,25 +330,25 @@ Telegram: ${user.telegram}
             }
         } 
         else if (command === '/suspend') {
-            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /suspend <email>');
+            if (args.length < 2) return sendAdminMessage(chatId, ' Format: /suspend <email>');
             const result = await Reseller.updateOne({ email: args[1] }, { $set: { status: 'suspended' } });
             
-            if (result.modifiedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* berhasil dibekukan.`);
-            else await sendAdminMessage(chatId, `❌ Gagal suspend. Akun tidak ditemukan atau sudah tersuspend.`);
+            if (result.modifiedCount === 1) await sendAdminMessage(chatId, ` Akun *${args[1]}* berhasil dibekukan.`);
+            else await sendAdminMessage(chatId, ` Gagal suspend. Akun tidak ditemukan atau sudah tersuspend.`);
         } 
         else if (command === '/aktif') {
-            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /aktif <email>');
+            if (args.length < 2) return sendAdminMessage(chatId, ' Format: /aktif <email>');
             const result = await Reseller.updateOne({ email: args[1] }, { $set: { status: 'verified' } });
             
-            if (result.modifiedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* diaktifkan kembali.`);
-            else await sendAdminMessage(chatId, `❌ Gagal. Akun tidak ditemukan atau sudah aktif.`);
+            if (result.modifiedCount === 1) await sendAdminMessage(chatId, ` Akun *${args[1]}* diaktifkan kembali.`);
+            else await sendAdminMessage(chatId, ` Gagal. Akun tidak ditemukan atau sudah aktif.`);
         } 
         else if (command === '/del') {
-            if (args.length < 2) return sendAdminMessage(chatId, '⚠️ Format: /del <email>');
+            if (args.length < 2) return sendAdminMessage(chatId, ' Format: /del <email>');
             const result = await Reseller.deleteOne({ email: args[1] });
             
-            if (result.deletedCount === 1) await sendAdminMessage(chatId, `✅ Akun *${args[1]}* dihapus permanen.`);
-            else await sendAdminMessage(chatId, `❌ Gagal. Email *${args[1]}* tidak ditemukan.`);
+            if (result.deletedCount === 1) await sendAdminMessage(chatId, ` Akun *${args[1]}* dihapus permanen.`);
+            else await sendAdminMessage(chatId, ` Gagal. Email *${args[1]}* tidak ditemukan.`);
         }
 
         res.status(200).send('Webhook Admin Bot OK');
