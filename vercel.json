@@ -13,7 +13,9 @@
     "VERIF_CHAT_ID": "8521019587",
     "BOT_USERNAME": "botverif_resseler_bot",
     "PTERO_BOT_URL": "http://cabangdua.lilyss.xyz:2019",
-    "ADMIN_BOT_TOKEN":"8512516198:AAFlFXCQp2yFz4RWFTaWAE0FRvtq0_P2sxs"
+    "ADMIN_BOT_TOKEN":"8512516198:AAFlFXCQp2yFz4RWFTaWAE0FRvtq0_P2sxs",
+    "OTP_BOT_TOKEN":"8789573230:AAGGWokCVgO6SxVcaDEwEu-Yp4F0lRRqtlA"
+  
   },
   "rewrites": [
     {
