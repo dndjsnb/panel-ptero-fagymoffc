@@ -7,9 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- [TAMBAHAN] Library pendeteksi Device & Browser -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.37/ua-parser.min.js"></script>
-    
     <style>
         body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
         .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
@@ -55,7 +52,6 @@
                   Pendaftaran Berhasil!<br>Selesaikan 2 Langkah Wajib Berikut:
             </div>
             
-            <!-- Langkah 1: WA -->
             <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
                 <h4 class="text-sm font-bold text-white mb-2"><span class="bg-green-600 text-white px-2 py-0.5 rounded-md mr-1">1</span> Konfirmasi WhatsApp</h4>
                 <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
@@ -66,7 +62,6 @@
                 </a>
             </div>
 
-            <!-- Langkah 2: Telegram -->
             <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
                 <h4 class="text-sm font-bold text-white mb-2"><span class="bg-blue-600 text-white px-2 py-0.5 rounded-md mr-1">2</span> Hubungkan Telegram</h4>
                 <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
@@ -86,6 +81,38 @@
     </div>
 
     <script>
+        // ========================================================
+        // FUNGSI GENERATE HARDWARE ID (CANVAS FINGERPRINTING)
+        // ========================================================
+        async function generateCanvasFingerprint() {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 200;
+                canvas.height = 50;
+                
+                ctx.fillStyle = "rgb(128, 0, 0)";
+                ctx.fillRect(10, 10, 100, 30);
+                ctx.font = "14pt Arial";
+                ctx.fillStyle = "rgb(0, 0, 255)";
+                ctx.fillText("Fahmi-Reseller-Lock", 15, 30); // Secret pattern
+                
+                ctx.strokeStyle = "rgba(0, 255, 0, 0.5)";
+                ctx.beginPath();
+                ctx.arc(50, 25, 20, 0, Math.PI * 2, true);
+                ctx.stroke();
+                
+                const dataURL = canvas.toDataURL();
+                let hash = 0;
+                for (let i = 0; i < dataURL.length; i++) {
+                    const char = dataURL.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                resolve(Math.abs(hash).toString(16));
+            });
+        }
+
         document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault(); 
             
@@ -96,47 +123,36 @@
             const alertBox = document.getElementById('alertBox');
             const submitBtn = document.querySelector('button[type="submit"]');
 
-            // --- [TAMBAHAN] EKSEKUSI DETEKSI HARDWARE & BROWSER ---
-            const parser = new UAParser();
-            const result = parser.getResult();
-            
-            const deviceMerk = result.device.vendor || result.os.name || 'Desktop/Unknown';
-            const deviceType = result.device.model || result.browser.name || 'Browser';
-            // -----------------------------------------------------
-
             submitBtn.innerText = "Memproses...";
             submitBtn.disabled = true;
 
             try {
+                // Panggil fungsi pembuat Hardware ID
+                const hwid = await generateCanvasFingerprint();
+
                 const response = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    // [UPDATE] Kirim payload deviceMerk dan deviceType ke backend
-                    body: JSON.stringify({ name, email, whatsapp, password, deviceMerk, deviceType })
+                    // Kirim hardwareId ke backend Express lu
+                    body: JSON.stringify({ name, email, whatsapp, password, hardwareId: hwid })
                 });
 
                 const resultBackend = await response.json();
                 alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400');
 
                 if (response.ok) {
-                    // Sembunyikan form dan teks login
                     document.getElementById('registerForm').classList.add('hidden');
                     document.getElementById('loginText').classList.add('hidden');
                     document.getElementById('headerText').classList.add('hidden'); 
-
-                    // Munculkan instruksi verifikasi 2 langkah
                     document.getElementById('verificationStep').classList.remove('hidden');
                     
-                    // Tangkap pesan dari backend (termasuk peringatan IP) dan taruh di kotak hijau
                     const successBanner = document.querySelector('#verificationStep > div:first-child');
                     successBanner.innerHTML = `<strong>${resultBackend.message}</strong><br><br>Selesaikan 2 Langkah Wajib Berikut:`;
 
-                    // --- SETUP LINK WA ---
                     const nomorAdmin = "6283175993830"; 
                     const pesanWa = `Halo Admin FahmiHost, saya sudah daftar akun Reseller dan ingin meminta aktivasi.%0A%0ANama: ${name}%0AEmail: ${email}%0ANo. WA Terdaftar: ${whatsapp}%0A%0A*Saya mengerti jika nomor pengirim ini berbeda dengan nomor WA Terdaftar di atas, maka pendaftaran saya otomatis DITOLAK.*`;
                     document.getElementById('btnWa').href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
 
-                    // --- SETUP LINK BOT TELEGRAM (Otomatis dari backend / .env Vercel) ---
                     const botUsername = resultBackend.botUsername; 
                     document.getElementById('btnTele').href = `https://t.me/${botUsername}?start=${resultBackend.userId}`;
 
