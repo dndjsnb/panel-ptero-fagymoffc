@@ -95,7 +95,6 @@
                 </div>
             </div>
         </header>
-
         <div class="p-6 overflow-y-auto">
             <div class="max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -187,8 +186,7 @@
             </div>
         </div>
     </main>
-
-    <div id="profileModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity">
+        <div id="profileModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity">
         <div class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-xl shadow-2xl overflow-hidden m-4 fade-in">
             <div class="flex justify-between items-center px-6 py-4 border-b border-slate-700/60 bg-slate-800/50">
                 <h3 class="text-lg font-bold text-slate-100">Detail Akun Reseller</h3>
@@ -201,7 +199,18 @@
                     <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label><input type="text" id="edit-wa" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly></div>
                     <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label><div class="flex items-center gap-2 px-3 py-1.5"><i class="fa-brands fa-telegram text-blue-400"></i><p class="text-sm font-medium text-slate-100" id="modal-tele"></p></div></div>
                     <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password Baru)</label><input type="password" id="edit-password" placeholder="••••••••••••" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none transition-colors" readonly></div>
-                    <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden"><label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label><input type="text" id="edit-otp" placeholder="Contoh: 123456" class="w-full bg-slate-900 border border-blue-500 rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none"><p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram lu buat ambil kodenya.</p></div>
+                    
+                    <!-- CONTAINER OTP DENGAN TOMBOL RESEND -->
+                    <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden">
+                        <label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label>
+                        <input type="text" id="edit-otp" placeholder="Contoh: 123456" class="w-full bg-slate-900 border border-blue-500 rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none">
+                        <div class="flex justify-between items-center mt-1">
+                            <p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram.</p>
+                            <button id="btn-resend-otp" type="button" onclick="requestOtp()" class="text-[11px] font-semibold text-blue-400 hover:text-blue-300 transition-colors bg-transparent border-none cursor-pointer">
+                                Kirim Ulang OTP
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-800/50 flex justify-end gap-3">
@@ -215,6 +224,12 @@
         const dropdownIcon = document.getElementById('dropdown-icon');
         const profileModal = document.getElementById('profileModal');
         const modalContent = profileModal.querySelector('div');
+
+        // ==== VARIABEL COOLDOWN ====
+        let resendAttempts = 0;
+        let cdInterval = null;
+        // Format durasi dalam detik (1m, 3m, 15m, 30m, 60m)
+        const cdDurations = [60, 180, 900, 1800, 3600]; 
 
         function toggleDropdown(event) {
             event.stopPropagation();
@@ -272,6 +287,18 @@
             document.getElementById('edit-password').placeholder = '••••••••••••';
             document.getElementById('otp-container').classList.add('hidden');
             document.getElementById('edit-otp').value = '';
+            
+            // Reset resend timer UI & state
+            clearInterval(cdInterval);
+            resendAttempts = 0;
+            const resendBtn = document.getElementById('btn-resend-otp');
+            if (resendBtn) {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = 'Kirim Ulang OTP';
+                resendBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
+                resendBtn.classList.add('text-blue-400', 'hover:text-blue-300', 'cursor-pointer');
+            }
+
             const btn = document.getElementById('btn-action-edit');
             btn.innerHTML = 'Edit Data';
             btn.setAttribute('onclick', 'toggleEditMode()');
@@ -290,28 +317,81 @@
             btn.setAttribute('onclick', 'requestOtp()');
         }
 
+        // ==== FUNGSI TIMER COOLDOWN ====
+        function startResendCooldown() {
+            const resendBtn = document.getElementById('btn-resend-otp');
+            if (!resendBtn) return;
+
+            let cdIndex = Math.min(resendAttempts, cdDurations.length - 1);
+            let timeLeft = cdDurations[cdIndex];
+            
+            resendAttempts++; 
+            resendBtn.disabled = true;
+            resendBtn.classList.remove('text-blue-400', 'hover:text-blue-300', 'cursor-pointer');
+            resendBtn.classList.add('text-slate-500', 'cursor-not-allowed');
+
+            clearInterval(cdInterval); 
+            
+            cdInterval = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(cdInterval);
+                    resendBtn.disabled = false;
+                    resendBtn.innerHTML = 'Kirim Ulang OTP';
+                    resendBtn.classList.remove('text-slate-500', 'cursor-not-allowed');
+                    resendBtn.classList.add('text-blue-400', 'hover:text-blue-300', 'cursor-pointer');
+                } else {
+                    let m = Math.floor(timeLeft / 60);
+                    let s = timeLeft % 60;
+                    resendBtn.innerHTML = `Tunggu ${m > 0 ? m + 'm ' : ''}${s}s`;
+                    timeLeft--;
+                }
+            }, 1000);
+        }
+
+        // ==== UPDATE FUNGSI REQUEST OTP ====
         async function requestOtp() {
             const userData = JSON.parse(localStorage.getItem('userData'));
             const btn = document.getElementById('btn-action-edit');
+            const resendBtn = document.getElementById('btn-resend-otp');
+
+            if (resendBtn && resendBtn.disabled) return; 
+
             btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Mengirim...';
             btn.disabled = true;
+            if (resendBtn) resendBtn.disabled = true;
 
             try {
-                const res = await fetch('/api/request-otp', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: userData.id }) });
+                const res = await fetch('/api/request-otp', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ userId: userData.id }) 
+                });
                 const data = await res.json();
+                
                 if (res.ok) {
                     showToast(data.message, 'success'); 
                     document.getElementById('otp-container').classList.remove('hidden');
                     btn.innerHTML = 'Simpan Perubahan';
                     btn.setAttribute('onclick', 'submitEditData()');
+                    
+                    // Trigger timer cooldown
+                    startResendCooldown();
                 } else {
                     showToast(data.message, 'error');
                     btn.innerHTML = 'Kirim OTP Verifikasi';
+                    if (resendBtn && resendAttempts === 0) {
+                        resendBtn.disabled = false;
+                    }
                 }
             } catch (err) {
                 showToast("Server error bro! Cek koneksi.", 'error');
                 btn.innerHTML = 'Kirim OTP Verifikasi';
-            } finally { btn.disabled = false; }
+                if (resendBtn && resendAttempts === 0) {
+                        resendBtn.disabled = false;
+                }
+            } finally { 
+                btn.disabled = false; 
+            }
         }
 
         async function submitEditData() {
