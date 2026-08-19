@@ -24,7 +24,9 @@ const resellerSchema = new mongoose.Schema({
     ipAddress: { type: String, default: 'UNKNOWN' },
     hardwareId: { type: String, required: true } // PENGGANTI DEVICE MERK & TYPE
 });
-const Reseller = mongoose.model('Reseller', resellerSchema);
+
+// FIX VERCEL CRASH 1: Cegah Overwrite Model
+const Reseller = mongoose.models.Reseller || mongoose.model('Reseller', resellerSchema);
 
 // --- SCHEMA IP TRACKER (ANTI SPAM) ---
 const ipSchema = new mongoose.Schema({
@@ -32,7 +34,9 @@ const ipSchema = new mongoose.Schema({
     registerCount: { type: Number, default: 0 },
     isBanned: { type: Boolean, default: false }
 });
-const IpTracker = mongoose.model('IpTracker', ipSchema);
+
+// FIX VERCEL CRASH 1: Cegah Overwrite Model
+const IpTracker = mongoose.models.IpTracker || mongoose.model('IpTracker', ipSchema);
 
 const plans = {
     "basic": { price: 5000 }, "standar": { price: 10000 }, "pro": { price: 15000 }, "advance": { price: 20000 },
@@ -53,7 +57,9 @@ const zakki = new ZakkiStore({
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, whatsapp, password, hardwareId } = req.body; 
-        const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'IP_TIDAK_DIKETAHUI';
+        
+        // FIX VERCEL CRASH 2: Tambah (?) di req.socket
+        const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'IP_TIDAK_DIKETAHUI';
         
         let ipRecord = await IpTracker.findOne({ ipAddress: clientIp });
         if (!ipRecord) ipRecord = new IpTracker({ ipAddress: clientIp, registerCount: 0, isBanned: false });
@@ -155,7 +161,6 @@ app.post('/api/tele-webhook', async (req, res) => {
                     await Reseller.findByIdAndUpdate(userId, { telegram: dataTele });
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: chatId, text: `  *Terhubung!*\nHalo ${user.name}, akun direview Admin.`, parse_mode: 'Markdown' });
                     
-                    // UPDATE: NOTIF ADMIN SEKARANG MENAMPILKAN HARDWARE ID
                     const msgAdmin = `  *RESELLER BARU*  \n\nNama: ${user.name}\nEmail: ${user.email}\nWA: ${user.whatsapp}\nTelegram: ${dataTele}\nHWID: \`${user.hardwareId || 'UNKNOWN'}\``;
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: ADMIN_CHAT_ID, text: msgAdmin, parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ text: "  ACC", callback_data: `ACC_${user.email}` }, { text: "  TOLAK", callback_data: `TOLAK_${user.email}` }]] } });
                 }
@@ -254,7 +259,6 @@ app.post('/api/admin-webhook', async (req, res) => {
             }
             else if (data === 'IP_PENDING') {
                 const users = await Reseller.find({ status: 'pending' });
-                // FORMAT UPDATE UNTUK MENAMPILKAN HARDWARE ID DI LIST
                 let txt = `⏳ *MONITOR AKUN PENDING:*\n\n`;
                 if (users.length === 0) txt += "Kosong."; else { 
                     users.forEach((u, i) => { 
@@ -266,7 +270,6 @@ app.post('/api/admin-webhook', async (req, res) => {
             }
             else if (data === 'IP_VERIFIED') {
                 const users = await Reseller.find({ status: 'verified' });
-                // FORMAT UPDATE UNTUK MENAMPILKAN HARDWARE ID DI LIST
                 let txt = `✅ *MONITOR AKUN VERIFIED:*\n\n`;
                 if (users.length === 0) txt += "Kosong."; else { 
                     users.forEach((u, i) => { 
@@ -318,7 +321,9 @@ app.post('/api/admin-webhook', async (req, res) => {
                 await Reseller.deleteOne({ email });
                 await answerCallback(cb.id, `Dihapus: ${email}`, true);
                 await editAdminMessage(chatId, messageId, `✅ Akun \`${email}\` dihapus.`, { inline_keyboard: [[{ text: "🔙 Kembali", callback_data: "LIST_RESELLER" }]] });
-     }
+         }
+            return res.status(200).send('OK');
+        }
 
         if (!update || !update.message || !update.message.text) return res.status(200).send('Bukan teks');
 
@@ -342,4 +347,4 @@ app.post('/api/admin-webhook', async (req, res) => {
 });
 
 module.exports = app;
-module.exports.mongoURI = mongoURI;
+module.exports.mongoURI = mongoURI
