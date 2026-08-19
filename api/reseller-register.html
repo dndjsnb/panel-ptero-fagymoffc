@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Reseller - Fahmi Hosting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Library pendeteksi Device & Browser (Tahap 1) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.37/ua-parser.min.js"></script>
+    
+    <style>
+        body { background: radial-gradient(circle at top, #111827, #030712); font-family: system-ui, -apple-system, sans-serif; }
+        .glass-card { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex items-center justify-center p-4">
+    <div class="glass-card p-8 rounded-2xl shadow-2xl max-w-sm w-full border border-gray-800 relative overflow-hidden">
+        <div class="absolute -bottom-24 -left-24 w-48 h-48 bg-emerald-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="text-center mb-8 relative z-10" id="headerText">
+            <h2 class="text-2xl font-extrabold text-white mb-1">Gabung Reseller</h2>
+            <p class="text-xs text-gray-400">Jual kembali layanan Fahmi Hosting</p>
+        </div>
+
+        <!-- Form Pendaftaran -->
+        <form id="registerForm" class="space-y-4 relative z-10">
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Nama Lengkap</label>
+                <input type="text" id="name" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="Budi Setiawan" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Email</label>
+                <input type="email" id="email" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="reseller@mail.com" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Nomor WhatsApp</label>
+                <input type="tel" id="whatsapp" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="081234567890" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
+                <input type="password" id="password" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500 transition-all" placeholder="        " required>
+            </div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Daftar Akun</button>
+            
+            <div id="alertBox" class="hidden mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
+        </form>
+
+        <p id="loginText" class="text-center text-xs text-gray-400 mt-6 relative z-10">Sudah punya akun? <a href="reseller-login.html" class="text-emerald-400 hover:underline">Masuk disini</a></p>
+
+        <!-- Container Verifikasi 2 Langkah -->
+        <div id="verificationStep" class="hidden relative z-10 space-y-4">
+            <div class="bg-emerald-500/20 text-emerald-400 p-3 rounded-xl text-sm font-semibold mb-4 border border-emerald-500/30 text-center">
+                  Pendaftaran Berhasil!<br>Selesaikan 2 Langkah Wajib Berikut:
+            </div>
+            
+            <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
+                <h4 class="text-sm font-bold text-white mb-2"><span class="bg-green-600 text-white px-2 py-0.5 rounded-md mr-1">1</span> Konfirmasi WhatsApp</h4>
+                <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
+                    Klik tombol WA di bawah. <b>PENTING: Gunakan nomor WA yang SAMA PERSIS dengan yang Anda isi di form!</b> Jika Anda mengirim pesan dengan nomor berbeda, akun otomatis <b>DITOLAK</b>. Jangan ubah teks pesannya.
+                </p>
+                <a id="btnWa" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 hover:bg-green-500 text-white font-semibold text-sm py-2.5 px-4 rounded-xl shadow-lg transition-all">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Kirim Pesan WA
+                </a>
+            </div>
+
+            <div class="text-left bg-gray-900/80 p-4 rounded-xl border border-gray-700/80">
+                <h4 class="text-sm font-bold text-white mb-2"><span class="bg-blue-600 text-white px-2 py-0.5 rounded-md mr-1">2</span> Hubungkan Telegram</h4>
+                <p class="text-[11px] text-gray-400 mb-3 leading-relaxed">
+                    Buka Bot Telegram kami melalui tombol di bawah. Setelah bot terbuka, <b>WAJIB KLIK TOMBOL "START"</b> (atau ketik <code class="bg-gray-800 px-1 rounded text-blue-300">/start</code>) agar notifikasi akun masuk ke sistem Admin.
+                </p>
+                <a id="btnTele" href="#" target="_blank" class="flex items-center justify-center gap-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-2.5 px-4 rounded-xl shadow-lg transition-all">
+                    <i class="fa-brands fa-telegram text-lg"></i> Buka Bot Telegram
+                </a>
+            </div>
+            
+            <div class="bg-red-500/10 border border-red-500/20 p-3 rounded-xl mt-4">
+                <p class="text-[10px] text-red-400 leading-relaxed font-semibold text-center">
+                       PERHATIAN: Admin TIDAK AKAN meng-ACC akun Anda jika salah satu dari 2 langkah di atas tidak dilakukan dengan benar.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); 
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const password = document.getElementById('password').value;
+            const alertBox = document.getElementById('alertBox');
+            const submitBtn = document.querySelector('button[type="submit"]');
+
+            // ========================================================
+            // EKSEKUSI DETEKSI HARDWARE & BROWSER (SUPER AKURAT)
+            // ========================================================
+            let merkHP = 'Unknown';
+            let tipeHP = 'Unknown';
+
+            try {
+                // 1. Ambil data dasar pakai UAParser
+                const parser = new UAParser();
+                const result = parser.getResult();
+                
+                merkHP = result.device.vendor || result.os.name || 'Desktop/Unknown';
+                tipeHP = result.device.model || result.browser.name || 'Browser';
+
+                // 2. TIMPA PAKAI CLIENT HINTS API (Menembus sensor Chrome Android)
+                if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+                    const hints = await navigator.userAgentData.getHighEntropyValues(["model", "platform", "brands"]);
+                    if (hints.model) {
+                        tipeHP = hints.model; // Bakal dapet contoh: CPH1823
+                        merkHP = result.device.vendor || hints.platform || 'Android Device'; 
+                    }
+                }
+            } catch (err) {
+                console.log("Gagal deteksi hardware mendalam", err);
+            }
+            // ========================================================
+
+            submitBtn.innerText = "Memproses...";
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // Kirim payload hardware ke backend
+                    body: JSON.stringify({ name, email, whatsapp, password, deviceMerk: merkHP, deviceType: tipeHP })
+                });
+
+                const resultBackend = await response.json();
+                alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400', 'bg-red-500/20', 'text-red-400');
+
+                if (response.ok) {
+                    document.getElementById('registerForm').classList.add('hidden');
+                    document.getElementById('loginText').classList.add('hidden');
+                    document.getElementById('headerText').classList.add('hidden'); 
+                    document.getElementById('verificationStep').classList.remove('hidden');
+                    
+                    const successBanner = document.querySelector('#verificationStep > div:first-child');
+                    successBanner.innerHTML = `<strong>${resultBackend.message}</strong><br><br>Selesaikan 2 Langkah Wajib Berikut:`;
+
+                    const nomorAdmin = "6283175993830"; 
+                    const pesanWa = `Halo Admin FahmiHost, saya sudah daftar akun Reseller dan ingin meminta aktivasi.%0A%0ANama: ${name}%0AEmail: ${email}%0ANo. WA Terdaftar: ${whatsapp}%0A%0A*Saya mengerti jika nomor pengirim ini berbeda dengan nomor WA Terdaftar di atas, maka pendaftaran saya otomatis DITOLAK.*`;
+                    document.getElementById('btnWa').href = `https://wa.me/${nomorAdmin}?text=${pesanWa}`;
+
+                    const botUsername = resultBackend.botUsername; 
+                    document.getElementById('btnTele').href = `https://t.me/${botUsername}?start=${resultBackend.userId}`;
+
+                } else {
+                    alertBox.classList.add('bg-red-500/20', 'text-red-400');
+                    alertBox.innerText = resultBackend.message || 'Gagal mendaftar.'; 
+                    submitBtn.innerText = "Daftar Akun";
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                alertBox.classList.remove('hidden', 'bg-emerald-500/20', 'text-emerald-400');
+                alertBox.classList.add('bg-red-500/20', 'text-red-400');
+                alertBox.innerText = 'Server error/gagal dihubungi, Cok!';
+                submitBtn.innerText = "Daftar Akun";
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
