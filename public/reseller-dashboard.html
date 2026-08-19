@@ -74,7 +74,7 @@
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0 bg-[#0B1120] relative">
         
-        <!-- HEADER DENGAN USER DROPDOWN (INTERAKTIF) -->
+        <!-- HEADER DENGAN USER DROPDOWN -->
         <header class="h-16 border-b border-slate-700/60 px-6 flex items-center justify-between bg-slate-900/50 backdrop-blur-sm sticky top-0 z-40">
             <div class="flex items-center gap-4">
                 <h2 class="text-sm font-semibold text-slate-200">Reseller Overview</h2>
@@ -325,50 +325,50 @@
             </div>
 
             <!-- Body Modal -->
-            <div class="p-6">
+            <div class="p-6" id="edit-form-container">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- Nama -->
                     <div class="space-y-1">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Username</label>
+                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nama Lengkap</label>
                         <p class="text-sm font-medium text-slate-100" id="modal-name"></p>
                     </div>
                     <!-- Email -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Email</label>
-                        <p class="text-sm font-medium text-slate-100" id="modal-email"></p>
+                        <input type="email" id="edit-email" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly>
                     </div>
                     <!-- WhatsApp -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Nomor WhatsApp</label>
-                        <p class="text-sm font-mono font-medium text-slate-100" id="modal-wa"></p>
+                        <input type="text" id="edit-wa" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-3 py-1.5 text-sm font-medium text-slate-100 focus:outline-none transition-colors" readonly>
                     </div>
                     <!-- Telegram -->
                     <div class="space-y-1">
                         <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 px-3 py-1.5">
                             <i class="fa-brands fa-telegram text-blue-400"></i>
                             <p class="text-sm font-medium text-slate-100" id="modal-tele"></p>
                         </div>
                     </div>
-                    <!-- Password -->
+                    <!-- Password Baru -->
                     <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2">
-                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password)</label>
-                        <div class="flex items-center justify-between bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2">
-                            <p class="text-sm font-mono font-bold text-slate-500 tracking-[0.2em]">••••••••••••</p>
-                            <button class="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">Ubah Password</button>
-                        </div>
+                        <label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password Baru)</label>
+                        <input type="password" id="edit-password" placeholder="••••••••••••" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none transition-colors" readonly>
+                    </div>
+
+                    <!-- KOLOM OTP (Muncul otomatis pas minta kode) -->
+                    <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden">
+                        <label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label>
+                        <input type="text" id="edit-otp" placeholder="Contoh: 123456" class="w-full bg-slate-900 border border-blue-500 rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none">
+                        <p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram lu buat ambil kodenya.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Footer Modal -->
             <div class="px-6 py-4 border-t border-slate-700/60 bg-slate-800/50 flex justify-end gap-3">
-                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">
-                    Tutup
-                </button>
-                <button class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">
-                    Edit Data
-                </button>
+                <button onclick="closeModal()" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-700 transition-colors">Tutup</button>
+                <button id="btn-action-edit" onclick="toggleEditMode()" class="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors">Edit Data</button>
             </div>
         </div>
     </div>
@@ -417,41 +417,157 @@
             modalContent.classList.remove('fade-out');
             modalContent.classList.add('fade-in');
 
-            // Karena kalau udah login datanya pasti ada, kita ambil dari localStorage 
-            // jika function ini dipanggil langsung dari onclick HTML tanpa di-pass parameter.
             if (!userData || !(userData instanceof Object)) {
                 userData = JSON.parse(localStorage.getItem('userData'));
             }
 
-            // Isi data ke modal 100% dari database
             document.getElementById('modal-name').textContent = userData.name;
-            document.getElementById('modal-email').textContent = userData.email;
-            document.getElementById('modal-wa').textContent = userData.whatsapp;
+            document.getElementById('edit-email').value = userData.email;
+            document.getElementById('edit-wa').value = userData.whatsapp;
             document.getElementById('modal-tele').textContent = userData.telegram;
+            
+            // Reset mode read-only
+            resetEditMode();
         }
 
         // Tutup Modal Profil
         function closeModal() {
-            // Animasi keluar
             modalContent.classList.remove('fade-in');
             modalContent.classList.add('fade-out');
             
-            // Tunggu animasi selesai baru di-hide
             setTimeout(() => {
                 profileModal.classList.add('hidden');
                 profileModal.classList.remove('flex');
-            }, 200); // 200ms sama dengan durasi animasi
+            }, 200); 
         }
 
-        // Fungsi untuk Keluar / Logout
+        // Fungsi reset mode form ke baca saja
+        function resetEditMode() {
+            const inputs = ['edit-email', 'edit-wa', 'edit-password'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                el.readOnly = true;
+                el.classList.add('border-transparent', 'bg-slate-900/50');
+                el.classList.remove('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
+            });
+            
+            document.getElementById('edit-password').value = '';
+            document.getElementById('edit-password').placeholder = '••••••••••••';
+            document.getElementById('otp-container').classList.add('hidden');
+            document.getElementById('edit-otp').value = '';
+            
+            const btn = document.getElementById('btn-action-edit');
+            btn.textContent = 'Edit Data';
+            btn.setAttribute('onclick', 'toggleEditMode()');
+        }
+
+        // Fungsi ubah mode form jadi bisa ngetik
+        function toggleEditMode() {
+            const inputs = ['edit-email', 'edit-wa', 'edit-password'];
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                el.readOnly = false;
+                el.classList.remove('border-transparent', 'bg-slate-900/50');
+                el.classList.add('border-slate-600', 'bg-slate-900', 'focus:border-blue-500');
+            });
+            
+            document.getElementById('edit-password').placeholder = 'Kosongkan jika tidak ubah password';
+            
+            const btn = document.getElementById('btn-action-edit');
+            btn.textContent = 'Kirim OTP Verifikasi';
+            btn.setAttribute('onclick', 'requestOtp()');
+        }
+
+        // Request OTP ke backend
+        async function requestOtp() {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const btn = document.getElementById('btn-action-edit');
+            
+            btn.textContent = 'Mengirim...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/request-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: userData.id })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alert(data.message); 
+                    // Munculin kolom OTP
+                    document.getElementById('otp-container').classList.remove('hidden');
+                    btn.textContent = 'Simpan Perubahan';
+                    btn.setAttribute('onclick', 'submitEditData()');
+                } else {
+                    alert("Gagal: " + data.message);
+                    btn.textContent = 'Kirim OTP Verifikasi';
+                }
+            } catch (err) {
+                alert("Server error bro!");
+                btn.textContent = 'Kirim OTP Verifikasi';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Submit OTP dan data baru ke backend
+        async function submitEditData() {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            const newEmail = document.getElementById('edit-email').value;
+            const newWa = document.getElementById('edit-wa').value;
+            const newPass = document.getElementById('edit-password').value;
+            const otpCode = document.getElementById('edit-otp').value;
+            const btn = document.getElementById('btn-action-edit');
+
+            if (!otpCode) {
+                alert("Masukin dulu kode OTP dari Telegram, Bro!");
+                return;
+            }
+                                btn.textContent = 'Memproses...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/verify-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: userData.id,
+                        otp: otpCode,
+                        newEmail: newEmail !== userData.email ? newEmail : null,
+                        newWhatsapp: newWa !== userData.whatsapp ? newWa : null,
+                        newPassword: newPass ? newPass : null
+                    })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    alert("Mantap: " + data.message);
+                    if (newEmail) userData.email = newEmail;
+                    if (newWa) userData.whatsapp = newWa;
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    closeModal();
+                } else {
+                    alert("Error: " + data.message);
+                    btn.textContent = 'Simpan Perubahan';
+                }
+            } catch (err) {
+                alert("Server error bro!");
+                btn.textContent = 'Simpan Perubahan';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Fungsi Logout
         function logout() {
-            // Hapus data sesi login di browser
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('userData');
-            
-            // Tendang balik ke halaman login
             window.location.href = 'reseller-login.html';
         }
     </script>
 </body>
 </html>
+
+       
