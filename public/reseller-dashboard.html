@@ -95,7 +95,7 @@
                 </div>
             </div>
         </header>
-                <div class="p-6 overflow-y-auto">
+        <div class="p-6 overflow-y-auto">
             <div class="max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                     <div class="md:col-span-4 bg-slate-800 border border-slate-700/60 rounded-xl p-5 shadow-sm flex flex-col justify-between relative overflow-hidden">
@@ -200,7 +200,7 @@
                     <div class="space-y-1"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Telegram Terhubung</label><div class="flex items-center gap-2 px-3 py-1.5"><i class="fa-brands fa-telegram text-blue-400"></i><p class="text-sm font-medium text-slate-100" id="modal-tele"></p></div></div>
                     <div class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2"><label class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Keamanan Akun (Password Baru)</label><input type="password" id="edit-password" placeholder="••••••••••••" class="w-full bg-slate-900/50 border border-transparent rounded-lg px-4 py-2 text-sm font-mono text-slate-200 focus:outline-none transition-colors" readonly></div>
                     
-                    <!-- CONTAINER OTP DENGAN TOMBOL RESEND BARU -->
+                    <!-- CONTAINER OTP DENGAN TOMBOL & TIMER KEPISAH -->
                     <div id="otp-container" class="space-y-2 sm:col-span-2 pt-2 border-t border-slate-700/50 mt-2 hidden">
                         <label class="text-[11px] font-bold text-blue-400 uppercase tracking-wider">Masukkan Kode OTP dari Telegram</label>
                         <div class="flex gap-2">
@@ -208,9 +208,17 @@
                         </div>
                         <div class="flex justify-between items-center mt-2">
                             <p class="text-[10px] text-slate-500">Cek pesan masuk dari bot Telegram lu.</p>
-                            <button id="btn-resend-otp" type="button" onclick="requestOtp()" class="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded px-3 py-1.5 transition-colors cursor-pointer shadow-sm">
-                                <i class="fa-solid fa-rotate-right"></i> <span>Kirim Ulang OTP</span>
-                            </button>
+                            
+                            <!-- Bungkus timer dan tombol -->
+                            <div class="flex items-center gap-3">
+                                <!-- Teks Timer CD -->
+                                <span id="cd-timer-text" class="text-[11px] font-semibold text-slate-300 hidden"></span>
+                                
+                                <!-- Tombol Resend -->
+                                <button id="btn-resend-otp" type="button" onclick="requestOtp()" class="flex items-center gap-1.5 text-[11px] font-medium text-blue-400 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded px-3 py-1.5 transition-colors cursor-pointer shadow-sm">
+                                    <i class="fa-solid fa-rotate-right"></i> <span>Kirim Ulang OTP</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -228,7 +236,6 @@
         const modalContent = profileModal.querySelector('div');
 
         // ==== VARIABEL COOLDOWN (ANTI-SPAM) ====
-        // Ambil data dari localStorage biar aman dari reload F5 & modal close
         let resendAttempts = parseInt(localStorage.getItem('otpAttempts')) || 0;
         let cooldownEndTime = parseInt(localStorage.getItem('otpCooldown')) || 0;
         let cdInterval = null;
@@ -295,7 +302,7 @@
             btn.innerHTML = 'Edit Data';
             btn.setAttribute('onclick', 'toggleEditMode()');
 
-            // CEK COOLDOWN PAS MODAL DIBUKA/DIRESET
+            // CEK COOLDOWN PAS MODAL DIBUKA
             if (cooldownEndTime > Date.now()) {
                 updateCooldownUI(); 
             } else {
@@ -317,21 +324,37 @@
             btn.setAttribute('onclick', 'requestOtp()');
         }
 
-        // ==== LOGIKA UI COOLDOWN ====
+        // ==== LOGIKA UI COOLDOWN (TIMER & TOMBOL DIPISAH) ====
         function lockCooldownUI(btn, timeLeft) {
+            // Lock tombol
             btn.disabled = true;
             btn.classList.remove('text-blue-400', 'bg-slate-800', 'hover:bg-slate-700', 'border-slate-600', 'cursor-pointer');
-            btn.classList.add('text-slate-500', 'bg-slate-900/50', 'border-slate-700/50', 'cursor-not-allowed', 'opacity-70');
+            btn.classList.add('text-slate-500', 'bg-slate-900/50', 'border-slate-700/50', 'cursor-not-allowed', 'opacity-50');
+            
+            // Format waktu
             let m = Math.floor(timeLeft / 60);
             let s = timeLeft % 60;
-            btn.innerHTML = `<i class="fa-solid fa-clock"></i> <span>Tunggu ${m > 0 ? m + 'm ' : ''}${s}s</span>`;
+            
+            // Tampilkan timer text di sebelahnya
+            const timerText = document.getElementById('cd-timer-text');
+            if (timerText) {
+                timerText.innerHTML = `<i class="fa-solid fa-clock"></i> Tunggu ${m > 0 ? m + 'm ' : ''}${s}s`;
+                timerText.classList.remove('hidden');
+            }
         }
 
         function resetCooldownUI(btn) {
+            // Unlock tombol
             btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> <span>Kirim Ulang OTP</span>';
-            btn.classList.remove('text-slate-500', 'bg-slate-900/50', 'border-slate-700/50', 'cursor-not-allowed', 'opacity-70');
+            btn.classList.remove('text-slate-500', 'bg-slate-900/50', 'border-slate-700/50', 'cursor-not-allowed', 'opacity-50');
             btn.classList.add('text-blue-400', 'bg-slate-800', 'hover:bg-slate-700', 'border-slate-600', 'cursor-pointer');
+            
+            // Sembunyikan timer text
+            const timerText = document.getElementById('cd-timer-text');
+            if (timerText) {
+                timerText.classList.add('hidden');
+                timerText.innerHTML = '';
+            }
         }
 
         function updateCooldownUI() {
@@ -358,19 +381,17 @@
             resendAttempts++;
             cooldownEndTime = Date.now() + (duration * 1000);
             
-            // Simpan ke local storage
             localStorage.setItem('otpAttempts', resendAttempts);
             localStorage.setItem('otpCooldown', cooldownEndTime);
             
             updateCooldownUI();
         }
 
-        // ==== UPDATE FUNGSI REQUEST OTP ====
+        // ==== LOGIKA REQUEST OTP ====
         async function requestOtp() {
             const userData = JSON.parse(localStorage.getItem('userData'));
             const btn = document.getElementById('btn-action-edit');
 
-            // CEGAH SPAM: Tolak nembak API kalau masih cooldown
             if (cooldownEndTime > Date.now()) {
                 document.getElementById('otp-container').classList.remove('hidden');
                 btn.innerHTML = 'Simpan Perubahan';
@@ -396,7 +417,7 @@
                     btn.innerHTML = 'Simpan Perubahan';
                     btn.setAttribute('onclick', 'submitEditData()');
                     
-                    startResendCooldown(); // Mulai timer
+                    startResendCooldown();
                 } else {
                     showToast(data.message, 'error');
                     btn.innerHTML = 'Kirim OTP Verifikasi';
