@@ -12,7 +12,7 @@ app.use(express.json());
 const mongoURI = 'mongodb+srv://faaahhmmii_db_user:NwGmRthZCDYqwafy@clusterfagym.qzt0o1a.mongodb.net/?appName=ClusterFagym';
 mongoose.connect(mongoURI).catch(() => {});
 
-// SCHEMA RESELLER (UPDATE ADA IP & DEVICE)
+// SCHEMA RESELLER (UPDATE ADA IP & HARDWARE ID)
 const resellerSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -22,8 +22,7 @@ const resellerSchema = new mongoose.Schema({
     status: { type: String, default: 'pending' },
     saldo: { type: Number, default: 0 },
     ipAddress: { type: String, default: 'UNKNOWN' },
-    deviceMerk: { type: String, default: 'UNKNOWN' },
-    deviceType: { type: String, default: 'UNKNOWN' }
+    hardwareId: { type: String, required: true } // PENGGANTI DEVICE MERK & TYPE
 });
 const Reseller = mongoose.model('Reseller', resellerSchema);
 
@@ -53,19 +52,23 @@ const zakki = new ZakkiStore({
 
 app.post('/api/register', async (req, res) => {
     try {
-        const { name, email, whatsapp, password, deviceMerk, deviceType } = req.body; 
+        const { name, email, whatsapp, password, hardwareId } = req.body; 
         const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'IP_TIDAK_DIKETAHUI';
         
         let ipRecord = await IpTracker.findOne({ ipAddress: clientIp });
         if (!ipRecord) ipRecord = new IpTracker({ ipAddress: clientIp, registerCount: 0, isBanned: false });
         if (ipRecord.isBanned) return res.status(403).json({ message: 'Akses Ditolak! IP Jaringan ini diblokir karena terindikasi spam.' });
         
+        if (!hardwareId) return res.status(400).json({ message: 'Akses Ditolak! Hardware ID tidak valid. Gunakan browser resmi.' });
+        const deviceExist = await Reseller.findOne({ hardwareId: hardwareId });
+        if (deviceExist) return res.status(403).json({ message: 'Akses Ditolak! HP/Perangkat ini sudah digunakan untuk membuat akun.' });
+
         const isExist = await Reseller.findOne({ $or: [{ email: email }, { whatsapp: whatsapp }] });
         if(isExist) return res.status(400).json({ message: 'Email atau Nomor WA sudah pernah didaftarkan!' });
 
         const newReseller = new Reseller({ 
             name, email, whatsapp, password, telegram: 'Belum Terhubung', status: 'pending', saldo: 0, 
-            ipAddress: clientIp, deviceMerk: deviceMerk || 'UNKNOWN', deviceType: deviceType || 'UNKNOWN' 
+            ipAddress: clientIp, hardwareId: hardwareId 
         });
         const savedUser = await newReseller.save();
 
@@ -151,7 +154,9 @@ app.post('/api/tele-webhook', async (req, res) => {
                     const dataTele = `ID: ${chatId} | ${username}`;
                     await Reseller.findByIdAndUpdate(userId, { telegram: dataTele });
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: chatId, text: `  *Terhubung!*\nHalo ${user.name}, akun direview Admin.`, parse_mode: 'Markdown' });
-                    const msgAdmin = `  *RESELLER BARU*  \n\nNama: ${user.name}\nEmail: ${user.email}\nWA: ${user.whatsapp}\nTelegram: ${dataTele}`;
+                    
+                    // UPDATE: NOTIF ADMIN SEKARANG MENAMPILKAN HARDWARE ID
+                    const msgAdmin = `  *RESELLER BARU*  \n\nNama: ${user.name}\nEmail: ${user.email}\nWA: ${user.whatsapp}\nTelegram: ${dataTele}\nHWID: \`${user.hardwareId || 'UNKNOWN'}\``;
                     await axios.post(`https://api.telegram.org/bot${VERIF_TOKEN}/sendMessage`, { chat_id: ADMIN_CHAT_ID, text: msgAdmin, parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ text: "  ACC", callback_data: `ACC_${user.email}` }, { text: "  TOLAK", callback_data: `TOLAK_${user.email}` }]] } });
                 }
             } catch (err) {}
@@ -179,6 +184,7 @@ app.post('/api/tele-webhook', async (req, res) => {
     }
     res.status(200).send('OK');
 });
+
 // --- FITUR ADMIN BOT WEBHOOK (TERINTEGRASI - FULL INLINE KEYBOARD) ---
 const botToken = process.env.ADMIN_BOT_TOKEN || 'TARUH_TOKEN_BOT_ADMIN_DI_SINI';
 const ADMIN_ID = 8521019587; 
@@ -225,8 +231,8 @@ app.post('/api/admin-webhook', async (req, res) => {
                 await answerCallback(cb.id);
             }
             else if (data === 'MENU_IP') {
-                const mkup = { inline_keyboard: [[{ text: "🚫 IP Diblokir (Spam)", callback_data: "IP_BANNED" }], [{ text: "⏳ IP Akun Pending", callback_data: "IP_PENDING" }], [{ text: "✅ IP Akun Verified", callback_data: "IP_VERIFIED" }], [{ text: "🔙 Kembali", callback_data: "MENU_UTAMA" }]] };
-                await editAdminMessage(chatId, messageId, `🌐 *MONITOR JARINGAN & IP* 🌐\nPilih kategori:`, mkup);
+                const mkup = { inline_keyboard: [[{ text: "🚫 IP Diblokir (Spam)", callback_data: "IP_BANNED" }], [{ text: "⏳ IP & HWID Pending", callback_data: "IP_PENDING" }], [{ text: "✅ IP & HWID Verified", callback_data: "IP_VERIFIED" }], [{ text: "🔙 Kembali", callback_data: "MENU_UTAMA" }]] };
+                await editAdminMessage(chatId, messageId, `🌐 *MONITOR JARINGAN & HWID* 🌐\nPilih kategori:`, mkup);
                 await answerCallback(cb.id);
             }
             else if (data === 'IP_BANNED') {
@@ -248,15 +254,25 @@ app.post('/api/admin-webhook', async (req, res) => {
             }
             else if (data === 'IP_PENDING') {
                 const users = await Reseller.find({ status: 'pending' });
-                let txt = `⏳ *IP AKUN PENDING:*\n\n`;
-                if (users.length === 0) txt += "Kosong."; else { users.forEach((u, i) => { txt += `${i+1}. \`${u.ipAddress || 'UNKNOWN'}\` - ${u.name}\n`; }); }
+                // FORMAT UPDATE UNTUK MENAMPILKAN HARDWARE ID DI LIST
+                let txt = `⏳ *MONITOR AKUN PENDING:*\n\n`;
+                if (users.length === 0) txt += "Kosong."; else { 
+                    users.forEach((u, i) => { 
+                        txt += `${i+1}. *${u.name}*\n   IP: \`${u.ipAddress || 'UNKNOWN'}\`\n   HWID: \`${u.hardwareId || 'UNKNOWN'}\`\n\n`; 
+                    }); 
+                }
                 await editAdminMessage(chatId, messageId, txt, { inline_keyboard: [[{ text: "🔙 Kembali", callback_data: "MENU_IP" }]] });
                 await answerCallback(cb.id);
             }
             else if (data === 'IP_VERIFIED') {
                 const users = await Reseller.find({ status: 'verified' });
-                let txt = `✅ *IP AKUN VERIFIED:*\n\n`;
-                if (users.length === 0) txt += "Kosong."; else { users.forEach((u, i) => { txt += `${i+1}. \`${u.ipAddress || 'UNKNOWN'}\` - ${u.name}\n`; }); }
+                // FORMAT UPDATE UNTUK MENAMPILKAN HARDWARE ID DI LIST
+                let txt = `✅ *MONITOR AKUN VERIFIED:*\n\n`;
+                if (users.length === 0) txt += "Kosong."; else { 
+                    users.forEach((u, i) => { 
+                        txt += `${i+1}. *${u.name}*\n   IP: \`${u.ipAddress || 'UNKNOWN'}\`\n   HWID: \`${u.hardwareId || 'UNKNOWN'}\`\n\n`; 
+                    }); 
+                }
                 await editAdminMessage(chatId, messageId, txt, { inline_keyboard: [[{ text: "🔙 Kembali", callback_data: "MENU_IP" }]] });
                 await answerCallback(cb.id);
             }
@@ -286,8 +302,7 @@ app.post('/api/admin-webhook', async (req, res) => {
                 } else {
                     let ikon = user.status === 'verified' ? '✅' : (user.status === 'suspended' ? '🚫' : (user.status === 'rejected' ? '❌' : '⏳'));
                     
-                    // FORMAT TAMPILAN DEVICE MERK & TYPE
-                    const txt = `👤 *DETAIL AKUN* 👤\n━━━━━━━━━━━━━━━━━━\n🔹 *Nama*: ${user.name}\n🔹 *Email*: \`${user.email}\`\n🔹 *WA*: \`${user.whatsapp}\`\n🔹 *IP*: \`${user.ipAddress}\`\n🔹 *Device*: ${user.deviceMerk} (${user.deviceType})\n🔹 *Saldo*: Rp ${user.saldo}\n🔹 *Tele*: ${user.telegram}\n\n📊 *STATUS*: ${ikon} *${user.status.toUpperCase()}*\n━━━━━━━━━━━━━━━━━━`;
+                    const txt = `👤 *DETAIL AKUN* 👤\n━━━━━━━━━━━━━━━━━━\n🔹 *Nama*: ${user.name}\n🔹 *Email*: \`${user.email}\`\n🔹 *WA*: \`${user.whatsapp}\`\n🔹 *IP*: \`${user.ipAddress}\`\n🔹 *HWID*: \`${user.hardwareId}\`\n🔹 *Saldo*: Rp ${user.saldo}\n🔹 *Tele*: ${user.telegram}\n\n📊 *STATUS*: ${ikon} *${user.status.toUpperCase()}*\n━━━━━━━━━━━━━━━━━━`;
                     const mkup = { inline_keyboard: [[{ text: "✅ Aktif", callback_data: `AKTIF_${user.email}` }, { text: "🚫 Suspend", callback_data: `SUSPEND_${user.email}` }], [{ text: "🗑️ Hapus", callback_data: `DELCONFIRM_${user.email}` }], [{ text: "🔙 Kembali", callback_data: "LIST_RESELLER" }]] };
                     await editAdminMessage(chatId, messageId, txt, mkup);
                 }
@@ -303,9 +318,7 @@ app.post('/api/admin-webhook', async (req, res) => {
                 await Reseller.deleteOne({ email });
                 await answerCallback(cb.id, `Dihapus: ${email}`, true);
                 await editAdminMessage(chatId, messageId, `✅ Akun \`${email}\` dihapus.`, { inline_keyboard: [[{ text: "🔙 Kembali", callback_data: "LIST_RESELLER" }]] });
-            }
-            return res.status(200).send('OK');
-        }
+     }
 
         if (!update || !update.message || !update.message.text) return res.status(200).send('Bukan teks');
 
