@@ -12,7 +12,7 @@ app.use(express.json());
 const mongoURI = 'mongodb+srv://faaahhmmii_db_user:NwGmRthZCDYqwafy@clusterfagym.qzt0o1a.mongodb.net/?appName=ClusterFagym';
 mongoose.connect(mongoURI).catch(() => {});
 
-// SCHEMA RESELLER (UPDATE ADA IP & HARDWARE ID)
+// SCHEMA RESELLER (UPDATE TAMBAH FITUR OTP)
 const resellerSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -22,10 +22,15 @@ const resellerSchema = new mongoose.Schema({
     status: { type: String, default: 'pending' },
     saldo: { type: Number, default: 0 },
     ipAddress: { type: String, default: 'UNKNOWN' },
-    hardwareId: { type: String, required: true } // PENGGANTI DEVICE MERK & TYPE
+    hardwareId: { type: String, required: true },
+    
+    // --- FIELD BARU UNTUK OTP ---
+    otp_code: { type: String, default: null },
+    otp_expires: { type: Date, default: null },
+    failed_otp_attempts: { type: Number, default: 0 },
+    lockout_until: { type: Date, default: null }
 });
 
-// FIX VERCEL CRASH 1: Cegah Overwrite Model
 const Reseller = mongoose.models.Reseller || mongoose.model('Reseller', resellerSchema);
 
 // --- SCHEMA IP TRACKER (ANTI SPAM) ---
@@ -35,7 +40,6 @@ const ipSchema = new mongoose.Schema({
     isBanned: { type: Boolean, default: false }
 });
 
-// FIX VERCEL CRASH 1: Cegah Overwrite Model
 const IpTracker = mongoose.models.IpTracker || mongoose.model('IpTracker', ipSchema);
 
 const plans = {
@@ -44,6 +48,11 @@ const plans = {
     "5gb": { price: 25000 }, "6gb": { price: 30000 }, "7gb": { price: 35000 }, "8gb": { price: 40000 },
     "9gb": { price: 45000 }, "10gb": { price: 50000 }, "unlimited": { price: 100000 }
 };
+
+// Urutan Penalti OTP: 30s, 1m, 3m, 9m, 30m, 1h
+const penaltyTimes = [
+    30 * 1000, 60 * 1000, 3 * 60 * 1000, 9 * 60 * 1000, 30 * 60 * 1000, 60 * 60 * 1000
+];
 
 const zakki = new ZakkiStore({
     baseUrl: 'https://qris.zakki.store',
@@ -57,8 +66,6 @@ const zakki = new ZakkiStore({
 app.post('/api/register', async (req, res) => {
     try {
         const { name, email, whatsapp, password, hardwareId } = req.body; 
-        
-        // FIX VERCEL CRASH 2: Tambah (?) di req.socket
         const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'IP_TIDAK_DIKETAHUI';
         
         let ipRecord = await IpTracker.findOne({ ipAddress: clientIp });
@@ -100,6 +107,102 @@ app.post('/api/login', async (req, res) => {
         
         res.status(200).json({ verified: true, message: 'Login sukses! Mengalihkan...', userData: { id: user._id, name: user.name, email: user.email, whatsapp: user.whatsapp, telegram: user.telegram, status: user.status, saldo: user.saldo || 0 } });
     } catch (error) { res.status(500).json({ message: 'Server error pas login!' }); }
+});
+
+// --- FITUR OTP: REQUEST KODE ---
+app.post('/api/request-otp', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await Reseller.findById(userId);
+        if (!user) return res.status(404).json({ message: "User tidak ditemukan!" });
+
+        if (user.telegram === 'Belum Terhubung') {
+            return res.status(400).json({ message: "Gagal request OTP! Lu harus hubungin akun ini ke Bot Telegram dulu, bro." });
+        }
+
+        const currentTime = new Date();
+
+        if (user.lockout_until && currentTime < user.lockout_until) {
+            const sisaWaktu = Math.ceil((user.lockout_until - currentTime) / 1000);
+            return res.status(429).json({ message: `Sistem terkunci! Tunggu ${sisaWaktu} detik lagi buat request OTP.` });
+        }
+
+        const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpires = new Date(Date.now() + 3 * 60 * 1000); 
+
+        await Reseller.updateOne({ _id: userId }, { $set: { otp_code: otpCode, otp_expires: otpExpires } });
+
+        const teleIdMatch = user.telegram.match(/ID: (\d+)/);
+        if (teleIdMatch && teleIdMatch[1]) {
+            // PAKAI TOKEN BOT KHUSUS OTP
+            const OTP_TOKEN = process.env.OTP_BOT_TOKEN; 
+            await axios.post(`https://api.telegram.org/bot${OTP_TOKEN}/sendMessage`, { 
+                chat_id: teleIdMatch[1], 
+                text: `🔐 *KODE OTP LU: ${otpCode}*\n\nKode ini berlaku selama *3 Menit*. Jangan kasih tau siapapun, Bro!`, 
+                parse_mode: 'Markdown' 
+            });
+        }
+
+        res.status(200).json({ message: "Kode OTP berhasil dikirim ke Telegram lu!" });
+    } catch (error) { res.status(500).json({ message: "Server error pas request OTP!" }); }
+});
+// --- FITUR OTP: VERIFIKASI & UPDATE DATA ---
+app.post('/api/verify-otp', async (req, res) => {
+    try {
+        const { userId, otp, newPassword, newWhatsapp, newEmail } = req.body;
+        const user = await Reseller.findById(userId);
+        if (!user) return res.status(404).json({ message: "User tidak ditemukan!" });
+
+        const currentTime = new Date();
+
+        if (user.lockout_until && currentTime < user.lockout_until) {
+            const sisaWaktu = Math.ceil((user.lockout_until - currentTime) / 1000);
+            return res.status(429).json({ message: `Sistem terkunci! Lu terlalu banyak masukin kode salah. Tunggu ${sisaWaktu} detik.` });
+        }
+
+        if (!user.otp_expires || currentTime > user.otp_expires) {
+            return res.status(400).json({ message: "Kode OTP udah kedaluwarsa (lewat 3 menit). Silakan request ulang." });
+        }
+
+        if (otp !== user.otp_code) {
+            let attempts = (user.failed_otp_attempts || 0) + 1;
+            let penaltyIndex = Math.min(attempts - 1, penaltyTimes.length - 1);
+            let penaltyDuration = penaltyTimes[penaltyIndex];
+            let lockoutTime = new Date(currentTime.getTime() + penaltyDuration);
+            
+            await Reseller.updateOne({ _id: userId }, {
+                $set: { failed_otp_attempts: attempts, lockout_until: lockoutTime }
+            });
+
+            return res.status(400).json({ message: `Kode OTP Salah! Lu kena penalti waktu ${penaltyDuration / 1000} detik.`, attempts_failed: attempts });
+        }
+
+        let updateData = { 
+            failed_otp_attempts: 0, 
+            lockout_until: null, 
+            otp_code: null, 
+            otp_expires: null 
+        };
+        
+        if (newPassword) updateData.password = newPassword;
+        if (newWhatsapp) updateData.whatsapp = newWhatsapp;
+        if (newEmail) updateData.email = newEmail;
+
+        await Reseller.updateOne({ _id: userId }, { $set: updateData });
+
+        const teleIdMatch = user.telegram.match(/ID: (\d+)/);
+        if (teleIdMatch && teleIdMatch[1]) {
+            // PAKAI TOKEN BOT KHUSUS OTP
+            const OTP_TOKEN = process.env.OTP_BOT_TOKEN; 
+            await axios.post(`https://api.telegram.org/bot${OTP_TOKEN}/sendMessage`, { 
+                chat_id: teleIdMatch[1], 
+                text: `✅ *DATA BERHASIL DIUBAH!*\n\nData akun lu udah sukses di-update lewat website.`, 
+                parse_mode: 'Markdown' 
+            });
+        }
+
+        res.status(200).json({ message: "Mantap! Verifikasi OTP berhasil dan data sukses diubah." });
+    } catch (error) { res.status(500).json({ message: "Server error pas verifikasi OTP!" }); }
 });
 
 app.post('/api/generate-qris', async (req, res) => {
@@ -347,4 +450,4 @@ app.post('/api/admin-webhook', async (req, res) => {
 });
 
 module.exports = app;
-module.exports.mongoURI = mongoURI
+module.exports.mongoURI = mongoURI;
