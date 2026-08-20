@@ -23,10 +23,30 @@
                 <label class="block text-xs font-medium text-gray-400 mb-1">Email</label>
                 <input type="email" id="loginEmail" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="reseller@mail.com" required>
             </div>
+            
+            <!-- Dimodifikasi: Wrapper relative & Tambahan Ikon Mata (Fitur 1) -->
             <div>
                 <label class="block text-xs font-medium text-gray-400 mb-1">Password</label>
-                <input type="password" id="loginPassword" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                <div class="relative">
+                    <input type="password" id="loginPassword" class="w-full bg-gray-900/90 border border-gray-700/80 rounded-xl pl-4 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 transition-all" placeholder="••••••••" required>
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200 transition-colors">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        </svg>
+                    </button>
+                </div>
             </div>
+
+            <!-- Tambahan: Ingat Saya & Lupa Password (Fitur 2 & 3) -->
+            <div class="flex items-center justify-between pt-1">
+                <label class="flex items-center text-xs text-gray-400 hover:text-gray-300 cursor-pointer">
+                    <input type="checkbox" id="rememberMe" class="mr-2 rounded bg-gray-900 border-gray-700/80 accent-blue-600 focus:ring-blue-500">
+                    Ingat Saya
+                </label>
+                <a href="forgot-password.html" class="text-xs text-blue-400 hover:underline">Lupa Password?</a>
+            </div>
+
             <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm py-3 px-4 rounded-xl shadow-lg transition-all mt-2">Masuk Dashboard</button>
             
             <div id="alertBox" class="hidden w-full mt-4 p-3 rounded-xl text-sm font-semibold text-center transition-all"></div>
@@ -36,11 +56,32 @@
     </div>
 
     <script>
+        // --- Skrip Baru: Toggle Show/Hide Password ---
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('loginPassword');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePasswordBtn.addEventListener('click', function () {
+            // Ubah tipe input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Ubah ikon mata (Buka / Coret)
+            if (type === 'text') {
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />`;
+            } else {
+                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />`;
+            }
+        });
+        // ---------------------------------------------
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
+            const password = passwordInput.value; // Mengambil value dari var di atas
+            const rememberMe = document.getElementById('rememberMe').checked; // Nilai boolean checkbox
+            
             const alertBox = document.getElementById('alertBox');
             const submitBtn = document.querySelector('button[type="submit"]');
 
@@ -53,7 +94,7 @@
                 const res = await fetch('/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password, rememberMe }) // rememberMe ikut dikirim ke backend jika perlu
                 });
 
                 const result = await res.json();
@@ -67,8 +108,15 @@
                     localStorage.setItem('isLoggedIn', 'true'); 
                     localStorage.setItem('userData', JSON.stringify(result.userData)); 
                     
-                    // Pindah ke dashboard (sesuaikan nama filenya jika berbeda)
-                    setTimeout(() => { window.location.href = 'reseller-dashboard.html'; }, 1500);
+                    // Jika user centang rememberMe, mungkin kamu ingin simpan durasi login lebih lama
+                    if(rememberMe) {
+                        localStorage.setItem('rememberUserEmail', email); // Contoh penggunaan sederhana
+                    } else {
+                        localStorage.removeItem('rememberUserEmail');
+                    }
+                    
+                    // Pindah ke dashboard
+                    setTimeout(() => { window.location.href = 'reseller-dashboard_2.html'; }, 1500);
                 } else if (res.ok && !result.verified) {
                     alertBox.classList.add('bg-red-500/20', 'text-red-400');
                     alertBox.innerText = "Akun belum diverifikasi oleh Admin via WA!";
